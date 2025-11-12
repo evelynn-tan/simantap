@@ -27,9 +27,8 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     }
 })->name('dashboard');
 
-// Grup Admin (SUDAH BENAR, JANGAN DIUBAH)
+// Grup Admin
 Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin')->name('admin.')->group(function () {
-    // ... (Semua rute admin Anda) ...
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('/pengguna', ManajemenPenggunaController::class);
     Route::resource('/barang', DataBarangController::class);
@@ -39,23 +38,49 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     Route::resource('/stock-opname', StockOpnameController::class);
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::post('/laporan/generate', [LaporanController::class, 'generate'])->name('laporan.generate');
+
+    // TAMBAHKAN RUTE UNTUK VIEW BARU
+    Route::get('/manajemen-permintaan', function () {
+        return view('admin.manajemen-permintaan');
+    })->name('manajemen-permintaan');
+
+    Route::get('/data-barang', function () {
+        return view('admin.data-barang');
+    })->name('data-barang');
+
+    Route::get('/tambah-barang', function () {
+        return view('admin.tambah-barang');
+    })->name('tambah-barang');
+
+    Route::get('/stock-opname', function () {
+        return view('admin.stock-opname');
+    })->name('stock-opname');
+
+    Route::get('/manajemen-pengguna', function () {
+        return view('admin.manajemen-pengguna');
+    })->name('manajemen-pengguna');
+
+    Route::get('/laporan', function () {
+        return view('admin.laporan');
+    })->name('laporan');
 });
 
-// Grup PEGAWAI (MODIFIKASI DI SINI)
+// Grup PEGAWAI
 Route::middleware(['auth:sanctum', 'verified', 'role:pegawai'])->prefix('pegawai')->name('pegawai.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [PegawaiDashboardController::class, 'index'])->name('dashboard');
-    
-    // Rute untuk Permintaan
-    Route::get('/barang-tersedia', [PegawaiPermintaanController::class, 'daftarBarang'])->name('barang.index');
-    
-    // TAMBAHKAN RUTE INI UNTUK MENAMPILKAN FORM
-    Route::get('/ajukan-permintaan', [PegawaiPermintaanController::class, 'create'])->name('permintaan.create');
-    
-    Route::post('/ajukan-permintaan', [PegawaiPermintaanController::class, 'ajukan'])->name('permintaan.ajukan');
-    Route::get('/permintaan-saya', [PegawaiPermintaanController::class, 'monitor'])->name('permintaan.monitor');
-    
-    // Rute untuk Profil
-    Route::get('/profil', [ProfilController::class, 'edit'])->name('profil.edit');
-    Route::put('/profil/update', [ProfilController::class, 'update'])->name('profil.update');
-});
 
+    // Rute untuk Daftar Barang
+    Route::get('/daftar-barang', [PegawaiPermintaanController::class, 'daftarBarang'])->name('daftar-barang');
+
+    // Rute untuk Monitor Permintaan
+    Route::get('/monitor-permintaan', [PegawaiPermintaanController::class, 'monitor'])->name('monitor-permintaan');
+
+    // Rute untuk Edit Profil
+    Route::get('/edit-profil', [ProfilController::class, 'edit'])->name('edit-profil');
+    Route::put('/edit-profil/update', [ProfilController::class, 'update'])->name('edit-profil.update');
+
+    // Rute tambahan untuk fitur permintaan
+    Route::get('/ajukan-permintaan', [PegawaiPermintaanController::class, 'create'])->name('permintaan.create');
+    Route::post('/ajukan-permintaan', [PegawaiPermintaanController::class, 'ajukan'])->name('permintaan.ajukan');
+});

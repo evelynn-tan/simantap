@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/Admin/DashboardController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -7,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Barang;
 use App\Models\Pengajuan;
 use App\Models\User;
+use App\Models\Pegawai;
+use App\Models\Operator;
 
 class DashboardController extends Controller
 {
@@ -15,32 +18,42 @@ class DashboardController extends Controller
         // Data untuk KPI Cards
         $jumlahJenisAset = Barang::count();
         $permintaanBaru = Pengajuan::where('status', 'menunggu')->count();
-        $perluRestock = Barang::where('stok', '<', 5)->count(); // Asumsi stok kritis < 5
+        $barangStokRendah = Barang::where('stok_sekarang', '<', 5)->count();
         $totalPermintaan = Pengajuan::count();
-        $totalStok = Barang::sum('stok');
 
-        // Data untuk tabel "Permintaan Terbaru"
-        $permintaanTerbaru = Pengajuan::with('user', 'details.barang')
+        // PERBAIKAN: Hitung total stok semua barang
+        $totalStok = Barang::sum('stok_sekarang');
+
+        // Data untuk charts/tables
+        $permintaanTerbaru = Pengajuan::with(['pegawai', 'pengajuanDetails.barang'])
             ->where('status', 'menunggu')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
-        // Data untuk "Daftar Pegawai Teratas"
-        $pegawaiTeratas = User::where('role', 'pegawai')
-            ->withCount('pengajuans') // Menghitung jumlah pengajuan
-            ->orderBy('pengajuans_count', 'desc')
-            ->take(3)
+        $barangTeratas = Barang::withCount(['pengajuanDetails as total_permintaan' => function ($query) {
+            $query->whereHas('pengajuan', function ($q) {
+                $q->where('status', 'disetujui');
+            });
+        }])
+            ->orderBy('total_permintaan', 'desc')
+            ->take(5)
             ->get();
+
+        // Hitung permintaan disetujui dan ditolak
+        $permintaanDisetujui = Pengajuan::where('status', 'disetujui')->count();
+        $permintaanDitolak = Pengajuan::where('status', 'ditolak')->count();
 
         return view('admin.dashboard', compact(
             'jumlahJenisAset',
             'permintaanBaru',
-            'perluRestock',
+            'barangStokRendah',
             'totalPermintaan',
-            'totalStok',
+            'totalStok', // TAMBAHKAN INI
             'permintaanTerbaru',
-            'pegawaiTeratas'
+            'barangTeratas',
+            'permintaanDisetujui',
+            'permintaanDitolak'
         ));
     }
 }

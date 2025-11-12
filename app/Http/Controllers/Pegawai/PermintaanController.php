@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Barang;
 use App\Models\Pengajuan;
 use App\Models\PengajuanDetail;
+use App\Models\Pegawai;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -14,11 +15,15 @@ class PermintaanController extends Controller
 {
     /**
      * Menampilkan halaman "Daftar Barang Tersedia"
-     * Sesuai mockup: ...09_31_00.jpg
      */
     public function daftarBarang(Request $request)
     {
-        $query = Barang::with('kategori')->where('stok', '>', 0);
+        $userId = Auth::id();
+        $pegawai = Pegawai::where('userID', $userId)->first();
+
+        $query = Barang::with('kategori')
+            ->where('status', 'tersedia')
+            ->where('stok_sekarang', '>', 0);
 
         // Logic untuk filter pencarian
         if ($request->filled('search')) {
@@ -28,12 +33,12 @@ class PermintaanController extends Controller
 
         // Logic untuk filter kategori
         if ($request->filled('kategori')) {
-            $query->where('kategori_id', $request->kategori);
+            $query->where('kategoriID', $request->kategori);
         }
 
-        $barangs = $query->orderBy('nama_barang')->paginate(15); // Paginate 15 item per halaman
+        $barangs = $query->orderBy('nama_barang')->get();
 
-        return view('pegawai.permintaan.daftar-barang', compact('barangs'));
+        return view('pegawai.daftar-barang', compact('barangs', 'pegawai'));
     }
 
     /**
@@ -41,36 +46,49 @@ class PermintaanController extends Controller
      */
     public function create()
     {
+        $userId = Auth::id();
+        $pegawai = Pegawai::where('userID', $userId)->first();
+
         // Ambil barang yang tersedia saja untuk ditampilkan di form
-        $barangs = Barang::where('stok', '>', 0)->orderBy('nama_barang')->get();
-        return view('pegawai.permintaan.create', compact('barangs'));
+        $barangs = Barang::where('status', 'tersedia')
+            ->where('stok_sekarang', '>', 0)
+            ->orderBy('nama_barang')
+            ->get();
+
+        return view('pegawai.permintaan.create', compact('barangs', 'pegawai'));
     }
 
     /**
      * Menyimpan data pengajuan baru dari form
-     * Sesuai Activity Diagram: Mengajukan Permintaan Barang
      */
     public function ajukan(Request $request)
     {
+        $userId = Auth::id();
+        $pegawai = Pegawai::where('userID', $userId)->first();
+
+        if (!$pegawai) {
+            return redirect()->back()->with('error', 'Data pegawai tidak ditemukan.');
+        }
+
         // 1. Validasi input
         $request->validate([
-            'keperluan' => 'required|string|max:500',
+            'description' => 'required|string|max:500',
             'items' => 'required|array|min:1',
-            'items.*.barang_id' => 'required|exists:barangs,id',
+            'items.*.barangID' => 'required|exists:barangs,barangID',
             'items.*.jumlah' => 'required|integer|min:1',
         ], [
-            'keperluan.required' => 'Kolom keperluan wajib diisi.',
+            'description.required' => 'Kolom keperluan wajib diisi.',
             'items.required' => 'Anda harus memilih minimal 1 barang.',
             'items.*.jumlah.min' => 'Jumlah barang tidak boleh 0.',
         ]);
 
         // 2. Cek apakah stok mencukupi untuk semua item
         foreach ($request->items as $item) {
-            $barang = Barang::find($item['barang_id']);
-            if ($barang->stok < $item['jumlah']) {
+            $barang = Barang::find($item['barangID']);
+            if ($barang->stok_sekarang < $item['jumlah']) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', 'Stok untuk barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersisa: ' . $barang->stok);
+                    ->with('error', 'Stok untuk barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersisa: ' . $barang->stok_sekarang);
             }
         }
 
@@ -79,24 +97,24 @@ class PermintaanController extends Controller
         try {
             // Buat 1 data Pengajuan
             $pengajuan = Pengajuan::create([
-                'user_id' => Auth::id(),
-                'keperluan' => $request->keperluan,
+                'pegawaiID' => $pegawai->pegawaiID,
+                'requested_at' => now(),
+                'description' => $request->description,
                 'status' => 'menunggu',
-                'created_at' => now(),
             ]);
 
             // Loop untuk menyimpan barang-barangnya ke PengajuanDetail
             foreach ($request->items as $item) {
                 PengajuanDetail::create([
-                    'pengajuan_id' => $pengajuan->id,
-                    'barang_id' => $item['barang_id'],
-                    'jumlah_diminta' => $item['jumlah'],
+                    'pengajuanID' => $pengajuan->pengajuanID,
+                    'barangID' => $item['barangID'],
+                    'jumlah' => $item['jumlah'],
                 ]);
             }
 
             DB::commit(); // Semua berhasil, simpan permanen
 
-            return redirect()->route('pegawai.permintaan.monitor')->with('success', 'Permintaan berhasil diajukan.');
+            return redirect()->route('pegawai.monitor-permintaan')->with('success', 'Permintaan berhasil diajukan.');
         } catch (\Exception $e) {
             DB::rollBack(); // Ada error, batalkan semua
             return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
@@ -105,12 +123,18 @@ class PermintaanController extends Controller
 
     /**
      * Menampilkan halaman "Monitor Status Permintaan"
-     * Sesuai mockup: ...09_31_20.jpg
      */
     public function monitor(Request $request)
     {
-        $query = Pengajuan::with('details.barang')
-            ->where('user_id', Auth::id());
+        $userId = Auth::id();
+        $pegawai = Pegawai::where('userID', $userId)->first();
+
+        if (!$pegawai) {
+            abort(404, 'Data pegawai tidak ditemukan');
+        }
+
+        $query = Pengajuan::with(['pengajuanDetails.barang'])
+            ->where('pegawaiID', $pegawai->pegawaiID);
 
         // Logic untuk filter status
         if ($request->filled('status')) {
@@ -125,8 +149,8 @@ class PermintaanController extends Controller
             $query->whereDate('created_at', '<=', $request->tanggal_selesai);
         }
 
-        $permintaans = $query->orderBy('created_at', 'desc')->paginate(10);
+        $permintaan = $query->orderBy('created_at', 'desc')->get();
 
-        return view('pegawai.permintaan.monitor', compact('permintaans'));
+        return view('pegawai.monitor-permintaan', compact('permintaan', 'pegawai'));
     }
 }

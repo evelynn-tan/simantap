@@ -1,10 +1,13 @@
 <?php
+// app/Http/Controllers/Pegawai/DashboardController.php
 
 namespace App\Http\Controllers\Pegawai;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pengajuan;
+use App\Models\Pegawai;
+use App\Models\Barang;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -13,25 +16,30 @@ class DashboardController extends Controller
     {
         $userId = Auth::id();
 
+        // Dapatkan data pegawai berdasarkan userID
+        $pegawai = Pegawai::where('userID', $userId)->first();
+
+        if (!$pegawai) {
+            abort(404, 'Data pegawai tidak ditemukan');
+        }
+
+        $pegawaiID = $pegawai->pegawaiID;
+
         // Data untuk KPI Cards
-        // "Barang Sedang Digunakan" dihitung dari permintaan yg disetujui
-        $barangDigunakan = Pengajuan::where('user_id', $userId)
+        $barangDigunakan = Pengajuan::where('pegawaiID', $pegawaiID)
             ->where('status', 'disetujui')
             ->count();
 
-        $totalPermintaan = Pengajuan::where('user_id', $userId)->count();
+        $totalPermintaan = Pengajuan::where('pegawaiID', $pegawaiID)->count();
 
-        // Data untuk tabel "Barang yang Sedang Saya Gunakan"
-        $barangDigunakanList = Pengajuan::with('details.barang')
-            ->where('user_id', $userId)
+        $menungguPersetujuan = Pengajuan::where('pegawaiID', $pegawaiID)
+            ->where('status', 'menunggu')
+            ->count();
+
+        // Barang yang sedang digunakan (detail)
+        $barangSedangDigunakan = Pengajuan::with(['pengajuanDetails.barang'])
+            ->where('pegawaiID', $pegawaiID)
             ->where('status', 'disetujui')
-            ->orderBy('processed_at', 'desc')
-            ->take(5) // Ambil 5 terakhir yg disetujui
-            ->get();
-
-        // Data untuk tabel "Riwayat 5 Permintaan Terakhir"
-        $riwayatPermintaan = Pengajuan::with('details.barang')
-            ->where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -39,8 +47,9 @@ class DashboardController extends Controller
         return view('pegawai.dashboard', compact(
             'barangDigunakan',
             'totalPermintaan',
-            'barangDigunakanList',
-            'riwayatPermintaan'
+            'menungguPersetujuan',
+            'barangSedangDigunakan',
+            'pegawai'
         ));
     }
 }

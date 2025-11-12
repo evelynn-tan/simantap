@@ -9,8 +9,17 @@ class Kategori extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'kategoriID';
+    public $incrementing = true;
+
+    protected $fillable = [
+        'nama_kategori',
+        'deskripsi',
+    ];
+
+    // Relasi ke Barang
     public function barangs()
     {
-        return $this->hasMany(Barang::class);
+        return $this->hasMany(Barang::class, 'kategoriID', 'kategoriID');
     }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Pegawai;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Pegawai;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
@@ -12,39 +14,46 @@ class ProfilController extends Controller
 {
     public function edit()
     {
-        $user = Auth::user();
-        return view('pegawai.profil.edit', compact('user'));
+        $userId = Auth::id();
+        $pegawai = Pegawai::where('userID', $userId)->first();
+
+        if (!$pegawai) {
+            abort(404, 'Data pegawai tidak ditemukan');
+        }
+
+        return view('pegawai.edit-profil', compact('pegawai'));
     }
 
     /**
      * Memperbarui data profil atau password
-     * Sesuai mockup: ...09_31_39.jpg & ...09_31_52.jpg
      */
     public function update(Request $request)
     {
+        $userId = Auth::id();
+        $pegawai = Pegawai::where('userID', $userId)->first();
         $user = Auth::user();
+
+        if (!$pegawai) {
+            return redirect()->back()->with('error', 'Data pegawai tidak ditemukan.');
+        }
 
         // Cek apakah ini update profil
         if ($request->has('update_profile')) {
 
             $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-                'nip' => 'nullable|string|max:20', // Sesuaikan jika NIP wajib
-                'jabatan' => 'nullable|string|max:255',
+                'nama_lengkap' => 'required|string|max:255',
+                'jabatan' => 'required|string|max:255',
+                'divisi' => 'required|string|max:255',
             ]);
 
-            $user->name = $request->name;
-            $user->email = $request->email;
+            // Update data pegawai
+            $pegawai->update([
+                'nama_lengkap' => $request->nama_lengkap,
+                'jabatan' => $request->jabatan,
+                'divisi' => $request->divisi,
+            ]);
 
-            // Simpan NIP/Jabatan. 
-            // NOTE: Anda perlu menambahkan kolom 'nip' dan 'jabatan' ke migrasi 'users'
-            // $user->nip = $request->nip; 
-            // $user->jabatan = $request->jabatan;
-
-            $user->save();
-
-            return redirect()->route('pegawai.profil.edit')->with('success_profile', 'Informasi profil berhasil diperbarui.');
+            return redirect()->route('pegawai.edit-profil')->with('success', 'Informasi profil berhasil diperbarui.');
         }
 
         // Cek apakah ini update password
@@ -57,15 +66,16 @@ class ProfilController extends Controller
 
             // Cek apakah password lama sesuai
             if (!Hash::check($request->current_password, $user->password)) {
-                return redirect()->route('pegawai.profil.edit')->withErrors(['current_password' => 'Password lama yang Anda masukkan salah.'])->with('tab', 'password');
+                return redirect()->route('pegawai.edit-profil')->withErrors(['current_password' => 'Password lama yang Anda masukkan salah.']);
             }
 
+            // Update password user
             $user->password = Hash::make($request->password);
             $user->save();
 
-            return redirect()->route('pegawai.profil.edit')->with('success_password', 'Password berhasil diperbarui.')->with('tab', 'password');
+            return redirect()->route('pegawai.edit-profil')->with('success', 'Password berhasil diperbarui.');
         }
 
-        return redirect()->route('pegawai.profil.edit');
+        return redirect()->route('pegawai.edit-profil');
     }
 }

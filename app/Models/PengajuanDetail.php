@@ -1,34 +1,33 @@
 <?php
+// app/Models/PengajuanDetail.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PengajuanDetail extends Model
 {
     use HasFactory;
 
-    /**
-     * Tabel ini tidak memiliki timestamps (created_at, updated_at).
-     * Jika Anda menambahkannya di migrasi, hapus baris ini.
-     */
-    public $timestamps = false;
+    protected $primaryKey = 'pengajuanDetailID';
+    public $incrementing = true;
 
-    /**
-     * Dapatkan pengajuan induk dari detail ini.
-     */
-    public function pengajuan(): BelongsTo
+    protected $fillable = [
+        'pengajuanID',
+        'barangID',
+        'jumlah',
+    ];
+
+    // Relasi ke Pengajuan
+    public function pengajuan()
     {
-        return $this->belongsTo(Pengajuan::class);
+        return $this->belongsTo(Pengajuan::class, 'pengajuanID', 'pengajuanID');
     }
 
-    /**
-     * Dapatkan barang yang terkait dengan detail ini.
-     */
-    public function barang(): BelongsTo
+    // Relasi ke Barang
+    public function barang()
     {
-        return $this->belongsTo(Barang::class);
+        return $this->belongsTo(Barang::class, 'barangID', 'barangID');
     }
 }
