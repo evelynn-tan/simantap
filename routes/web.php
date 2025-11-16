@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     Route::get('/permintaan', [ManajemenPermintaanController::class, 'index'])->name('permintaan.index');
     Route::post('/permintaan/setujui/{id}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui');
     Route::post('/permintaan/tolak/{id}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak');
-    Route::resource('/stock-opname', StockOpnameController::class);
+    Route::resource('views/admin/stock-opname', StockOpnameController::class);
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::post('/laporan/generate', [LaporanController::class, 'generate'])->name('laporan.generate');
 
@@ -53,7 +53,7 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     })->name('tambah-barang');
 
     Route::get('/stock-opname', function () {
-        return view('admin.stock-opname');
+        return view('admin.stock-opname.index');
     })->name('stock-opname');
 
     Route::get('/manajemen-pengguna', function () {
