@@ -8,6 +8,7 @@ use App\Models\Barang;
 use App\Models\Pengajuan;
 use App\Models\PengajuanDetail;
 use App\Models\Pegawai;
+use App\Models\Kategori;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -20,15 +21,18 @@ class PermintaanController extends Controller
     {
         $userId = Auth::id();
         $pegawai = Pegawai::where('userID', $userId)->first();
-
+        $kategoris = Kategori::orderBy('nama_kategori')->get();
         $query = Barang::with('kategori')
             ->where('status', 'tersedia')
             ->where('stok_sekarang', '>', 0);
 
         // Logic untuk filter pencarian
         if ($request->filled('search')) {
-            $query->where('nama_barang', 'like', '%' . $request->search . '%')
-                ->orWhere('kode_barang', 'like', '%' . $request->search . '%');
+            // Dibungkus closure agar tidak bentrok dengan `orWhere`
+            $query->where(function($q) use ($request) {
+                $q->where('nama_barang', 'like', '%' . $request->search . '%')
+                  ->orWhere('kode_barang', 'like', '%' . $request->search . '%');
+            });
         }
 
         // Logic untuk filter kategori
@@ -36,9 +40,9 @@ class PermintaanController extends Controller
             $query->where('kategoriID', $request->kategori);
         }
 
-        $barangs = $query->orderBy('nama_barang')->get();
+        $barangs = $query->orderBy('nama_barang')->paginate(10);
 
-        return view('pegawai.daftar-barang', compact('barangs', 'pegawai'));
+        return view('pegawai.daftar-barang', compact('barangs', 'pegawai', 'kategoris'));
     }
 
     /**

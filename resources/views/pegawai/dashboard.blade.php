@@ -1,58 +1,14 @@
+@extends('pegawai.layout')
+
+@section('title', 'Dashboard Pegawai - SIMANTAP')
+@section('page-title')
+    Selamat Datang, {{ $pegawai->nama_lengkap }}!
+@endsection
+@section('page-subtitle', 'Dashboard Pegawai BPS Kota Tanjungpinang')
+@section('content')
+
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Pegawai - SIMANTAP</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body class="bg-gray-100">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="w-64 bg-green-800 text-white">
-            <div class="p-4">
-                <h1 class="text-2xl font-bold">SIMANTAP</h1>
-                <p class="text-sm text-green-200">Sistem Informasi Manajemen Aset Negara</p>
-            </div>
-            
-            <nav class="mt-6">
-                <a href="{{ route('pegawai.dashboard') }}" class="block py-3 px-4 bg-green-700 border-l-4 border-yellow-400">
-                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
-                </a>
-                <a href="{{ route('pegawai.daftar-barang') }}" class="block py-3 px-4 hover:bg-green-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-list mr-3"></i>Daftar Barang Tersedia
-                </a>
-                <a href="{{ route('pegawai.monitor-permintaan') }}" class="block py-3 px-4 hover:bg-green-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-eye mr-3"></i>Monitor Status Permintaan
-                </a>
-                <a href="{{ route('pegawai.edit-profil') }}" class="block py-3 px-4 hover:bg-green-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-user-edit mr-3"></i>Edit Profil
-                </a>
-            </nav>
-        </div>
-
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
-            <!-- Header -->
-            <header class="bg-white shadow">
-                <div class="flex justify-between items-center px-6 py-4">
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">Selamat Datang, {{ $pegawai->nama_lengkap }}!</h1>
-                        <p class="text-gray-600">Dashboard Pegawai BPS Kota Tanjungpinang</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-gray-700">{{ $pegawai->nama_lengkap }}</span>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </header>
-
             <!-- Content -->
             <main class="flex-1 p-6 overflow-auto">
                 <!-- KPI Cards -->
@@ -139,3 +95,4 @@
     </div>
 </body>
 </html>
+@endsection
