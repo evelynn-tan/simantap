@@ -49,11 +49,7 @@
 
         <div class="flex-1 bg-gray-100">
             
-            <header class="bg-white shadow">
-                <div class="flex justify-between items-center px-6 py-4">
-                    {{-- Kosongkan header di sini sesuai permintaan sebelumnya --}}
-                </div>
-            </header>
+    
 
             <div class="py-12">
                 <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
