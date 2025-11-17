@@ -153,8 +153,7 @@ class PermintaanController extends Controller
             $query->whereDate('created_at', '<=', $request->tanggal_selesai);
         }
 
-        $permintaan = $query->orderBy('created_at', 'desc')->get();
-
+        $permintaan = $query->orderBy('created_at', 'desc')->paginate(10);
         return view('pegawai.monitor-permintaan', compact('permintaan', 'pegawai'));
     }
 }

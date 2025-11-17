@@ -6,26 +6,59 @@
 
 @section('content')
 <div class="bg-white rounded-lg shadow-sm border">
-    <!-- Header dengan Filter -->
-    <div class="px-6 py-4 border-b">
-        <div class="flex justify-between items-center">
-            <div>
-                <h3 class="text-lg font-semibold text-gray-800">Monitor Status Permintaan</h3>
-                <p class="text-sm text-gray-600">Pantau status permintaan barang yang telah Anda ajukan</p>
-            </div>
-            <div class="flex items-center space-x-4">
-                <select class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                    <option>Semua Status</option>
-                    <option>Menunggu</option>
-                    <option>Disetujui</option>
-                    <option>Ditolak</option>
-                </select>
-                <input type="date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                <input type="date" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+    <form method="GET" action="{{ route('pegawai.monitor-permintaan') }}">
+        
+        <div class="px-6 py-4 border-b">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800">Monitor Status Permintaan</h3>
+                    <p class="text-sm text-gray-600">Pantau status permintaan barang yang telah Anda ajukan</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2">
+                    
+                    <select 
+                        name="status" 
+                        class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                        onchange="this.form.submit()" {{-- Opsional: Auto-submit saat ganti --}}
+                    >
+                        <option value="">Semua Status</option>
+                        <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu</option>
+                        <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
+                        <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                    </select>
+
+                    <input 
+                        type="date" 
+                        name="tanggal_mulai" 
+                        value="{{ request('tanggal_mulai') }}"
+                        class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                        title="Tanggal Mulai"
+                    >
+
+                    <span class="text-gray-400">-</span>
+
+                    <input 
+                        type="date" 
+                        name="tanggal_selesai" 
+                        value="{{ request('tanggal_selesai') }}"
+                        class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                        title="Tanggal Selesai"
+                    >
+
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                        <i class="fas fa-filter mr-1"></i> Filter
+                    </button>
+                    
+                    @if(request()->hasAny(['status', 'tanggal_mulai', 'tanggal_selesai']))
+                        <a href="{{ route('pegawai.monitor-permintaan') }}" class="text-gray-500 hover:text-red-500 px-2" title="Reset Filter">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
-    </div>
-
+    </form>
     <!-- Table -->
     <div class="overflow-x-auto">
         <table class="min-w-full">
@@ -91,9 +124,8 @@
         </table>
     </div>
 
-    <!-- Footer -->
     <div class="px-6 py-4 border-t bg-gray-50">
-        <p class="text-sm text-gray-600">Menampilkan {{ $permintaan->count() }} permintaan</p>
+         {{ $permintaan->appends(request()->query())->links() }}
     </div>
 </div>
 @endsection
