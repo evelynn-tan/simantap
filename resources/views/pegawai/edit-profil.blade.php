@@ -16,36 +16,46 @@
             <form action="{{ route('pegawai.edit-profil.update') }}" method="POST">
                 @csrf
                 @method('PUT')
-                
+                <input type="hidden" name="update_profile" value="1">
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" value="{{ $pegawai->nama_lengkap }}" 
+                        <input type="text" name="nama_lengkap" value="{{ old('nama_lengkap', $pegawai->nama_lengkap) }}"
                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        @error('nama_lengkap')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">NIP</label>
-                        <input type="text" value="{{ $pegawai->nip }}" 
+                        <input type="text" value="{{ $pegawai->nip }}"
                                class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-500" readonly>
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" value="{{ Auth::user()->email }}" 
+                        <input type="email" value="{{ Auth::user()->email }}"
                                class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-500" readonly>
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Jabatan</label>
-                        <input type="text" name="jabatan" value="{{ $pegawai->jabatan }}" 
+                        <input type="text" name="jabatan" value="{{ old('jabatan', $pegawai->jabatan) }}"
                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        @error('jabatan')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
-                    
+
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Divisi</label>
-                        <input type="text" name="divisi" value="{{ $pegawai->divisi }}" 
+                        <input type="text" name="divisi" value="{{ old('divisi', $pegawai->divisi) }}"
                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                        @error('divisi')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
                 
@@ -90,24 +100,36 @@
                 <p class="text-sm text-gray-600">Pastikan password baru Anda kuat dan aman. Minimal 6 karakter.</p>
             </div>
             <div class="p-6">
-                <form>
+                <form action="{{ route('pegawai.edit-profil.update') }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="update_password" value="1">
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Password Lama</label>
-                            <input type="password" placeholder="Masukkan password lama" 
+                            <input type="password" name="current_password" placeholder="Masukkan password lama"
                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            @error('current_password')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Password Baru</label>
-                            <input type="password" placeholder="Masukkan password baru (minimal 6 karakter)" 
+                            <input type="password" name="password" placeholder="Masukkan password baru (minimal 8 karakter)"
                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            @error('password')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Konfirmasi Password Baru</label>
-                            <input type="password" placeholder="Ulangi password baru" 
+                            <input type="password" name="password_confirmation" placeholder="Ulangi password baru"
                                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            @error('password_confirmation')
+                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
@@ -115,7 +137,7 @@
                     <div class="mt-4 p-4 bg-blue-50 rounded-lg">
                         <h4 class="text-sm font-medium text-blue-800 mb-2">Tips Keamanan Password:</h4>
                         <ul class="text-xs text-blue-700 space-y-1">
-                            <li>• Gunakan minimal 6 karakter</li>
+                            <li>• Gunakan minimal 8 karakter</li>
                             <li>• Kombinasikan huruf besar, huruf kecil, dan angka</li>
                             <li>• Jangan gunakan informasi pribadi yang mudah ditebak</li>
                             <li>• Ubah password secara berkala</li>
