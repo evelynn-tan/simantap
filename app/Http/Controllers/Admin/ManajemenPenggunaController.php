@@ -9,10 +9,6 @@ use Illuminate\Support\Facades\Hash;
 
 class ManajemenPenggunaController extends Controller
 {
-    /**
-     * Menampilkan halaman "Manajemen Pengguna Sistem"
-     * Sesuai mockup: screencapture-fabric-camel-47506428-figma-site-2025-11-05-09_33_33.jpg
-     */
     public function index()
     {
         // Ambil data untuk KPI Cards

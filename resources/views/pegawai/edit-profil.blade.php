@@ -1,4 +1,4 @@
-@extends('pegawai.layout')
+@extends('layouts.pegawai-layout')
 
 @section('title', 'Edit Profil - SIMANTAP')
 @section('page-title', 'Edit Profil Pegawai BPS')

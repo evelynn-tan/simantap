@@ -73,8 +73,6 @@ class DatabaseSeeder extends Seeder
         $kategoris = [
             ['nama' => 'ATK', 'deskripsi' => 'Alat Tulis Kantor'],
             ['nama' => 'Elektronik', 'deskripsi' => 'Perangkat Elektronik'],
-            ['nama' => 'Furniture', 'deskripsi' => 'Perabot Kantor'],
-            ['nama' => 'Kendaraan', 'deskripsi' => 'Kendaraan Dinas'],
         ];
 
         foreach ($kategoris as $kategori) {
@@ -91,8 +89,6 @@ class DatabaseSeeder extends Seeder
             ['kode' => 'ATK003', 'nama' => 'Pensil 2B Faber Castell', 'kategori' => 'ATK', 'satuan' => 'pcs', 'stok' => 15],
             ['kode' => 'ATK004', 'nama' => 'Spidol Whiteboard Snowman', 'kategori' => 'ATK', 'satuan' => 'pcs', 'stok' => 12],
             ['kode' => 'ATK005', 'nama' => 'Stapler HD-50 Max', 'kategori' => 'ATK', 'satuan' => 'pcs', 'stok' => 6],
-            ['kode' => 'ELK001', 'nama' => 'Laptop Dell Latitude', 'kategori' => 'Elektronik', 'satuan' => 'unit', 'stok' => 8],
-            ['kode' => 'ELK002', 'nama' => 'Printer Epson L3110', 'kategori' => 'Elektronik', 'satuan' => 'unit', 'stok' => 3],
         ];
 
         foreach ($barangs as $barang) {

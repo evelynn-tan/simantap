@@ -1,4 +1,4 @@
-@extends('pegawai.layout')
+@extends('layouts.pegawai-layout')
 
 @section('title', 'Monitor Status Permintaan - SIMANTAP')
 @section('page-title', 'Monitor Status Permintaan')

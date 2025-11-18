@@ -41,7 +41,7 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
 
     // TAMBAHKAN RUTE UNTUK VIEW BARU
     Route::get('/manajemen-permintaan', function () {
-        return view('admin.manajemen-permintaan');
+        return view('admin.permintaan.index');
     })->name('manajemen-permintaan');
 
     Route::get('/data-barang', function () {
