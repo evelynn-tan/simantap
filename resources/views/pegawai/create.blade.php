@@ -30,8 +30,8 @@
 
                 <!-- Keperluan -->
                 <div class="mb-6">
-                    <label for="keperluan" class="block mb-2 text-sm font-medium text-gray-900">Keperluan *</label>
-                    <textarea id="keperluan" name="keperluan" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Jelaskan untuk apa barang ini dibutuhkan..." required>{{ old('keperluan') }}</textarea>
+                    <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Keperluan *</label>
+                    <textarea id="description" name="description" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" placeholder="Jelaskan untuk apa barang ini dibutuhkan..." required>{{ old('description') }}</textarea>
                 </div>
                 
                 <!-- Daftar Barang yang Diajukan -->
@@ -42,10 +42,10 @@
                         <div class="flex items-center gap-4 p-4 border rounded-lg">
                             <div class="flex-1">
                                 <label class="block mb-2 text-sm font-medium text-gray-900">Barang *</label>
-                                <select :name="'items[' + index + '][barang_id]'" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
+                                <select :name="'items[' + index + '][barangID]'" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
                                     <option value="">-- Pilih Barang --</option>
                                     @foreach($barangs as $barang)
-                                        <option value="{{ $barang->id }}">{{ $barang->nama_barang }} (Stok: {{ $barang->stok }})</option>
+                                        <option value="{{ $barang->barangID }}">{{ $barang->nama_barang }} (Stok: {{ $barang->stok_sekarang }})</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -67,7 +67,7 @@
                 <hr class="my-6">
 
                 <div class="flex justify-end gap-4">
-                    <a href="{{ route('pegawai.barang.index') }}" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">Batal</a>
+                    <a href="{{ route('pegawai.daftar-barang') }}" class="text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">Batal</a>
                     <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Kirim Pengajuan</button>
                 </div>
             </form>
