@@ -15,8 +15,8 @@ class ManajemenPermintaanController extends Controller
     public function index()
     {
         // 1. Ambil semua data pengajuan dari database
-        // Kita pakai ->with() agar data pegawai (user) dan barangnya (details.barang) ikut terambil
-        $permintaan = Pengajuan::with('user', 'details.barang')
+        // Kita pakai ->with() agar data pegawai dan barangnya ikut terambil
+        $permintaan = Pengajuan::with('pegawai', 'pengajuanDetails.barang')
             ->orderBy('created_at', 'desc') // Urutkan dari yg terbaru
             ->get();
 
@@ -28,58 +28,31 @@ class ManajemenPermintaanController extends Controller
 
     /**
      * Memproses aksi "Setujui" permintaan.
-     * (Sesuai Activity Diagram "Memvalidasi Permintaan Barang", alur "ya, stok mencukupi")
      */
-    public function setujui($id)
+    public function setujui(Pengajuan $pengajuan)
     {
-        $permintaan = Pengajuan::findOrFail($id);
+        // Ubah status pengajuan
+        $pengajuan->status = 'disetujui';
+        $pengajuan->approved_by = auth()->id();
+        $pengajuan->approved_at = now();
+        $pengajuan->save();
 
-        // 1. Ubah status pengajuan
-        $permintaan->status = 'disetujui';
-        $permintaan->operator_id = auth()->id(); // Catat siapa operator yg menyetujui
-        $permintaan->processed_at = now();
-        $permintaan->save();
-
-        // 2. KURANGI STOK BARANG (LOGIKA PENTING)
-        // (Ini akan meng-include use case "Mencatat Barang Keluar")
-        foreach ($permintaan->details as $detail) {
-            $barang = $detail->barang;
-
-            // Catat di tabel transaksi (sesuai ERD)
-            \App\Models\Transaksi::create([
-                'barang_id' => $barang->id,
-                'operator_id' => auth()->id(),
-                'pengajuan_id' => $permintaan->id,
-                'jenis' => 'keluar',
-                'jumlah' => $detail->jumlah_diminta,
-                'stok_sebelum' => $barang->stok,
-                'stok_sesudah' => $barang->stok - $detail->jumlah_diminta,
-            ]);
-
-            // Update stok di master barang
-            $barang->stok -= $detail->jumlah_diminta;
-            $barang->save();
-        }
-
-        // 3. Kembalikan ke halaman sebelumnya dengan pesan sukses
+        // Kembalikan ke halaman sebelumnya dengan pesan sukses
         return redirect()->route('admin.permintaan.index')->with('success', 'Permintaan berhasil disetujui.');
     }
 
     /**
      * Memproses aksi "Tolak" permintaan.
-     * (Sesuai Activity Diagram "Memvalidasi Permintaan Barang", alur "tidak")
      */
-    public function tolak($id)
+    public function tolak(Pengajuan $pengajuan)
     {
-        $permintaan = Pengajuan::findOrFail($id);
+        // Ubah status pengajuan
+        $pengajuan->status = 'ditolak';
+        $pengajuan->approved_by = auth()->id();
+        $pengajuan->approved_at = now();
+        $pengajuan->save();
 
-        // 1. Ubah status pengajuan
-        $permintaan->status = 'ditolak';
-        $permintaan->operator_id = auth()->id();
-        $permintaan->processed_at = now();
-        $permintaan->save();
-
-        // 2. Kembalikan ke halaman sebelumnya dengan pesan sukses
+        // Kembalikan ke halaman sebelumnya dengan pesan sukses
         return redirect()->route('admin.permintaan.index')->with('success', 'Permintaan telah ditolak.');
     }
 }

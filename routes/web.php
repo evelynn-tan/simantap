@@ -33,16 +33,14 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     Route::resource('/pengguna', ManajemenPenggunaController::class);
     Route::resource('/barang', DataBarangController::class);
     Route::get('/permintaan', [ManajemenPermintaanController::class, 'index'])->name('permintaan.index');
-    Route::post('/permintaan/setujui/{id}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui');
-    Route::post('/permintaan/tolak/{id}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak');
+    Route::post('/permintaan/setujui/{pengajuan}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui');
+    Route::post('/permintaan/tolak/{pengajuan}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak');
     Route::resource('views/admin/stock-opname', StockOpnameController::class);
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::post('/laporan/generate', [LaporanController::class, 'generate'])->name('laporan.generate');
 
     // TAMBAHKAN RUTE UNTUK VIEW BARU
-    Route::get('/manajemen-permintaan', function () {
-        return view('admin.permintaan.index');
-    })->name('manajemen-permintaan');
+    Route::get('/manajemen-permintaan', [ManajemenPermintaanController::class, 'index'])->name('manajemen-permintaan');
 
     Route::get('/data-barang', function () {
         return view('admin.data-barang');
@@ -56,9 +54,6 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
         return view('admin.stock-opname.index');
     })->name('stock-opname');
 
-    Route::get('/manajemen-pengguna', function () {
-        return view('admin.manajemen-pengguna');
-    })->name('manajemen-pengguna');
 
     Route::get('/laporan', function () {
         return view('admin.laporan');

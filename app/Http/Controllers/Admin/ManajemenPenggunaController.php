@@ -67,7 +67,14 @@ class ManajemenPenggunaController extends Controller
      */
     public function edit(User $pengguna)
     {
-        return view('admin.pengguna.edit', compact('pengguna'));
+        return view('admin.manajemen-pengguna.index', compact(
+        'totalPengguna',
+        'pegawaiBPS',
+        'operatorBMN',
+        'penggunaAktif',
+        'users'
+    ));
+
     }
 
     /**
