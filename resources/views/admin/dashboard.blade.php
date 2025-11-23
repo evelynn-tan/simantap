@@ -117,7 +117,7 @@
                 <div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-blue-50 transition border border-gray-100">
                     <div>
                         <span class="font-bold text-gray-800 block">{{ $barang->nama_barang }}</span>
-                        <span class="text-xs text-gray-500">Stok: {{ $barang->stok }}</span>
+                        <span class="text-xs text-gray-500">Stok: {{ $barang->stok_sekarang }}</span>
                     </div>
                     <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
                         {{ $barang->total_permintaan }}x diminta
