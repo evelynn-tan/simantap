@@ -16,7 +16,7 @@ class ManajemenPermintaanController extends Controller
     {
         // 1. Ambil semua data pengajuan dari database
         // Kita pakai ->with() agar data pegawai (user) dan barangnya (details.barang) ikut terambil
-        $permintaan = Pengajuan::with('user', 'details.barang')
+        $permintaan = Pengajuan::with('pegawai', 'details.barang')
             ->orderBy('created_at', 'desc') // Urutkan dari yg terbaru
             ->get();
 

@@ -46,4 +46,16 @@ class Pengajuan extends Model
     {
         return $this->hasOne(TransaksiKeluar::class, 'pengajuanID', 'pengajuanID');
     }
+
+    // Relasi ke User melalui Pegawai
+    public function user()
+    {
+        return $this->hasOneThrough(User::class, Pegawai::class, 'pegawaiID', 'userID', 'pegawaiID', 'userID');
+    }
+
+    // Alias untuk pengajuanDetails
+    public function details()
+    {
+        return $this->hasMany(PengajuanDetail::class, 'pengajuanID', 'pengajuanID');
+    }
 }
