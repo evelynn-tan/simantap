@@ -18,7 +18,7 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
-// Rute Jetstream untuk /dashboard (SUDAH BENAR, JANGAN DIUBAH)
+
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     if (Auth::user()->role == 'operator') {
         return redirect()->route('admin.dashboard');
@@ -30,11 +30,18 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 // Grup Admin
 Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    Route::resource('/pengguna', ManajemenPenggunaController::class);
-    Route::resource('/barang', DataBarangController::class);
     
-    // Permintaan
-    Route::get('/permintaan', [ManajemenPermintaanController::class, 'index'])->name('permintaan.index');
+    Route::resource('/pengguna', ManajemenPenggunaController::class)->names([
+        'index' => 'manajemen-pengguna',
+    ]);
+
+    Route::resource('/barang', DataBarangController::class)->names([
+        'index' => 'data-barang',
+        'create' => 'tambah-barang',
+    ]);
+    
+    Route::get('/permintaan', [ManajemenPermintaanController::class, 'index'])->name('manajemen-permintaan');
+    
     Route::post('/permintaan/setujui/{id}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui');
     Route::post('/permintaan/tolak/{id}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak');
 <<<<<<< HEAD
@@ -68,11 +75,13 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     })->name('laporan');
 =======
     
-    // Perbaikan kecil: resource jangan pakai path 'views/admin/...', cukup nama URL saja
+    // 1. Route ini untuk menangani panggilan 'admin.stock-opname' (Sidebar)
+    Route::get('/stock-opname-list', [StockOpnameController::class, 'index'])->name('stock-opname');
+    
+    // 2. Resource ini untuk menangani panggilan 'admin.stock-opname.index' (Tombol Batal) dan fungsi CRUD lainnya
     Route::resource('stock-opname', StockOpnameController::class); 
     
-    // Laporan (Gunakan ini saja)
-    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan'); 
     Route::post('/laporan/generate', [LaporanController::class, 'generate'])->name('laporan.generate');
 
 >>>>>>> 8635e35a726f21a8b1a4420ec1356843184b5c40
