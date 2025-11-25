@@ -18,6 +18,30 @@
                     <p class="text-xs text-gray-500 mt-1">Total stok: {{ $totalStok ?? 0 }} unit</p>
                 </div>
             </div>
+            
+            <nav class="mt-6">
+                <a href="{{ route('admin.dashboard') }}" class="block py-3 px-4 bg-blue-700 border-l-4 border-yellow-400">
+                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                </a>
+                <a href="{{ route('admin.manajemen-permintaan') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
+                    <i class="fas fa-clipboard-list mr-3"></i>Manajemen Permintaan
+                </a>
+                <a href="{{ route('admin.data-barang') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
+                    <i class="fas fa-boxes mr-3"></i>Data Barang
+                </a>
+                <a href="{{ route('admin.tambah-barang') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
+                    <i class="fas fa-plus-circle mr-3"></i>Tambah Barang Baru
+                </a>
+                <a href="{{ route('admin.stock-opname') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
+                    <i class="fas fa-clipboard-check mr-3"></i>Stock Opname
+                </a>
+                <a href="{{ route('admin.pengguna.index') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
+                    <i class="fas fa-users mr-3"></i>Manajemen Pengguna
+                </a>
+                <a href="{{ route('admin.laporan') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
+                    <i class="fas fa-chart-bar mr-3"></i>Laporan
+                </a>
+            </nav>
         </div>
 
         <!-- Permintaan Baru -->
