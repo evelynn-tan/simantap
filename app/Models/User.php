@@ -43,4 +43,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Operator::class, 'userID', 'userID');
     }
+
+    public function getRoleDisplayAttribute()
+    {
+        if ($this->role == 'operator') {
+            return 'Operator BMN';
+        }
+    
+    // Huruf besar di awal kata (misal: 'pegawai' jadi 'Pegawai')
+    return ucfirst($this->role);
+    }
 }

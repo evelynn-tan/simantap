@@ -263,7 +263,7 @@
 
                     <div class="mt-10 text-sm opacity-90">
                         <div class="font-semibold">BPS Kota Tanjungpinang</div>
-                        <div class="mt-1">Siap mendukung sensus dan pengelolaan data ekonomi daerah.</div>
+                        <div class="mt-1">Siap mendukung sensus dan pengelolaan data aset BPS Kota Tanjungpinang.</div>
                     </div>
                 </div>
             </aside>
