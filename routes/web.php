@@ -32,6 +32,8 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('/pengguna', ManajemenPenggunaController::class);
     Route::resource('/barang', DataBarangController::class);
+    
+    // Permintaan
     Route::get('/permintaan', [ManajemenPermintaanController::class, 'index'])->name('permintaan.index');
     Route::post('/permintaan/setujui/{pengajuan}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui');
     Route::post('/permintaan/tolak/{pengajuan}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak');
@@ -58,6 +60,16 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     Route::get('/laporan', function () {
         return view('admin.laporan');
     })->name('laporan');
+    Route::post('/permintaan/setujui/{id}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui');
+    Route::post('/permintaan/tolak/{id}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak');
+    
+    // Perbaikan kecil: resource jangan pakai path 'views/admin/...', cukup nama URL saja
+    Route::resource('stock-opname', StockOpnameController::class); 
+    
+    // Laporan (Gunakan ini saja)
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::post('/laporan/generate', [LaporanController::class, 'generate'])->name('laporan.generate');
+
 });
 
 // Grup PEGAWAI

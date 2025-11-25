@@ -1,13 +1,19 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Tambah Pengguna Baru
-        </h2>
-    </x-slot>
+@extends('layouts.admin')
+@section('title', 'Tambah Pengguna Baru')
+@section('header', 'Tambah Pengguna Baru')
 
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-md rounded-lg p-6">
+@section('content')
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white shadow-md rounded-lg p-6">
+                @if ($errors->any())
+                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <form action="{{ route('admin.pengguna.store') }}" method="POST">
                     @csrf
                     <div class="grid md:grid-cols-2 gap-6">
@@ -24,11 +30,19 @@
                             <input type="text" name="jabatan" id="jabatan" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                         </div>
                         <div>
+                            <label for="nip" class="block mb-2 text-sm font-medium text-gray-900">NIP *</label>
+                            <input type="text" name="nip" id="nip" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
+                        </div>
+                        <div>
                             <label for="role" class="block mb-2 text-sm font-medium text-gray-900">Role *</label>
                             <select id="role" name="role" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                                <option value="pegawai">Pegawai BPS</option>
+                                <option value="pegawai" selected>Pegawai BPS</option>
                                 <option value="operator">Operator BMN</option>
                             </select>
+                        </div>
+                        <div id="divisi-field">
+                            <label for="divisi" class="block mb-2 text-sm font-medium text-gray-900">Divisi *</label>
+                            <input type="text" name="divisi" id="divisi" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                         </div>
                         <div>
                             <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password *</label>
@@ -46,4 +60,18 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+
+    <script>
+        document.getElementById('role').addEventListener('change', function() {
+            var divisiField = document.getElementById('divisi-field');
+            var divisiInput = document.getElementById('divisi');
+            if (this.value === 'operator') {
+                divisiField.style.display = 'none';
+                divisiInput.removeAttribute('required');
+            } else {
+                divisiField.style.display = 'block';
+                divisiInput.setAttribute('required', 'required');
+            }
+        });
+    </script>
+@endsection
