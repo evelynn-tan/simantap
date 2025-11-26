@@ -22,7 +22,10 @@ class LaporanController extends Controller
      */
     public function index(Request $request)
     {
-        $pegawais = User::where('role', 'pegawai')->orderBy('name')->get();
+        // PERBAIKAN DI SINI: Mengubah 'name' menjadi 'email' untuk orderBy, 
+        // karena kolom 'name' tidak ada di tabel 'users'.
+        $pegawais = User::where('role', 'pegawai')->orderBy('email')->get();
+        
         $kategoris = Kategori::orderBy('nama_kategori')->get();
         $hasilLaporan = null;
         $jenisLaporan = $request->get('jenis_laporan');
