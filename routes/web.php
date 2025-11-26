@@ -30,34 +30,19 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 // Grup Admin
 Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
-    // --- SOLUSI KONFLIK PENGGUNA ---
-    Route::get('/manajemen-pengguna', [ManajemenPenggunaController::class, 'index'])->name('manajemen-pengguna');
     Route::resource('/pengguna', ManajemenPenggunaController::class);
-    
-    // --- SOLUSI KONFLIK BARANG ---
-    Route::get('/barang-list', [DataBarangController::class, 'index'])->name('data-barang');
-    Route::get('/barang-tambah', [DataBarangController::class, 'create'])->name('tambah-barang');
     Route::resource('/barang', DataBarangController::class);
     
-    // --- SOLUSI KONFLIK PERMINTAAN ---
-    Route::get('/permintaan', [ManajemenPermintaanController::class, 'index'])->name('manajemen-permintaan');
-    Route::get('/permintaan-list', [ManajemenPermintaanController::class, 'index'])->name('permintaan.index'); // Alias
-
+    // Permintaan
+    Route::get('/permintaan', [ManajemenPermintaanController::class, 'index'])->name('permintaan.index');
     Route::post('/permintaan/setujui/{id}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui');
     Route::post('/permintaan/tolak/{id}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak');
     
-    // --- SOLUSI KONFLIK STOCK OPNAME ---
-    Route::get('/stock-opname-list', [StockOpnameController::class, 'index'])->name('stock-opname');
+    // Perbaikan kecil: resource jangan pakai path 'views/admin/...', cukup nama URL saja
     Route::resource('stock-opname', StockOpnameController::class); 
     
-    // --- SOLUSI KONFLIK LAPORAN (FIX BARU) ---
-    // 1. Untuk Dashboard (admin.laporan)
-    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan'); 
-    
-    // 2. Untuk Sidebar (admin.laporan.index) - Alias ke controller yang sama
-    Route::get('/laporan-list', [LaporanController::class, 'index'])->name('laporan.index');
-    
+    // Laporan (Gunakan ini saja)
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::post('/laporan/generate', [LaporanController::class, 'generate'])->name('laporan.generate');
 
 });
