@@ -4,57 +4,88 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Barang;
-use App\Models\StockOpname;
-use App\Models\StockOpnameDetail;
-use App\Models\Transaksi;
-use Illuminate\Support\Facades\DB;
-// TAMBAHKAN 3 BARIS INI
 use App\Models\User;
 use App\Models\Kategori;
 use App\Models\Pengajuan;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class LaporanController extends Controller
 {
     /**
-     * Menampilkan halaman "Pusat Laporan"
-     * Sesuai mockup: screencapture-fabric-camel-47506428-figma-site-2025-11-05-09_33_56.png
+     * Menampilkan halaman "Pusat Laporan" dan memproses filter.
      */
     public function index(Request $request)
     {
-        $pegawais = User::where('role', 'pegawai')->orderBy('name')->get();
+        // 1. Ambil data yang dibutuhkan untuk filter dropdown
+        // PERBAIKAN: Menggunakan get() terlebih dahulu, lalu diurutkan menggunakan Collection sortBy('name') 
+        // untuk menghindari error SQL 'Unknown column name' dan memastikan pengurutan.
+        $pegawais = User::where('role', 'pegawai')->get()->sortBy('name'); 
+        
+        // Asumsi 'nama_kategori' sudah benar di tabel 'kategoris'
         $kategoris = Kategori::orderBy('nama_kategori')->get();
-        $hasilLaporan = null;
-        $jenisLaporan = $request->get('jenis_laporan');
+        
+        // 2. Inisialisasi hasil laporan sebagai koleksi kosong
+        $hasilLaporan = collect([]); 
+        $jenisLaporan = $request->get('jenis_laporan', 'umum'); // Default ke 'umum'
 
-        // Cek jika ada request untuk generate laporan
-        if ($request->has('jenis_laporan')) {
-            $query = Pengajuan::with('user', 'details.barang')
-                            ->where('status', 'disetujui'); // Kita hanya laporkan yg disetujui
+        // 3. Logika Filter Laporan (Hanya eksekusi jika ada filter yang disubmit)
+        if ($request->has('jenis_laporan') && ($request->jenis_laporan == 'umum' || $request->jenis_laporan == 'pegawai')) {
+            
+            // Query Dasar: Ambil Pengajuan yang statusnya disetujui (Barang Keluar)
+            $query = Pengajuan::with(['user', 'details.barang'])
+                             ->where('status', 'disetujui');
+            
+            // Filter Berdasarkan Jenis Laporan dan Parameter Tambahan
+            if ($jenisLaporan == 'pegawai') {
+                // Filter wajib: Pegawai ID
+                if ($request->filled('pegawai_id')) {
+                    // Menggunakan userID (sesuai pola non-standar DB Anda)
+                    $query->where('userID', $request->pegawai_id); 
+                }
+                
+                // Filter Periode
+                if ($request->filled('periode')) {
+                    $days = (int) $request->periode;
+                    if ($days > 0) {
+                        $query->where('processed_at', '>=', Carbon::now()->subDays($days));
+                    }
+                }
 
-            // Filter Laporan Per Pegawai
-            if ($request->filled('pegawai_id')) {
-                $query->where('user_id', $request->pegawai_id);
-            }
-            // Filter Laporan Umum (Berdasarkan Kategori Barang)
-            if ($request->filled('kategori_id')) {
-                $query->whereHas('details.barang', function($q) use ($request) {
-                    $q->where('kategori_id', $request->kategori_id);
-                });
-            }
-            // Filter Tanggal
-            if ($request->filled('tanggal_mulai')) {
-                $query->whereDate('processed_at', '>=', $request->tanggal_mulai);
-            }
-            if ($request->filled('tanggal_selesai')) {
-                $query->whereDate('processed_at', '<=', $request->tanggal_selesai);
+            } elseif ($jenisLaporan == 'umum') {
+                 // Filter Laporan Umum (Berdasarkan Kategori Barang)
+                if ($request->filled('kategori_id')) {
+                    $kategoriId = $request->kategori_id;
+                    $query->whereHas('details.barang', function($q) use ($kategoriId) {
+                        // Menggunakan kategoriID (sesuai pola non-standar DB Anda)
+                        $q->where('kategoriID', $kategoriId);
+                    });
+                }
+
+                // Filter Tanggal Mulai dan Selesai
+                if ($request->filled('tanggal_mulai')) {
+                    $query->whereDate('processed_at', '>=', $request->tanggal_mulai);
+                }
+                if ($request->filled('tanggal_selesai')) {
+                    $endDate = Carbon::parse($request->tanggal_selesai)->endOfDay();
+                    $query->where('processed_at', '<=', $endDate);
+                }
             }
 
+            // Eksekusi Query dan Urutkan
             $hasilLaporan = $query->orderBy('processed_at', 'desc')->get();
         }
 
+        // 4. Kirimkan data ke view
+        // PENTING: Gunakan toArray() pada koleksi yang sudah diurutkan agar konsisten
         return view('admin.laporan.index', compact('pegawais', 'kategoris', 'hasilLaporan', 'jenisLaporan'));
     }
 
-    // Fungsi 'generate' sudah disatukan di 'index' untuk kemudahan
+    // Metode untuk generate report (misalnya Export Excel/PDF)
+    public function generate(Request $request)
+    {
+        // Redirect kembali ke index dengan semua parameter filter
+        return redirect()->route('admin.laporan.index', $request->except('action'));
+    }
 }

@@ -7,15 +7,20 @@ class StockOpnameDetail extends Model
 {
     use HasFactory;
     
-    // INI BAGIAN PENTINGNYA
+    // Menggunakan $guarded untuk mengizinkan mass assignment, kecuali 'id'.
     protected $guarded = ['id'];
 
     public function stockOpname()
     {
-        return $this->belongsTo(StockOpname::class);
+        // PENTING: Jika foreign key di DB menggunakan CamelCase (misal: 'stockOpnameID'), 
+        // kita perlu mendefinisikannya secara eksplisit.
+        return $this->belongsTo(StockOpname::class, 'stockOpnameID');
     }
+    
     public function barang()
     {
-        return $this->belongsTo(Barang::class);
+        // PENTING: Jika foreign key di DB menggunakan CamelCase (misal: 'barangID'), 
+        // kita perlu mendefinisikannya secara eksplisit.
+        return $this->belongsTo(Barang::class, 'barangID');
     }
 }

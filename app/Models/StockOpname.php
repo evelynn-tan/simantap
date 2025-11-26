@@ -7,7 +7,14 @@ class StockOpname extends Model
 {
     use HasFactory;
 
-    // INI JUGA PENTING
+    // PENTING: Karena error SQL menunjuk ke 'operatorID', kita asumsikan 
+    // nama kolom di DB non-standar (CamelCase) dan harus didefinisikan 
+    // di model untuk relasi dan potensi Primary Key.
+    
+    // Jika Primary Key Anda bukan 'id' (misalnya 'stockOpnameID'), tambahkan:
+    // protected $primaryKey = 'stockOpnameID';
+
+    // Menggunakan $guarded untuk mengizinkan mass assignment, kecuali 'id'.
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -21,6 +28,8 @@ class StockOpname extends Model
 
     public function operator()
     {
-        return $this->belongsTo(User::class, 'operator_id');
+        // MENGUBAH foreign key dari 'operator_id' menjadi 'operatorID' 
+        // agar sesuai dengan nama kolom di database Anda (berdasarkan error).
+        return $this->belongsTo(User::class, 'operatorID'); 
     }
 }

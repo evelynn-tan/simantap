@@ -4,30 +4,37 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Transaksi extends Model
 {
     use HasFactory;
-    public function barang(): BelongsTo
+    
+    // PENTING: Karena database menggunakan ID operator non-standar (operatorID)
+    // dan kolom lain diisi melalui create(), kita gunakan $guarded untuk mengizinkan mass assignment.
+    protected $guarded = ['id'];
+    
+    protected $casts = [
+        'tanggal_transaksi' => 'datetime',
+    ];
+
+    // Relasi ke Barang
+    public function barang()
     {
-        return $this->belongsTo(Barang::class);
+        // Asumsi foreign key barang juga non-standar: 'barangID'
+        return $this->belongsTo(Barang::class, 'barangID', 'barangID');
+    }
+    
+    // Relasi ke Operator
+    public function operator()
+    {
+        // MENGUBAH foreign key menjadi 'operatorID' agar sesuai dengan database non-standar
+        return $this->belongsTo(User::class, 'operatorID');
     }
 
-    public function operator(): BelongsTo
+    // Transaksi ini bisa direferensikan oleh Stock Opname (referensi_jenis='StockOpname')
+    // atau yang lainnya (misalnya, Pengajuan)
+    public function referensi()
     {
-        // Kita spesifikkan 'operator_id' sebagai foreign key
-        return $this->belongsTo(User::class, 'operator_id');
-    }
-
-    public function pengajuan(): BelongsTo
-    {
-        return $this->belongsTo(Pengajuan::class);
-    }
-
-    public function details(): HasMany
-    {
-        return $this->hasMany(TransaksiDetail::class);
+        return $this->morphTo('referensi', 'referensi_jenis', 'referensi_id');
     }
 }

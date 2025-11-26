@@ -9,23 +9,18 @@ class Barang extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'barangID';
+    // Tambahkan definisi Primary Key untuk memastikan penamaan non-standar (BarangID) dikenal
+    protected $primaryKey = 'barangID'; 
     public $incrementing = true;
-
-    protected $fillable = [
-        'kode_barang',
-        'nama_barang',
-        'kategoriID',
-        'satuan',
-        'stok_awal',
-        'stok_sekarang',
-        'deskripsi',
-        'status',
-    ];
+    
+    // Gunakan $guarded untuk mengizinkan semua mass assignment kecuali 'id', 
+    // menyelaraskan dengan Model lain yang sudah diperbaiki.
+    protected $guarded = ['id'];
 
     // Relasi ke Kategori
     public function kategori()
     {
+        // Foreign key di sini adalah kategoriID (non-standar)
         return $this->belongsTo(Kategori::class, 'kategoriID', 'kategoriID');
     }
 
