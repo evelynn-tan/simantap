@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    // Tambahkan Request $request di sini
+    public function index(Request $request)
     {
         $userId = Auth::id();
 
@@ -36,19 +37,27 @@ class DashboardController extends Controller
             ->where('status', 'menunggu')
             ->count();
 
-        // Barang yang sedang digunakan (detail)
+        // ========================================================
+        // DATA UTAMA (PAGINATION)
+        // ========================================================
         $barangSedangDigunakan = Pengajuan::with(['pengajuanDetails.barang'])
             ->where('pegawaiID', $pegawaiID)
             ->where('status', 'disetujui')
             ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get();
+            ->paginate(5); 
+
+        // --- LOGIKA AJAX (AGAR TIDAK RELOAD) ---
+        // Jika request ini berasal dari Javascript (AJAX), kembalikan potongan tabel saja
+        if ($request->ajax()) {
+            return view('pegawai.partials.barang-saya-table', compact('barangSedangDigunakan'))->render();
+        }
+        // ---------------------------------------
 
         // Riwayat 5 permintaan terakhir
         $riwayatPermintaan = Pengajuan::with(['pengajuanDetails.barang'])
             ->where('pegawaiID', $pegawaiID)
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(5) 
             ->get();
 
         // TOP 5 barang paling sering diminta user

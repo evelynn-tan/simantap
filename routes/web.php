@@ -65,4 +65,6 @@ Route::middleware(['auth:sanctum', 'verified', 'role:pegawai'])->prefix('pegawai
     // Rute tambahan untuk fitur permintaan
     Route::get('/ajukan-permintaan', [PegawaiPermintaanController::class, 'create'])->name('permintaan.create');
     Route::post('/ajukan-permintaan', [PegawaiPermintaanController::class, 'ajukan'])->name('permintaan.ajukan');
+    Route::get('/barang-saya', [PengajuanController::class, 'barangSaya'])->name('barang.saya');
+
 });
