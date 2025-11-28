@@ -18,19 +18,10 @@ class LaporanController extends Controller
      */
     public function index(Request $request)
     {
-<<<<<<< HEAD
         // PERBAIKAN DI SINI: Mengubah 'name' menjadi 'email' untuk orderBy, 
         // karena kolom 'name' tidak ada di tabel 'users'.
         $pegawais = User::where('role', 'pegawai')->orderBy('email')->get();
         
-=======
-        // 1. Ambil data yang dibutuhkan untuk filter dropdown
-        // PERBAIKAN: Menggunakan get() terlebih dahulu, lalu diurutkan menggunakan Collection sortBy('name') 
-        // untuk menghindari error SQL 'Unknown column name' dan memastikan pengurutan.
-        $pegawais = User::where('role', 'pegawai')->get()->sortBy('name'); 
-        
-        // Asumsi 'nama_kategori' sudah benar di tabel 'kategoris'
->>>>>>> 0557b93218fdee1c56e83ef1ad5ba1ca00d8f418
         $kategoris = Kategori::orderBy('nama_kategori')->get();
         
         // 2. Inisialisasi hasil laporan sebagai koleksi kosong
