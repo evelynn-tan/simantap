@@ -94,7 +94,6 @@
                                 </ul>
                             </td>
                             <td class="px-4 py-3 text-center">
-                                <!-- PERBAIKAN DI SINI: Mengubah 'permintaan.index' menjadi 'admin.permintaan.index' -->
                                 <a href="{{ route('admin.permintaan.index') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs transition font-medium">
                                     Proses
                                 </a>

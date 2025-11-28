@@ -15,8 +15,6 @@ class ManajemenPermintaanController extends Controller
     public function index()
     {
         // 1. Ambil semua data pengajuan dari database
-        // Kita pakai ->with() agar data pegawai dan barangnya ikut terambil
-        $permintaan = Pengajuan::with('pegawai', 'pengajuanDetails.barang')
         // Kita pakai ->with() agar data pegawai (user) dan barangnya (details.barang) ikut terambil
         $permintaan = Pengajuan::with('pegawai', 'details.barang')
             ->orderBy('created_at', 'desc') // Urutkan dari yg terbaru
@@ -31,14 +29,8 @@ class ManajemenPermintaanController extends Controller
     /**
      * Memproses aksi "Setujui" permintaan.
      */
-    public function setujui(Pengajuan $pengajuan)
+    public function setujui($id)
     {
-        // Ubah status pengajuan
-        $pengajuan->status = 'disetujui';
-        $pengajuan->approved_by = auth()->id();
-        $pengajuan->approved_at = now();
-        $pengajuan->save();
-
         $pengajuan = Pengajuan::findOrFail($id);
 
         // Ubah status pengajuan
@@ -61,7 +53,7 @@ class ManajemenPermintaanController extends Controller
     /**
      * Memproses aksi "Tolak" permintaan.
      */
-    public function tolak(Pengajuan $pengajuan)
+    public function tolak($id)
     {
         $pengajuan = Pengajuan::findOrFail($id);
 

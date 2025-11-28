@@ -1,172 +1,145 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mulai Sesi Stock Opname - SIMANTAP</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .min-h-full-screen {
-            min-height: 100vh;
-        }
-        body { font-family: 'Inter', sans-serif; }
-    </style>
-</head>
-<body class="bg-gray-100">
-    <div class="flex min-h-full-screen">
-        
-        <div class="w-64 bg-blue-800 text-white min-h-full-screen">
-            <div class="p-4 pt-6">
-                <h1 class="text-2xl font-bold">SIMANTAP</h1>
-                <p class="text-sm text-blue-200">Sistem Informasi Manajemen Aset Negara</p>
-            </div>
-            
-            <nav class="mt-6">
-                <a href="{{ route('admin.dashboard') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
-                </a>
-                
-                <a href="{{ route('admin.manajemen-permintaan') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-clipboard-list mr-3"></i>Manajemen Permintaan
-                </a>
-                
-                <a href="{{ route('admin.data-barang') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-boxes mr-3"></i>Data Barang
-                </a>
-                
-                <a href="{{ route('admin.tambah-barang') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-plus-circle mr-3"></i>Tambah Barang Baru
-                </a>
-                
-                <a href="{{ route('admin.stock-opname') }}" class="block py-3 px-4 bg-blue-700 border-l-4 border-yellow-400">
-                    <i class="fas fa-clipboard-check mr-3"></i>Stock Opname
-                </a>
-                
-                <a href="{{ route('admin.manajemen-pengguna') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-users mr-3"></i>Manajemen Pengguna
-                </a>
-                
-                <a href="{{ route('admin.laporan') }}" class="block py-3 px-4 hover:bg-blue-700 border-l-4 border-transparent hover:border-yellow-400">
-                    <i class="fas fa-chart-bar mr-3"></i>Laporan
-                </a>
-            </nav>
+@extends('layouts.admin')
+
+@section('title', 'Mulai Sesi Stock Opname - SIMANTAP')
+@section('header', 'Stock Opname')
+
+@section('content')
+    
+    <p class="text-gray-500 mb-8">Lakukan pengecekan dan penyesuaian stok fisik barang</p>
+    
+    @if (session('error'))
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-4" role="alert">
+            <strong class="font-bold">Gagal!</strong>
+            <span class="block sm:inline">{{ session('error') }}</span>
         </div>
+    @endif
 
-        <div class="flex-1 bg-gray-50 p-8">
-            
-            <header class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-900">Stock Opname</h1>
-                <p class="text-gray-500">Lakukan pengecekan dan penyesuaian stok fisik barang</p>
-            </header>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-5 rounded-xl shadow-md border border-gray-200">
-                    <div class="flex justify-between items-center mb-2">
-                        <dt class="text-md font-medium text-gray-700">Total Item</dt>
-                        <i class="fas fa-box-open text-blue-500"></i>
-                    </div>
-                    <dd class="text-3xl font-bold text-gray-900">{{ $barangs->count() }}</dd>
-                    <p class="text-xs text-gray-500">Item dalam sistem</p>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl shadow-md border border-gray-200">
-                    <div class="flex justify-between items-center mb-2">
-                        <dt class="text-md font-medium text-gray-700">Sudah Diperiksa</dt>
-                        <i class="fas fa-check-circle text-green-500"></i>
-                    </div>
-                    <dd id="count-checked" class="text-3xl font-bold text-gray-900">0</dd>
-                    <p id="progress-text" class="text-xs text-gray-500">0% selesai</p>
-                </div>
-
-                <div class="bg-white p-5 rounded-xl shadow-md border border-gray-200">
-                    <div class="flex justify-between items-center mb-2">
-                        <dt class="text-md font-medium text-gray-700">Ada Selisih</dt>
-                        <i class="fas fa-exclamation-triangle text-red-500"></i>
-                    </div>
-                    <dd id="count-difference" class="text-3xl font-bold text-gray-900">0</dd>
-                    <p class="text-xs text-gray-500">Item dengan perbedaan stok</p>
-                </div>
-            </div>
-            
-            <div class="bg-white overflow-hidden shadow-xl rounded-xl p-8">
-                
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Daftar Stock Opname</h3>
-                <p class="text-gray-600 mb-6 text-sm">Input jumlah fisik untuk setiap barang. Sistem akan otomatis menghitung selisih.</p>
-
-                <form id="opname-form" action="{{ route('admin.stock-opname.store') }}" method="POST">
-                    @csrf
-                    
-                    <div class="overflow-x-auto relative sm:rounded-lg border border-gray-200">
-                        <table class="w-full text-sm text-left text-gray-600">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="py-3 px-4">Kode Barang</th>
-                                    <th scope="col" class="py-3 px-4">Nama Barang</th>
-                                    <th scope="col" class="py-3 px-4">Kategori</th>
-                                    <th scope="col" class="py-3 px-4">Stok Sistem</th>
-                                    <th scope="col" class="py-3 px-4 text-center">Jumlah Fisik</th>
-                                    <th scope="col" class="py-3 px-4 text-center">Selisih</th>
-                                </tr>
-                            </thead>
-                            <tbody id="opname-table-body">
-                                @forelse ($barangs as $barang)
-                                <tr class="bg-white border-b hover:bg-gray-50" data-stok-sistem="{{ $barang->stok_sekarang }}">
-                                    
-                                    <td class="py-4 px-4 font-semibold text-gray-800 whitespace-nowrap">
-                                        {{ $barang->kode_barang ?? 'ATK000' . $barang->id }}
-                                    </td>
-                                    
-                                    <th scope="row" class="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
-                                        {{ $barang->nama_barang }}
-                                    </th>
-                                    
-                                    <td class="py-4 px-4">
-                                        {{ $barang->kategori->nama_kategori ?? 'N/A' }}
-                                    </td>
-                                    
-                                    <td class="py-4 px-4 font-medium text-gray-700">
-                                        {{ $barang->stok_sekarang }} {{ $barang->satuan ?? 'Unit' }}
-                                    </td>
-                                    
-                                    <td class="py-4 px-4 text-center" style="width: 150px;">
-                                        <input type="number" 
-                                                name="stok_fisik[{{ $barang->id }}]" 
-                                                class="input-stok-fisik bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 text-center" 
-                                                value="{{ old('stok_fisik.' . $barang->id) }}" 
-                                                min="0">
-                                    </td>
-                                    
-                                    <td class="py-4 px-4 text-center font-semibold text-gray-500 selisih-output">
-                                        Belum diisi
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr class="bg-white border-b">
-                                    <td colspan="6" class="py-8 px-6 text-center text-gray-500">
-                                        <i class="fas fa-info-circle mr-2"></i>Tidak ada data barang yang tersedia untuk opname.
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mt-6 flex justify-end">
-                        <a href="{{ route('admin.stock-opname.index') }}" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2">
-                            Batal Opname
-                        </a>
-                        <button type="button" id="open-modal-btn" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                            <i class="fas fa-save mr-2"></i> Simpan & Sesuaikan Stok
-                        </button>
-                    </div>
-
-                </form>
-
-            </div>
-        </div>
+    {{-- Notifikasi Error Inline (Pengganti alert()) --}}
+    <div id="error-notification" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-4" role="alert">
+        <strong class="font-bold">Perhatian!</strong>
+        <span id="error-message" class="block sm:inline">Anda harus mengisi setidaknya satu item sebelum menyimpan.</span>
     </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-5 rounded-xl shadow-md border border-gray-200">
+            <div class="flex justify-between items-center mb-2">
+                <dt class="text-md font-medium text-gray-700">Total Item</dt>
+                <i class="fas fa-box-open text-blue-500"></i>
+            </div>
+            <dd class="text-3xl font-bold text-gray-900">{{ $barangs->count() }}</dd>
+            <p class="text-xs text-gray-500">Item dalam sistem</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-md border border-gray-200">
+            <div class="flex justify-between items-center mb-2">
+                <dt class="text-md font-medium text-gray-700">Sudah Diperiksa</dt>
+                <i class="fas fa-check-circle text-green-500"></i>
+            </div>
+            <dd id="count-checked" class="text-3xl font-bold text-gray-900">0</dd>
+            <p id="progress-text" class="text-xs text-gray-500">0% selesai</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-md border border-gray-200">
+            <div class="flex justify-between items-center mb-2">
+                <dt class="text-md font-medium text-gray-700">Ada Selisih</dt>
+                <i class="fas fa-exclamation-triangle text-red-500"></i>
+            </div>
+            <dd id="count-difference" class="text-3xl font-bold text-gray-900">0</dd>
+            <p class="text-xs text-gray-500">Item dengan perbedaan stok</p>
+        </div>
+    </div>
+    
+    <div class="bg-white overflow-hidden shadow-xl rounded-xl p-8">
+        
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Daftar Stock Opname</h3>
+        <p class="text-gray-600 mb-6 text-sm">Input jumlah fisik untuk setiap barang. Sistem akan otomatis menghitung selisih.</p>
+
+        <form id="opname-form" action="{{ route('admin.stock-opname.store') }}" method="POST">
+            @csrf
+            
+            {{-- Tambahkan Input Catatan --}}
+            <div class="mb-6">
+                <label for="catatan" class="block mb-2 text-sm font-medium text-gray-900">Catatan Stock Opname (Opsional)</label>
+                <textarea name="catatan" id="catatan" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh: Opname dilakukan oleh tim A dan B, fokus pada barang kategori ATK dan Elektronik.">{{ old('catatan') }}</textarea>
+                @error('catatan')
+                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="overflow-x-auto relative sm:rounded-lg border border-gray-200">
+                <table class="w-full text-sm text-left text-gray-600">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="py-3 px-4">Kode Barang</th>
+                            <th scope="col" class="py-3 px-4">Nama Barang</th>
+                            <th scope="col" class="py-3 px-4">Kategori</th>
+                            <th scope="col" class="py-3 px-4">Stok Sistem</th>
+                            <th scope="col" class="py-3 px-4 text-center">Jumlah Fisik</th>
+                            <th scope="col" class="py-3 px-4 text-center">Selisih</th>
+                        </tr>
+                    </thead>
+                    <tbody id="opname-table-body">
+                        @forelse ($barangs as $barang)
+                        <tr class="bg-white border-b hover:bg-gray-50" data-barang-id="{{ $barang->id }}" data-stok-sistem="{{ $barang->stok_sekarang }}">
+                            
+                            <td class="py-4 px-4 font-semibold text-gray-800 whitespace-nowrap">
+                                {{ $barang->kode_barang ?? 'ATK000' . $barang->id }}
+                            </td>
+                            
+                            <th scope="row" class="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
+                                {{ $barang->nama_barang }}
+                            </th>
+                            
+                            <td class="py-4 px-4">
+                                {{-- PERBAIKAN: Menggunakan optional chaining (?->) untuk mencegah error jika kategori null --}}
+                                {{ $barang->kategori?->nama_kategori ?? 'N/A' }}
+                            </td>
+                            
+                            <td class="py-4 px-4 font-medium text-gray-700">
+                                {{ $barang->stok_sekarang }} {{ $barang->satuan ?? 'Unit' }}
+                            </td>
+                            
+                            <td class="py-4 px-4 text-center" style="width: 150px;">
+                                <input type="number" 
+                                    name="stok_fisik[{{ $barang->id }}]" 
+                                    class="input-stok-fisik bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 text-center" 
+                                    value="{{ old('stok_fisik.' . $barang->id) }}" 
+                                    min="0">
+                                {{-- Menampilkan pesan error validasi khusus untuk field ini --}}
+                                @if ($errors->has('stok_fisik.' . $barang->id))
+                                    <p class="mt-1 text-xs text-red-600">{{ $errors->first('stok_fisik.' . $barang->id) }}</p>
+                                @endif
+                            </td>
+                            
+                            <td class="py-4 px-4 text-center font-semibold text-gray-500 selisih-output">
+                                Belum diisi
+                            </td>
+                        </tr>
+                        @empty
+                        <tr class="bg-white border-b">
+                            <td colspan="6" class="py-8 px-6 text-center text-gray-500">
+                                <i class="fas fa-info-circle mr-2"></i>Tidak ada data barang yang tersedia untuk opname.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <a href="{{ route('admin.stock-opname.index') }}" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2">
+                    Batal Opname
+                </a>
+                <button type="button" id="open-modal-btn" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                    <i class="fas fa-save mr-2"></i> Simpan & Sesuaikan Stok
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+    
+    {{-- Modal Konfirmasi (HTML) --}}
     <div id="confirmation-modal" class="fixed inset-0 z-50 overflow-y-auto bg-gray-900 bg-opacity-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity" aria-hidden="true"></div>
@@ -196,11 +169,15 @@
                                     Tindakan penyesuaian stok tidak dapat dibatalkan.
                                 </p>
                             </div>
+                            <div class="mt-4">
+                                <label for="modal-catatan-view" class="block text-xs font-medium text-gray-700">Catatan Opname yang akan disimpan:</label>
+                                <p id="modal-catatan-view" class="text-sm text-gray-800 p-2 border rounded bg-gray-100 italic break-words min-h-[40px] mt-1">Tidak ada catatan</p>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="submit" form="opname-form" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="submit" form="opname-form" id="confirm-submit-btn" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm">
                         Ya, Simpan & Sesuaikan
                     </button>
                     <button type="button" id="close-modal-btn" class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
@@ -210,143 +187,181 @@
             </div>
         </div>
     </div>
+    
+    {{-- JAVASCRIPT --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('opname-form');
+            const tableBody = document.getElementById('opname-table-body');
+            const inputFields = tableBody.querySelectorAll('.input-stok-fisik');
+            const totalItems = inputFields.length;
+            
+            const catatanInput = document.getElementById('catatan');
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.getElementById('opname-form');
-        const tableBody = document.getElementById('opname-table-body');
-        const inputFields = tableBody.querySelectorAll('.input-stok-fisik');
-        const totalItems = inputFields.length;
-        
-        const countChecked = document.getElementById('count-checked');
-        const countDifference = document.getElementById('count-difference');
-        const progressText = document.getElementById('progress-text');
+            const countChecked = document.getElementById('count-checked');
+            const countDifference = document.getElementById('count-difference');
+            const progressText = document.getElementById('progress-text');
+            
+            // Elemen notifikasi error baru
+            const errorNotification = document.getElementById('error-notification');
+            const errorMessage = document.getElementById('error-message');
 
-        // Modal Elements
-        const modal = document.getElementById('confirmation-modal');
-        const openModalBtn = document.getElementById('open-modal-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const totalDiperiksaModal = document.getElementById('total-diperiksa-modal');
-        const itemSelisihModal = document.getElementById('item-selisih-modal');
-        const itemsSavedCount = document.getElementById('items-saved-count');
-        
-        // Element baru untuk menampung hasil pengurangan di modal
-        const itemsRemainingModalFinal = document.getElementById('items-remaining-modal-final');
 
-        
-        function updateSummary() {
-            let checkedCount = 0;
-            let differenceCount = 0;
+            const modal = document.getElementById('confirmation-modal');
+            const openModalBtn = document.getElementById('open-modal-btn');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const totalDiperiksaModal = document.getElementById('total-diperiksa-modal');
+            const itemSelisihModal = document.getElementById('item-selisih-modal');
+            const itemsSavedCount = document.getElementById('items-saved-count');
+            const itemsRemainingModalFinal = document.getElementById('items-remaining-modal-final');
+            const modalCatatanView = document.getElementById('modal-catatan-view');
 
-            inputFields.forEach(input => {
-                const row = input.closest('tr');
-                const stokSistem = parseInt(row.dataset.stokSistem) || 0; 
-                
-                const inputValue = input.value.trim();
-                const stokFisik = inputValue === '' ? NaN : parseInt(inputValue);
-                
-                const selisihOutput = row.querySelector('.selisih-output');
-                
-                const isFilled = !isNaN(stokFisik) && inputValue !== '';
-                
-                // Mendapatkan ID Barang dari atribut name saat ini (sebelum dihapus)
-                const currentName = input.name; 
-                const barangIdMatch = currentName ? currentName.match(/\[(.*?)\]/) : null;
-                const barangId = barangIdMatch ? barangIdMatch[1] : null;
+            
+            function updateSummary() {
+                let checkedCount = 0;
+                let differenceCount = 0;
 
-                if (isFilled) {
-                    checkedCount++;
-                    const selisih = stokFisik - stokSistem; 
+                inputFields.forEach(input => {
+                    const row = input.closest('tr');
                     
-                    selisihOutput.textContent = selisih;
-                    selisihOutput.className = 'py-4 px-4 text-center font-semibold selisih-output';
+                    const stokSistemString = row.dataset.stokSistem;
+                    const stokSistem = Number(stokSistemString) || 0; 
                     
-                    if (selisih !== 0) {
-                        differenceCount++;
-                        selisihOutput.classList.add(selisih > 0 ? 'text-green-600' : 'text-red-600');
+                    const inputValue = input.value.trim();
+                    const stokFisik = inputValue === '' ? NaN : Number(inputValue); 
+                    
+                    const selisihOutput = row.querySelector('.selisih-output');
+                    
+                    // Cek apakah input valid (terisi dan merupakan angka non-negatif)
+                    const isFilledAndValid = !isNaN(stokFisik) && inputValue !== '' && stokFisik >= 0;
+                    
+                    // Ambil ID Barang dari data-attribute baris
+                    const barangId = row.dataset.barangId;
+
+                    // --- LOGIKA PERHITUNGAN DAN UPDATE ---
+                    if (isFilledAndValid) { 
+                        checkedCount++;
+                        
+                        // PERHITUNGAN: Selisih = Fisik - Sistem
+                        const selisih = stokFisik - stokSistem; 
+                        
+                        selisihOutput.textContent = selisih;
+                        selisihOutput.className = 'py-4 px-4 text-center font-semibold selisih-output';
+                        
+                        if (selisih !== 0) {
+                            differenceCount++;
+                            selisihOutput.classList.add(selisih > 0 ? 'text-green-600' : 'text-red-600');
+                        } else {
+                            selisihOutput.classList.add('text-gray-700');
+                        }
+                        
+                        // PENTING: Pastikan input memiliki atribut name agar ter-submit
+                        if (!input.hasAttribute('name') && barangId) {
+                            input.setAttribute('name', `stok_fisik[${barangId}]`);
+                        }
+
                     } else {
-                         selisihOutput.classList.add('text-gray-700');
+                        // Jika input kosong atau tidak valid, hapus atribut name agar tidak dikirim
+                        // input.removeAttribute('name'); // Menonaktifkan ini karena akan mengganggu 'old' value
+                        
+                        selisihOutput.textContent = 'Belum diisi';
+                        selisihOutput.className = 'py-4 px-4 text-center font-semibold text-gray-500 selisih-output';
                     }
-                    
-                    // MEMASTIKAN ATTRIBUTE NAME ADA JIKA DIISI (PENTING UNTUK SUBMIT)
-                    // Jika name attribute hilang, buat kembali.
-                    if (!input.hasAttribute('name') && barangId) {
-                        input.setAttribute('name', `stok_fisik[${barangId}]`);
-                    }
+                });
+                
+                // Update KPI Cards di atas
+                const progress = totalItems > 0 ? (checkedCount / totalItems) * 100 : 0;
+                countChecked.textContent = checkedCount;
+                countDifference.textContent = differenceCount;
+                progressText.textContent = `${progress.toFixed(0)}% selesai`;
+
+                // Update info di modal
+                totalDiperiksaModal.textContent = checkedCount;
+                itemSelisihModal.textContent = differenceCount;
+                itemsSavedCount.textContent = checkedCount;
+                itemsRemainingModalFinal.textContent = totalItems - checkedCount; 
+                modalCatatanView.textContent = catatanInput.value.trim() || 'Tidak ada catatan';
+            }
+
+            // --- Event Listeners ---
+            
+            // 1. Live calculation and summary update
+            inputFields.forEach(input => {
+                input.addEventListener('input', updateSummary);
+            });
+            catatanInput.addEventListener('input', updateSummary);
 
 
-                } else {
-                    // Jika tidak diisi, hapus atribut 'name' agar tidak terkirim ke controller
-                    input.removeAttribute('name');
-                    
-                    selisihOutput.textContent = 'Belum diisi';
-                    selisihOutput.className = 'py-4 px-4 text-center font-semibold text-gray-500 selisih-output';
+            // 2. Modal interactions
+            openModalBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
                 }
             });
             
-            // Update KPI Cards
-            const progress = totalItems > 0 ? (checkedCount / totalItems) * 100 : 0;
-            countChecked.textContent = checkedCount;
-            countDifference.textContent = differenceCount;
-            progressText.textContent = `${progress.toFixed(0)}% selesai`;
-        }
+            // Tambahkan event listener untuk tombol ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+            
+            // 3. Submit handler
+            form.addEventListener('submit', function(e) {
+                // Hapus input yang kosong atau tidak valid SEBELUM submit,
+                // agar tidak dikirim ke controller, tetapi tetap biarkan yang valid.
+                inputFields.forEach(input => {
+                    const value = input.value.trim();
+                    const numValue = Number(value);
+                    
+                    // Jika kosong ATAU bukan angka valid non-negatif
+                    if (value === '' || isNaN(numValue) || numValue < 0) {
+                        // Hapus attribute name agar tidak ikut ter-submit
+                        input.removeAttribute('name');
+                    } else {
+                         // Pastikan attribute name ada untuk input yang valid
+                         const row = input.closest('tr');
+                         const barangId = row.dataset.barangId;
+                         input.setAttribute('name', `stok_fisik[${barangId}]`);
+                    }
+                });
+            });
 
-        function openModal() {
-            const checkedCount = parseInt(countChecked.textContent);
-            const remainingCount = totalItems - checkedCount; // HITUNG SELISIH DI SINI
+            // --- Fungsi Modal ---
+            function openModal() {
+                const checkedCount = parseInt(countChecked.textContent);
 
-            // Cek minimum: harus ada setidaknya 1 item yang diperiksa.
-            if (checkedCount === 0) {
-                alert("Gagal menyimpan: Anda harus mengisi setidaknya satu item sebelum menyimpan.");
-                openModalBtn.classList.add('animate-pulse', 'ring-4', 'ring-red-400');
-                setTimeout(() => {
-                    openModalBtn.classList.remove('animate-pulse', 'ring-4', 'ring-red-400');
-                }, 1000);
-                return; 
+                if (checkedCount === 0) {
+                    // MENGHAPUS alert() dan mengganti dengan notifikasi inline
+                    errorNotification.classList.remove('hidden');
+                    openModalBtn.classList.add('animate-pulse', 'ring-4', 'ring-red-400', 'transition', 'duration-300');
+                    
+                    // Hilangkan notifikasi dan animasi setelah beberapa saat
+                    setTimeout(() => {
+                        openModalBtn.classList.remove('animate-pulse', 'ring-4', 'ring-red-400', 'transition', 'duration-300');
+                        errorNotification.classList.add('hidden');
+                    }, 3000); 
+                    
+                    return; 
+                }
+                
+                // Sembunyikan notifikasi error jika ada sebelum membuka modal
+                errorNotification.classList.add('hidden');
+
+                // Update ringkasan terakhir sebelum membuka modal
+                updateSummary(); 
+                modal.classList.remove('hidden');
             }
 
-            // Update data di dalam modal
-            totalDiperiksaModal.textContent = checkedCount;
-            itemSelisihModal.textContent = countDifference.textContent;
-            itemsSavedCount.textContent = checkedCount;
-            // UPDATE BARU UNTUK JUMLAH ITEM SISA
-            itemsRemainingModalFinal.textContent = remainingCount; 
-
-            // Tampilkan modal
-            modal.classList.remove('hidden');
-        }
-
-        function closeModal() {
-            modal.classList.add('hidden');
-        }
-
-
-        // Event Listeners
-        // Diperlukan sebuah loop awal untuk menyimpan ID barang di atribut input karena kita menghapusnya
-        inputFields.forEach(input => {
-            const row = input.closest('tr');
-            // Simpan ID barang di atribut 'id' jika belum ada, atau gunakan logic lain.
-            // Saat ini kita tidak perlu memodifikasi atribut name jika kosong saat load, 
-            // cukup simpan ID-nya dan biarkan name terhapus di updateSummary jika input kosong.
-        });
-
-
-        inputFields.forEach(input => {
-            input.addEventListener('input', updateSummary);
-        });
-
-        openModalBtn.addEventListener('click', openModal);
-        closeModalBtn.addEventListener('click', closeModal);
-        // Menutup modal ketika mengklik di luar area modal
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
+            function closeModal() {
+                modal.classList.add('hidden');
             }
-        });
 
-        // Panggil sekali saat load
-        updateSummary();
-    });
-</script>
-</body>
-</html>
+
+            // Panggil sekali saat load
+            updateSummary();
+        });
+    </script>
+@endsection

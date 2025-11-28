@@ -9,23 +9,42 @@ class Barang extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'barangID';
+    // Tambahkan definisi Primary Key untuk memastikan penamaan non-standar (BarangID) dikenal
+    protected $primaryKey = 'barangID'; 
     public $incrementing = true;
+    
+    // Route model binding gunakan barangID
+    public function getRouteKeyName()
+    {
+        return 'barangID';
+    }
+    
+    // Resolve route binding dengan barangID
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where('barangID', $value)->firstOrFail();
+    }
+    
+    // Gunakan $guarded untuk mengizinkan semua mass assignment kecuali 'id', 
+    // menyelaraskan dengan Model lain yang sudah diperbaiki.
+    protected $guarded = ['id'];
 
-    protected $fillable = [
-        'kode_barang',
-        'nama_barang',
-        'kategoriID',
-        'satuan',
-        'stok_awal',
-        'stok_sekarang',
-        'deskripsi',
-        'status',
-    ];
+    // Accessor: map stok virtual attribute ke stok_sekarang column
+    public function getStokAttribute()
+    {
+        return $this->attributes['stok_sekarang'] ?? 0;
+    }
+
+    // Mutator: map stok virtual attribute ke stok_sekarang column saat assign
+    public function setStokAttribute($value)
+    {
+        $this->attributes['stok_sekarang'] = $value;
+    }
 
     // Relasi ke Kategori
     public function kategori()
     {
+        // Foreign key di sini adalah kategoriID (non-standar)
         return $this->belongsTo(Kategori::class, 'kategoriID', 'kategoriID');
     }
 

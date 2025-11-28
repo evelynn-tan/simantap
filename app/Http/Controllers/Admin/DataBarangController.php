@@ -19,6 +19,7 @@ class DataBarangController extends Controller
         $barangs = Barang::with('kategori')->orderBy('nama_barang')->get();
         $totalBarang = $barangs->count();
         $totalKategori = Kategori::count();
+        $kategoriList = Kategori::orderBy('nama_kategori')->get();
 
         // Logika untuk KPI Card "Barang Habis" dan "Stok Rendah" (misal: rendah < 10)
         $barangHabis = $barangs->where('stok', 0)->count();
@@ -30,7 +31,8 @@ class DataBarangController extends Controller
             'totalBarang',
             'totalKategori',
             'barangHabis',
-            'stokRendah'
+            'stokRendah',
+            'kategoriList'
         ));
     }
 
@@ -51,22 +53,22 @@ class DataBarangController extends Controller
     {
         // Validasi data (sesuai mockup "Status Validasi")
         $request->validate([
-            'kode_barang' => 'required|string|max:255|unique:barangs',
+            'kode_barang' => 'required|string|max:255|unique:barangs,kode_barang',
             'nama_barang' => 'required|string|max:255',
-            'kategori_id' => 'required|exists:kategoris,id',
+            'kategori_id' => 'required|exists:kategoris,kategoriID',
             'satuan' => 'required|string|max:50',
             'stok_awal' => 'required|integer|min:0',
         ]);
 
         // Simpan data ke database
-        Barang::create([
-            'kode_barang' => $request->kode_barang,
-            'nama_barang' => $request->nama_barang,
-            'kategori_id' => $request->kategori_id,
-            'satuan' => $request->satuan,
-            'stok' => $request->stok_awal,
-            'deskripsi' => $request->deskripsi,
-        ]);
+        $barang = new Barang();
+        $barang->kode_barang = $request->kode_barang;
+        $barang->nama_barang = $request->nama_barang;
+        $barang->kategoriID = $request->kategori_id;
+        $barang->satuan = $request->satuan;
+        $barang->stok = $request->stok_awal;
+        $barang->deskripsi = $request->deskripsi;
+        $barang->save();
 
         return redirect()->route('admin.barang.index')->with('success', 'Barang baru berhasil ditambahkan.');
     }
@@ -76,6 +78,9 @@ class DataBarangController extends Controller
      */
     public function edit(Barang $barang)
     {
+        // Debug: log barang yang diterima
+        \Log::info('Edit barang:', ['barangID' => $barang->barangID, 'nama' => $barang->nama_barang]);
+        
         $kategoris = Kategori::orderBy('nama_kategori')->get();
         return view('admin.barang.edit', compact('barang', 'kategoris'));
     }
@@ -86,21 +91,20 @@ class DataBarangController extends Controller
     public function update(Request $request, Barang $barang)
     {
         $request->validate([
-            'kode_barang' => 'required|string|max:255|unique:barangs,kode_barang,' . $barang->id,
+            'kode_barang' => 'required|string|max:255|unique:barangs,kode_barang,' . $barang->barangID . ',barangID',
             'nama_barang' => 'required|string|max:255',
-            'kategori_id' => 'required|exists:kategoris,id',
+            'kategori_id' => 'required|exists:kategoris,kategoriID',
             'satuan' => 'required|string|max:50',
             'stok' => 'required|integer|min:0',
         ]);
 
-        $barang->update([
-            'kode_barang' => $request->kode_barang,
-            'nama_barang' => $request->nama_barang,
-            'kategori_id' => $request->kategori_id,
-            'satuan' => $request->satuan,
-            'stok' => $request->stok,
-            'deskripsi' => $request->deskripsi,
-        ]);
+        $barang->kode_barang = $request->kode_barang;
+        $barang->nama_barang = $request->nama_barang;
+        $barang->kategoriID = $request->kategori_id;
+        $barang->satuan = $request->satuan;
+        $barang->stok = $request->stok;
+        $barang->deskripsi = $request->deskripsi;
+        $barang->save();
 
         return redirect()->route('admin.barang.index')->with('success', 'Data barang berhasil diperbarui.');
     }
