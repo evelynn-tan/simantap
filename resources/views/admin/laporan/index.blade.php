@@ -139,7 +139,7 @@
                                 @foreach ($hasilLaporan as $permintaan)
                                     <tr class="bg-white border-b hover:bg-gray-50">
                                         {{-- Gunakan processed_at yang disediakan di controller --}}
-                                        <td class="px-6 py-4 font-medium">{{ $permintaan->processed_at ? $permintaan->processed_at->format('d/m/Y H:i') : 'Menunggu' }}</td>
+                                        <td class="px-6 py-4 font-medium">{{ $permintaan->approved_at ? $permintaan->approved_at->format('d/m/Y H:i') : 'Menunggu' }}</td>
                                         {{-- Asumsi relasi User di Pengajuan dinamai 'user' --}}
                                         <td class="px-6 py-4">{{ $permintaan->user->name ?? $permintaan->userID ?? '-' }}</td>
                                         <td class="px-6 py-4">

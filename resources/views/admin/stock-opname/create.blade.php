@@ -80,10 +80,12 @@
                     </thead>
                     <tbody id="opname-table-body">
                         @forelse ($barangs as $barang)
-                        <tr class="bg-white border-b hover:bg-gray-50" data-barang-id="{{ $barang->id }}" data-stok-sistem="{{ $barang->stok_sekarang }}">
+                        <tr class="bg-white border-b hover:bg-gray-50" 
+                            data-barang-id="{{ $barang->barangID }}" {{-- PERBAIKAN 1: Menggunakan barangID --}}
+                            data-stok-sistem="{{ $barang->stok_sekarang }}">
                             
                             <td class="py-4 px-4 font-semibold text-gray-800 whitespace-nowrap">
-                                {{ $barang->kode_barang ?? 'ATK000' . $barang->id }}
+                                {{ $barang->kode_barang ?? 'ATK000' . $barang->barangID }}
                             </td>
                             
                             <th scope="row" class="py-4 px-4 font-medium text-gray-900 whitespace-nowrap">
@@ -91,7 +93,7 @@
                             </th>
                             
                             <td class="py-4 px-4">
-                                {{-- PERBAIKAN: Menggunakan optional chaining (?->) untuk mencegah error jika kategori null --}}
+                                {{-- Menggunakan optional chaining (?->) untuk mencegah error jika kategori null --}}
                                 {{ $barang->kategori?->nama_kategori ?? 'N/A' }}
                             </td>
                             
@@ -100,15 +102,16 @@
                             </td>
                             
                             <td class="py-4 px-4 text-center" style="width: 150px;">
-                                <input type="number" 
-                                    name="stok_fisik[{{ $barang->id }}]" 
-                                    class="input-stok-fisik bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 text-center" 
-                                    value="{{ old('stok_fisik.' . $barang->id) }}" 
-                                    min="0">
-                                {{-- Menampilkan pesan error validasi khusus untuk field ini --}}
-                                @if ($errors->has('stok_fisik.' . $barang->id))
-                                    <p class="mt-1 text-xs text-red-600">{{ $errors->first('stok_fisik.' . $barang->id) }}</p>
-                                @endif
+                               <input type="number" 
+                               name="stok_fisik[{{ $barang->barangID }}]" 
+                               class="input-stok-fisik bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 text-center" 
+                               
+                               value="{{ old('stok_fisik.' . $barang->barangID) }}" 
+                               min="0">
+                               {{-- Menampilkan pesan error validasi khusus untuk field ini --}}
+                               @if ($errors->has('stok_fisik.' . $barang->barangID)) {{-- PERBAIKAN 2: Menggunakan barangID --}}
+                                   <p class="mt-1 text-xs text-red-600">{{ $errors->first('stok_fisik.' . $barang->barangID) }}</p>
+                               @endif
                             </td>
                             
                             <td class="py-4 px-4 text-center font-semibold text-gray-500 selisih-output">
@@ -257,13 +260,12 @@
                         
                         // PENTING: Pastikan input memiliki atribut name agar ter-submit
                         if (!input.hasAttribute('name') && barangId) {
+                            // Ini seharusnya sudah diatur di PHP, tapi ini adalah fallback
                             input.setAttribute('name', `stok_fisik[${barangId}]`);
                         }
 
                     } else {
-                        // Jika input kosong atau tidak valid, hapus atribut name agar tidak dikirim
-                        // input.removeAttribute('name'); // Menonaktifkan ini karena akan mengganggu 'old' value
-                        
+                        // Jika input kosong atau tidak valid
                         selisihOutput.textContent = 'Belum diisi';
                         selisihOutput.className = 'py-4 px-4 text-center font-semibold text-gray-500 selisih-output';
                     }
@@ -310,7 +312,7 @@
             
             // 3. Submit handler
             form.addEventListener('submit', function(e) {
-                // Hapus input yang kosong atau tidak valid SEBELUM submit,
+                // Hapus input yang kosong atau tidak valid SEBELUM submit
                 // agar tidak dikirim ke controller, tetapi tetap biarkan yang valid.
                 inputFields.forEach(input => {
                     const value = input.value.trim();
@@ -323,7 +325,7 @@
                     } else {
                          // Pastikan attribute name ada untuk input yang valid
                          const row = input.closest('tr');
-                         const barangId = row.dataset.barangId;
+                         const barangId = row.dataset.barangId; // Ini mengambil ID yang sudah kita perbaiki di HTML
                          input.setAttribute('name', `stok_fisik[${barangId}]`);
                     }
                 });

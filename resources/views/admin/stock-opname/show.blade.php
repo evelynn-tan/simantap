@@ -31,7 +31,8 @@
                     </div>
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
                         <dt class="text-sm font-medium text-gray-500">Total Item Selisih</dt>
-                        <dd class="mt-1 text-xl font-semibold text-gray-900">{{ $opname->details->where('selisih', '!=', 0)->count() }}</dd>
+                        {{-- Menggunakan stokSelisih yang sudah dikoreksi --}}
+                        <dd class="mt-1 text-xl font-semibold text-gray-900">{{ $opname->details->where('stokSelisih', '!=', 0)->count() }}</dd>
                     </div>
                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
                         <dt class="text-sm font-medium text-gray-500">Operator</dt>
@@ -62,19 +63,24 @@
                                 <td class="py-4 px-6">
                                     {{ $detail->barang->kategori->nama_kategori ?? 'N/A' }}
                                 </td>
-                                <td class="py-4 px-6 text-center font-medium text-gray-700">{{ $detail->stok_sistem }}</td>
-                                <td class="py-4 px-6 text-center font-medium text-blue-600">{{ $detail->stok_fisik }}</td>
                                 
+                                {{-- Menggunakan CamelCase stokSistem --}}
+                                <td class="py-4 px-6 text-center font-medium text-gray-700">{{ $detail->stokSistem }}</td>
+                                
+                                {{-- Menggunakan CamelCase stokFisik --}}
+                                <td class="py-4 px-6 text-center font-medium text-blue-600">{{ $detail->stokFisik }}</td>
+                                
+                                {{-- Menggunakan CamelCase stokSelisih --}}
                                 <td class="py-4 px-6 text-center font-bold
-                                    @if ($detail->selisih > 0)
+                                    @if ($detail->stokSelisih > 0)
                                         text-green-600
-                                    @elseif ($detail->selisih < 0)
+                                    @elseif ($detail->stokSelisih < 0)
                                         text-red-600
                                     @else
                                         text-gray-700
                                     @endif
                                 ">
-                                    {{ $detail->selisih }}
+                                    {{ $detail->stokSelisih }}
                                 </td>
                             </tr>
                             @endforeach

@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 class StockOpname extends Model
 {
     use HasFactory;
-
-    // PENTING: Karena error SQL menunjuk ke 'operatorID', kita asumsikan 
-    // nama kolom di DB non-standar (CamelCase) dan harus didefinisikan 
-    // di model untuk relasi dan potensi Primary Key.
     
-    // Jika Primary Key Anda bukan 'id' (misalnya 'stockOpnameID'), tambahkan:
-    // protected $primaryKey = 'stockOpnameID';
+    // PERBAIKAN: Definisikan Primary Key yang non-standar (opnameID)
+    protected $primaryKey = 'opnameID'; //
 
-    // Menggunakan $guarded untuk mengizinkan mass assignment, kecuali 'id'.
-    protected $guarded = ['id'];
+    // PERBAIKAN: Ganti $guarded agar primary key yang non-standar tidak perlu di mass-assign
+    // Jika Anda ingin menggunakan $guarded
+    protected $guarded = ['opnameID']; 
+    
+    // Atau lebih aman menggunakan $fillable:
+    // protected $fillable = ['operatorID', 'tanggal_opname', 'keterangan']; 
 
     protected $casts = [
         'tanggal_opname' => 'datetime',
@@ -23,13 +23,13 @@ class StockOpname extends Model
 
     public function details()
     {
-        return $this->hasMany(StockOpnameDetail::class);
+        return $this->hasMany(StockOpnameDetail::class, 'opnameID'); // Tambahkan FK eksplisit ke StockOpnameDetail
     }
 
     public function operator()
     {
         // MENGUBAH foreign key dari 'operator_id' menjadi 'operatorID' 
-        // agar sesuai dengan nama kolom di database Anda (berdasarkan error).
+        // agar sesuai dengan nama kolom di database Anda.
         return $this->belongsTo(User::class, 'operatorID'); 
     }
 }

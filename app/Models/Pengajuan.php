@@ -12,6 +12,12 @@ class Pengajuan extends Model
 
     protected $primaryKey = 'pengajuanID';
     public $incrementing = true;
+    
+    // PERBAIKAN KRUSIAL: Tambahkan casting untuk kolom tanggal
+    protected $casts = [
+        'requested_at' => 'datetime',
+        'approved_at' => 'datetime', // Memastikan ini adalah objek Carbon untuk di-format
+    ];
 
     protected $fillable = [
         'pegawaiID',

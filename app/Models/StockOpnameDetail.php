@@ -7,20 +7,28 @@ class StockOpnameDetail extends Model
 {
     use HasFactory;
     
-    // Menggunakan $guarded untuk mengizinkan mass assignment, kecuali 'id'.
-    protected $guarded = ['id'];
+    // PERBAIKAN 1: Definisikan Primary Key non-standar
+    // Berdasarkan migrasi, PK-nya adalah 'opnameDetailID'
+    protected $primaryKey = 'opnameDetailID';
+    
+    // PERBAIKAN KRUSIAL 2: Daftarkan semua kolom yang boleh diisi, 
+    // pastikan namanya SAMA dengan database (CamelCase)
+    protected $fillable = [
+        'opnameID', 
+        'barangID', 
+        'stokSistem', 
+        'stokFisik', 
+        'stokSelisih', // Nama kolom yang benar
+        'keterangan', // Dari migrasi
+    ]; 
 
     public function stockOpname()
     {
-        // PENTING: Jika foreign key di DB menggunakan CamelCase (misal: 'stockOpnameID'), 
-        // kita perlu mendefinisikannya secara eksplisit.
-        return $this->belongsTo(StockOpname::class, 'stockOpnameID');
+        return $this->belongsTo(StockOpname::class, 'opnameID');
     }
     
     public function barang()
     {
-        // PENTING: Jika foreign key di DB menggunakan CamelCase (misal: 'barangID'), 
-        // kita perlu mendefinisikannya secara eksplisit.
         return $this->belongsTo(Barang::class, 'barangID');
     }
 }

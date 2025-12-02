@@ -13,6 +13,13 @@ class Barang extends Model
     protected $primaryKey = 'barangID'; 
     public $incrementing = true;
     
+    // PERBAIKAN KRUSIAL FINAL: Tambahkan Casting untuk Primary Key
+    protected $casts = [
+        'barangID' => 'integer', 
+        'stok_sekarang' => 'integer', 
+        // Tambahkan casting untuk FK lain jika perlu (misal: 'kategoriID' => 'integer')
+    ];
+    
     // Route model binding gunakan barangID
     public function getRouteKeyName()
     {
@@ -25,8 +32,7 @@ class Barang extends Model
         return $this->where('barangID', $value)->firstOrFail();
     }
     
-    // Gunakan $guarded untuk mengizinkan semua mass assignment kecuali 'id', 
-    // menyelaraskan dengan Model lain yang sudah diperbaiki.
+    // Gunakan $guarded untuk mengizinkan semua mass assignment kecuali 'id' (sudah benar)
     protected $guarded = ['id'];
 
     // Accessor: map stok virtual attribute ke stok_sekarang column
@@ -44,7 +50,6 @@ class Barang extends Model
     // Relasi ke Kategori
     public function kategori()
     {
-        // Foreign key di sini adalah kategoriID (non-standar)
         return $this->belongsTo(Kategori::class, 'kategoriID', 'kategoriID');
     }
 

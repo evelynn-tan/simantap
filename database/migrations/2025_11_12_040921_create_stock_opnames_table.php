@@ -11,7 +11,11 @@ return new class extends Migration
     {
         Schema::create('stock_opnames', function (Blueprint $table) {
             $table->id('opnameID');
-            $table->foreignId('operatorID')->constrained('operators', 'operatorID');
+            // PERBAIKAN: Ubah referensi tabel dari 'operators' ke 'users'
+            // dan kolom referensi menjadi 'id' (standar Laravel)
+            $table->foreignId('operatorID')->constrained('users', 'userID'); 
+            // JIKA tabel users Anda menggunakan userID sebagai PK: $table->foreignId('operatorID')->constrained('users', 'userID');
+            
             $table->date('tanggal_opname');
             $table->text('keterangan')->nullable();
             $table->timestamps();

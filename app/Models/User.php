@@ -10,6 +10,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    // Primary Key non-standar
     protected $primaryKey = 'userID';
     public $incrementing = true;
 
@@ -32,6 +33,30 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Accessor untuk properti 'name'.
+     * Digunakan untuk mengambil nama lengkap dari tabel terkait (Pegawai/Operator)
+     * karena tabel users tidak memiliki kolom 'name'.
+     */
+    public function getNameAttribute()
+    {
+        // Jika peran adalah operator, ambil dari tabel operators
+        if ($this->role === 'operator' && $this->operator) {
+            // Mengambil dari kolom 'nama_lengkap' di tabel operators
+            return $this->operator->nama_lengkap; 
+        }
+
+        // Jika peran adalah pegawai, ambil dari tabel pegawais
+        if ($this->role === 'pegawai' && $this->pegawai) {
+            // Asumsi: Kolom nama di tabel pegawais juga 'nama_lengkap' atau 'nama'
+            // Menggunakan nama_lengkap sebagai asumsi konsisten
+            return $this->pegawai->nama_lengkap ?? $this->email; 
+        }
+
+        // Fallback ke email jika nama tidak ditemukan atau role tidak dikenal
+        return $this->email;
+    }
+
     // Relasi ke Pegawai
     public function pegawai()
     {
@@ -50,7 +75,7 @@ class User extends Authenticatable
             return 'Operator BMN';
         }
     
-    // Huruf besar di awal kata (misal: 'pegawai' jadi 'Pegawai')
-    return ucfirst($this->role);
+        // Huruf besar di awal kata (misal: 'pegawai' jadi 'Pegawai')
+        return ucfirst($this->role);
     }
 }
