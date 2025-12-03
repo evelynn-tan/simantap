@@ -75,7 +75,7 @@
                 @forelse($permintaan as $p)
                 <tr class="hover:bg-gray-50 transition duration-150">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ $p->created_at->format('d M Y') }}
+                        {{ $p->created_at->timezone('Asia/Jakarta')->format('h:i A d M Y') }}
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-900">
                         @foreach($p->pengajuanDetails as $detail)

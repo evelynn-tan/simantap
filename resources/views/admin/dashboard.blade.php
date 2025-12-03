@@ -84,7 +84,7 @@
                     <tbody class="text-gray-700">
                         @forelse($permintaanTerbaru ?? [] as $permintaan)
                         <tr class="border-b border-gray-100 hover:bg-gray-50">
-                            <td class="px-4 py-3 whitespace-nowrap">{{ $permintaan->created_at->format('d M') }}</td>
+                            <td class="px-4 py-3 whitespace-nowrap">{{ $permintaan->created_at->timezone('Asia/Jakarta')->format('h:i A d M Y') }}</td>
                             <td class="px-4 py-3 font-medium">{{ $permintaan->pegawai->nama_lengkap ?? $permintaan->user->name ?? '-' }}</td>
                             <td class="px-4 py-3">
                                 <ul class="list-disc list-inside text-xs text-gray-600">

@@ -46,10 +46,7 @@ class LaporanController extends Controller
                         $query->where('approved_at', '>=', Carbon::now()->subDays($days));
                     }
                 }
-
             } elseif ($jenisLaporan == 'umum') {
-                 // Filter Laporan Umum (Berdasarkan Kategori Barang)
-                 // ... (kode filter kategori)
 
                 // Filter Tanggal Mulai dan Selesai
                 if ($request->filled('tanggal_mulai')) {
