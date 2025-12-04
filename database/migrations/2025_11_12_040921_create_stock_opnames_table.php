@@ -1,5 +1,6 @@
 <?php
-// database/migrations/2024_01_11_create_stock_opnames_table.php
+// database/migrations/2025_11_12_040921_create_stock_opnames_table.php
+// STOCK OPNAME TABLE - Ubah operatorID ke userID
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,14 +12,12 @@ return new class extends Migration
     {
         Schema::create('stock_opnames', function (Blueprint $table) {
             $table->id('opnameID');
-            // PERBAIKAN: Ubah referensi tabel dari 'operators' ke 'users'
-            // dan kolom referensi menjadi 'id' (standar Laravel)
-            $table->foreignId('operatorID')->constrained('users', 'userID'); 
-            // JIKA tabel users Anda menggunakan userID sebagai PK: $table->foreignId('operatorID')->constrained('users', 'userID');
-            
+            $table->foreignId('userID')->constrained('users', 'userID')->onDelete('restrict');  // Operator yang melakukan opname
             $table->date('tanggal_opname');
             $table->text('keterangan')->nullable();
             $table->timestamps();
+
+            $table->index('tanggal_opname');
         });
     }
 

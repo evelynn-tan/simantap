@@ -9,71 +9,113 @@ class Barang extends Model
 {
     use HasFactory;
 
-    // Tambahkan definisi Primary Key untuk memastikan penamaan non-standar (BarangID) dikenal
-    protected $primaryKey = 'barangID'; 
+    protected $primaryKey = 'barangID';
     public $incrementing = true;
-    
-    // PERBAIKAN KRUSIAL FINAL: Tambahkan Casting untuk Primary Key
-    protected $casts = [
-        'barangID' => 'integer', 
-        'stok_sekarang' => 'integer', 
-        // Tambahkan casting untuk FK lain jika perlu (misal: 'kategoriID' => 'integer')
+
+    protected $fillable = [
+        'kode_barang',
+        'nama_barang',
+        'kategoriID',
+        'satuan',
+        'stok',
+        'deskripsi',
     ];
-    
-    // Route model binding gunakan barangID
+
+    protected $casts = [
+        'stok' => 'integer',
+        'satuan' => 'string',
+    ];
+
+    /**
+     * Route model binding menggunakan barangID
+     */
     public function getRouteKeyName()
     {
         return 'barangID';
     }
-    
-    // Resolve route binding dengan barangID
-    public function resolveRouteBinding($value, $field = null)
-    {
-        return $this->where('barangID', $value)->firstOrFail();
-    }
-    
-    // Gunakan $guarded untuk mengizinkan semua mass assignment kecuali 'id' (sudah benar)
-    protected $guarded = ['id'];
 
-    // Accessor: map stok virtual attribute ke stok_sekarang column
-    public function getStokAttribute()
-    {
-        return $this->attributes['stok_sekarang'] ?? 0;
-    }
-
-    // Mutator: map stok virtual attribute ke stok_sekarang column saat assign
-    public function setStokAttribute($value)
-    {
-        $this->attributes['stok_sekarang'] = $value;
-    }
-
-    // Relasi ke Kategori
+    /**
+     * Relasi ke Kategori
+     */
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'kategoriID', 'kategoriID');
     }
 
-    // Relasi ke Pengajuan Detail
+    /**
+     * Relasi ke PengajuanDetails
+     */
     public function pengajuanDetails()
     {
         return $this->hasMany(PengajuanDetail::class, 'barangID', 'barangID');
     }
 
-    // Relasi ke Detail Barang Masuk
-    public function detailBarangMasuks()
+    /**
+     * Relasi ke DetailRangggings (untuk tracking transaksi)
+     */
+    public function detailRangggings()
     {
-        return $this->hasMany(DetailBarangMasuk::class, 'barangID', 'barangID');
+        return $this->hasMany(DetailRangging::class, 'barangID', 'barangID');
     }
 
-    // Relasi ke Detail Barang Keluar
-    public function detailBarangKeluars()
-    {
-        return $this->hasMany(DetailBarangKeluar::class, 'barangID', 'barangID');
-    }
-
-    // Relasi ke Stock Opname Detail
+    /**
+     * Relasi ke StockOpnameDetails
+     */
     public function stockOpnameDetails()
     {
         return $this->hasMany(StockOpnameDetail::class, 'barangID', 'barangID');
+    }
+
+    /**
+     * ACCESSOR: Menghitung status barang dari nilai stok
+     */
+    public function getStatusAttribute()
+    {
+        if ($this->stok <= 0) {
+            return 'habis';
+        }
+        if ($this->stok < 5) {
+            return 'rendah';
+        }
+        return 'tersedia';
+    }
+
+    /**
+     * Auto-generate kode barang saat create
+     * Format: BRG-001, BRG-002, dst
+     */
+    protected static function booted()
+    {
+        static::creating(function ($barang) {
+            if (!$barang->kode_barang) {
+                $lastBarang = Barang::orderBy('barangID', 'desc')->first();
+                $nextNum = ($lastBarang ? intval(substr($lastBarang->kode_barang, 4)) + 1 : 1);
+                $barang->kode_barang = 'BRG-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+            }
+        });
+    }
+
+    /**
+     * Scope: Barang tersedia (stok > 0)
+     */
+    public function scopeTersedia($query)
+    {
+        return $query->where('stok', '>', 0);
+    }
+
+    /**
+     * Scope: Barang habis (stok <= 0)
+     */
+    public function scopeHabis($query)
+    {
+        return $query->where('stok', '<=', 0);
+    }
+
+    /**
+     * Scope: Barang stok rendah (0 < stok < 5)
+     */
+    public function scopeRendah($query)
+    {
+        return $query->where('stok', '>', 0)->where('stok', '<', 5);
     }
 }

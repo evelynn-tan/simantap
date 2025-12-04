@@ -1,5 +1,4 @@
 <?php
-// app/Models/Pengajuan.php
 
 namespace App\Models;
 
@@ -12,11 +11,10 @@ class Pengajuan extends Model
 
     protected $primaryKey = 'pengajuanID';
     public $incrementing = true;
-    
-    // PERBAIKAN KRUSIAL: Tambahkan casting untuk kolom tanggal
+
     protected $casts = [
         'requested_at' => 'datetime',
-        'approved_at' => 'datetime', // Memastikan ini adalah objek Carbon untuk di-format
+        'approved_at' => 'datetime',
     ];
 
     protected $fillable = [
@@ -29,39 +27,67 @@ class Pengajuan extends Model
         'approved_at',
     ];
 
-    // Relasi ke Pegawai
+    /**
+     * Relasi ke Pegawai
+     */
     public function pegawai()
     {
         return $this->belongsTo(Pegawai::class, 'pegawaiID', 'pegawaiID');
     }
 
-    // Relasi ke Operator (yang approve)
-    public function operator()
+    /**
+     * Relasi ke User (yang approve - operator)
+     */
+    public function approver()
     {
-        return $this->belongsTo(Operator::class, 'approved_by', 'operatorID');
+        return $this->belongsTo(User::class, 'approved_by', 'userID');
     }
 
-    // Relasi ke Pengajuan Detail
+    /**
+     * Relasi ke PengajuanDetails
+     */
     public function pengajuanDetails()
     {
         return $this->hasMany(PengajuanDetail::class, 'pengajuanID', 'pengajuanID');
     }
 
-    // Relasi ke Transaksi Keluar
-    public function transaksiKeluar()
+    /**
+     * Alias untuk pengajuanDetails
+     */
+    public function details()
     {
-        return $this->hasOne(TransaksiKeluar::class, 'pengajuanID', 'pengajuanID');
+        return $this->hasMany(PengajuanDetail::class, 'pengajuanID', 'pengajuanID');
     }
 
-    // Relasi ke User melalui Pegawai
+    /**
+     * Relasi ke User melalui Pegawai
+     */
     public function user()
     {
         return $this->hasOneThrough(User::class, Pegawai::class, 'pegawaiID', 'userID', 'pegawaiID', 'userID');
     }
 
-    // Alias untuk pengajuanDetails
-    public function details()
+    /**
+     * Scope: Filter pengajuan yang menunggu
+     */
+    public function scopeMenunggu($query)
     {
-        return $this->hasMany(PengajuanDetail::class, 'pengajuanID', 'pengajuanID');
+        return $query->where('status', 'menunggu');
+    }
+
+    /**
+     * Scope: Filter pengajuan yang disetujui
+     */
+    public function scopeDisetujui($query)
+    {
+        return $query->where('status', 'disetujui');
+    }
+
+    /**
+     * Scope: Filter pengajuan yang ditolak
+     */
+    public function scopeDitolak($query)
+    {
+        return $query->where('status', 'ditolak');
     }
 }

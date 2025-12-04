@@ -9,43 +9,48 @@ class Operator extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'operatorID';
-    public $incrementing = true;
+    protected $table = 'operators';
+    protected $primaryKey = 'userID';  // PK = userID (bukan operatorID)
+    public $incrementing = false;  // userID bukan auto-increment
+    protected $keyType = 'int';
+
+    // Tidak ada timestamps karena tabel operators hanya FK
+    public $timestamps = false;
 
     protected $fillable = [
         'userID',
-        'nama_lengkap',
-        'nip',
-        'jabatan',
     ];
 
-    // Relasi ke User
+    /**
+     * Relasi ke User
+     */
     public function user()
     {
         return $this->belongsTo(User::class, 'userID', 'userID');
     }
 
-    // Relasi ke Transaksi Masuk
-    public function transaksiMasuks()
+    /**
+     * Relasi ke Transaksis (untuk log operator)
+     */
+    public function transaksis()
     {
-        return $this->hasMany(TransaksiMasuk::class, 'operatorID', 'operatorID');
+        return $this->hasMany(Transaksi::class, 'userID', 'userID');
     }
 
-    // Relasi ke Transaksi Keluar
-    public function transaksiKeluars()
-    {
-        return $this->hasMany(TransaksiKeluar::class, 'operatorID', 'operatorID');
-    }
-
-    // Relasi ke Stock Opname
+    /**
+     * Relasi ke StockOpnames
+     */
     public function stockOpnames()
     {
-        return $this->hasMany(StockOpname::class, 'operatorID', 'operatorID');
+        return $this->hasMany(StockOpname::class, 'userID', 'userID');
     }
 
-    // Relasi ke Laporan
+    /**
+     * Relasi ke Laporans
+     */
     public function laporans()
     {
-        return $this->hasMany(Laporan::class, 'operatorID', 'operatorID');
+        return $this->hasMany(Laporan::class, 'userID', 'userID');
     }
 }
+

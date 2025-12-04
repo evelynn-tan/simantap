@@ -1,5 +1,4 @@
 <?php
-// app/Models/PengajuanDetail.php
 
 namespace App\Models;
 
@@ -17,17 +16,51 @@ class PengajuanDetail extends Model
         'pengajuanID',
         'barangID',
         'jumlah',
+        'status',  // NEW: menunggu, disetujui, ditolak
     ];
 
-    // Relasi ke Pengajuan
+    protected $casts = [
+        'jumlah' => 'integer',
+        'status' => 'string',
+    ];
+
+    /**
+     * Relasi ke Pengajuan
+     */
     public function pengajuan()
     {
         return $this->belongsTo(Pengajuan::class, 'pengajuanID', 'pengajuanID');
     }
 
-    // Relasi ke Barang
+    /**
+     * Relasi ke Barang
+     */
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'barangID', 'barangID');
+    }
+
+    /**
+     * Scope: Filter detail yang menunggu
+     */
+    public function scopeMenunggu($query)
+    {
+        return $query->where('status', 'menunggu');
+    }
+
+    /**
+     * Scope: Filter detail yang disetujui
+     */
+    public function scopeDisetujui($query)
+    {
+        return $query->where('status', 'disetujui');
+    }
+
+    /**
+     * Scope: Filter detail yang ditolak
+     */
+    public function scopeDitolak($query)
+    {
+        return $query->where('status', 'ditolak');
     }
 }

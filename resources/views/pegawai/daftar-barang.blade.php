@@ -118,8 +118,8 @@
 
                         <td class="px-6 py-4 text-sm">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
-                                {{ $barang->stok_sekarang < 5 ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100' }}">
-                                {{ $barang->stok_sekarang }} {{ $barang->satuan }}
+                                {{ $barang->stok < 5 ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100' }}">
+                                {{ $barang->stok }} {{ $barang->satuan }}
                             </span>
                         </td>
                         
@@ -226,7 +226,7 @@
                     <div class="mb-5">
                         <label class="block text-sm font-bold text-slate-700 mb-2">Stok Tersedia</label>
                         <input type="text" 
-                            x-bind:value="selectedBarang.stok_sekarang + ' ' + selectedBarang.satuan"
+                            x-bind:value="selectedBarang.stok + ' ' + selectedBarang.satuan"
                             disabled 
                             class="block w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-500 font-medium"
                         >
@@ -241,7 +241,7 @@
                             name="items[0][jumlah]" 
                             x-model.number="formData.jumlah" 
                             min="1" 
-                            x-bind:max="selectedBarang.stok_sekarang"
+                            x-bind:max="selectedBarang.stok"
                             @input="validateJumlah"
                             required
                             class="block w-full border-slate-200 rounded-xl shadow-sm focus:ring-emerald-500 focus:border-emerald-500 px-4 py-3 transition-all"
@@ -304,8 +304,8 @@ function barangPage() {
         },
 
         validateJumlah() {
-            if (this.formData.jumlah > this.selectedBarang.stok_sekarang) {
-                this.formData.jumlah = this.selectedBarang.stok_sekarang;
+            if (this.formData.jumlah > this.selectedBarang.stok) {
+                this.formData.jumlah = this.selectedBarang.stok;
             }
             if (this.formData.jumlah < 1) {
                 this.formData.jumlah = 1;

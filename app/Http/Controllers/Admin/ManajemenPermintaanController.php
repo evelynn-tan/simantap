@@ -4,66 +4,121 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Pengajuan; // <-- IMPORT MODEL YANG DIBUTUHKAN
+use App\Models\Pengajuan;
+use App\Models\PengajuanDetail;
+use App\Models\Barang;
 
 class ManajemenPermintaanController extends Controller
 {
     /**
-     * Menampilkan halaman Manajemen Permintaan.
-     * (Sesuai Activity Diagram "Memvalidasi Permintaan Barang", langkah "Menampilkan daftar...")
+     * Menampilkan daftar pengajuan
      */
     public function index()
     {
-        // 1. Ambil semua data pengajuan dari database
-        // Kita pakai ->with() agar data pegawai (user) dan barangnya (details.barang) ikut terambil
-        $permintaan = Pengajuan::with('pegawai', 'details.barang')
-            ->orderBy('created_at', 'desc') // Urutkan dari yg terbaru
+        $pengajuans = Pengajuan::with(['pegawai', 'pengajuanDetails.barang'])
+            ->orderBy('requested_at', 'desc')
             ->get();
 
-        // 2. Kirim data tersebut ke view yang akan kita buat
-        return view('admin.permintaan.index', [
-            'daftarPermintaan' => $permintaan
-        ]);
+        return view('admin.permintaan.index', compact('pengajuans'));
     }
 
     /**
-     * Memproses aksi "Setujui" permintaan.
+     * Menampilkan detail pengajuan
      */
-    public function setujui($id)
+    public function show(Pengajuan $pengajuan)
     {
-        $pengajuan = Pengajuan::findOrFail($id);
+        $pengajuan->load(['pegawai', 'pengajuanDetails.barang', 'approver']);
 
-        // Ubah status pengajuan
-        $pengajuan->status = 'disetujui';
-        $pengajuan->approved_by = auth()->id();
-        $pengajuan->approved_at = now();
-        $pengajuan->save();
+        return view('admin.permintaan.show', compact('pengajuan'));
+    }
 
-        // Kurangi stok barang
-        foreach ($pengajuan->details as $detail) {
-            $barang = $detail->barang;
-            $barang->stok_sekarang -= $detail->jumlah;
-            $barang->save();
+    /**
+     * Menyetujui pengajuan
+     * - Set status pengajuan = 'disetujui'
+     * - Set per-item status = 'disetujui'
+     * - Kurangi stok barang
+     */
+    public function setujui(Request $request, Pengajuan $pengajuan)
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.pengajuanDetailID' => 'required|exists:pengajuan_details,pengajuanDetailID',
+            'items.*.approve' => 'boolean',
+        ]);
+
+        $userID = auth()->id();
+        $now = now();
+
+        foreach ($request->items as $item) {
+            $detail = PengajuanDetail::findOrFail($item['pengajuanDetailID']);
+
+            if ($item['approve'] ?? false) {
+                // Setujui item ini
+                $detail->update(['status' => 'disetujui']);
+
+                // Kurangi stok barang
+                $barang = $detail->barang;
+                $barang->decrement('stok', $detail->jumlah);
+            }
         }
 
-        // Kembalikan ke halaman sebelumnya dengan pesan sukses
-        return redirect()->route('admin.permintaan.index')->with('success', 'Permintaan berhasil disetujui.');
+        // Update pengajuan status & approved_by
+        $pengajuan->update([
+            'status' => 'disetujui',
+            'approved_by' => $userID,
+            'approved_at' => $now,
+        ]);
+
+        return redirect()->route('admin.permintaan.index')
+            ->with('success', 'Pengajuan telah disetujui.');
     }
 
     /**
-     * Memproses aksi "Tolak" permintaan.
+     * Menolak pengajuan
+     * - Set status pengajuan = 'ditolak'
+     * - Set per-item status = 'ditolak'
      */
-    public function tolak($id)
+    public function tolak(Request $request, Pengajuan $pengajuan)
     {
-        $pengajuan = Pengajuan::findOrFail($id);
+        $request->validate([
+            'alasan' => 'required|string|max:500',
+        ]);
 
-        // Ubah status pengajuan
-        $pengajuan->status = 'ditolak';
-        $pengajuan->approved_by = auth()->id();
-        $pengajuan->approved_at = now();
-        $pengajuan->save();
+        $userID = auth()->id();
+        $now = now();
 
-        // Kembalikan ke halaman sebelumnya dengan pesan sukses
-        return redirect()->route('admin.permintaan.index')->with('success', 'Permintaan telah ditolak.');
+        // Tolak semua item
+        $pengajuan->pengajuanDetails()
+            ->update(['status' => 'ditolak']);
+
+        // Update pengajuan status
+        $pengajuan->update([
+            'status' => 'ditolak',
+            'approved_by' => $userID,
+            'approved_at' => $now,
+            'alasan_penolakan' => $request->alasan,
+        ]);
+
+        return redirect()->route('admin.permintaan.index')
+            ->with('success', 'Pengajuan telah ditolak.');
+    }
+
+    /**
+     * Membatalkan pengajuan (hanya status 'menunggu')
+     */
+    public function batal(Pengajuan $pengajuan)
+    {
+        if ($pengajuan->status !== 'menunggu') {
+            return redirect()->back()
+                ->with('error', 'Hanya pengajuan dengan status "menunggu" yang dapat dibatalkan.');
+        }
+
+        $pengajuan->pengajuanDetails()
+            ->update(['status' => 'ditolak']);
+
+        $pengajuan->update(['status' => 'dibatalkan']);
+
+        return redirect()->route('admin.permintaan.index')
+            ->with('success', 'Pengajuan telah dibatalkan.');
     }
 }

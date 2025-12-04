@@ -1,5 +1,7 @@
 <?php
-// database/migrations/2024_01_09_create_transaksi_keluars_table.php
+// database/migrations/2025_11_12_040847_create_transaksi_keluars_table.php
+// DEPRECATED - Transaksi keluar sudah merge ke transaksis table
+// File ini dihapus, schema sudah tercakup di transaksis
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,17 +11,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('transaksi_keluars', function (Blueprint $table) {
-            $table->id('transaksiKeluarID');
-            $table->foreignId('pengajuanID')->constrained('pengajuans', 'pengajuanID');
-            $table->date('tanggal');
-            $table->foreignId('operatorID')->constrained('operators', 'operatorID');
-            $table->timestamps();
-        });
+        // SKIP - Sudah tercakup di transaksis table
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('transaksi_keluars');
+        // SKIP
     }
 };

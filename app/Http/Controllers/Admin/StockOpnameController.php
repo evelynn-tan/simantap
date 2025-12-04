@@ -7,140 +7,157 @@ use Illuminate\Http\Request;
 use App\Models\Barang;
 use App\Models\StockOpname;
 use App\Models\StockOpnameDetail;
-use App\Models\Transaksi; 
+use App\Models\DetailRangging;
+use App\Models\Transaksi;
 use Illuminate\Support\Facades\DB;
-use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class StockOpnameController extends Controller
 {
     /**
-     * Menampilkan halaman indeks dan daftar riwayat Stock Opname.
+     * Display list of stock opname records
      */
     public function index()
     {
-        // Mengambil semua riwayat Stock Opname, diurutkan dari yang terbaru.
-        $riwayatOpname = StockOpname::with('operator') 
+        $riwayatOpname = StockOpname::with('user')
             ->orderByDesc('tanggal_opname')
-            ->get();
+            ->paginate(10);
 
-        // Mengirimkan data ke view
-        return view('admin.stock-opname.index', [
-            'riwayatOpname' => $riwayatOpname
-        ]);
+        return view('admin.stock-opname.index', compact('riwayatOpname'));
     }
 
     /**
-     * Menampilkan formulir untuk membuat Stock Opname baru.
+     * Show form to create new stock opname
      */
     public function create()
     {
-        // Mengambil semua data barang beserta kategorinya
-        $barangs = Barang::with('kategori')->orderBy('kode_barang')->get();
+        $barangs = Barang::with('kategori')
+            ->orderBy('kode_barang')
+            ->get();
+
         return view('admin.stock-opname.create', compact('barangs'));
     }
 
-
     /**
-     * Menyimpan hasil stock opname dan melakukan koreksi stok.
+     * Save stock opname and adjust inventory
      */
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
             'stok_fisik' => 'required|array',
-            'stok_fisik.*' => 'required|integer|min:0', 
-            'catatan' => 'nullable|string|max:255',
+            'stok_fisik.*' => 'required|integer|min:0',
+            'keterangan' => 'nullable|string|max:500',
         ]);
 
-        // Memulai transaksi database untuk memastikan atomisitas
         DB::beginTransaction();
         try {
-            
-            // 1. Buat record StockOpname induk
+            $userID = Auth::id();
+            $now = now();
+
+            // Create stock opname header
             $opname = StockOpname::create([
-                'operatorID' => auth()->id(), 
-                'tanggal_opname' => now(),
-                'keterangan' => $request->catatan, 
+                'userID' => $userID,
+                'tanggal_opname' => $now->toDateString(),
+                'keterangan' => $request->keterangan,
             ]);
 
             $stokFisikData = $request->stok_fisik;
+            $totalSelisih = 0;
 
-            // 2. Iterasi melalui setiap item barang yang di-opname
+            // Process each item
             foreach ($stokFisikData as $barang_id => $stok_fisik) {
-                
-                // Konversi ID ke Integer (untuk robust)
-                $valid_barang_id = (int)$barang_id; 
-                
-                // PERBAIKAN KRUSIAL FINAL: LEWATI ID YANG TIDAK VALID (0 atau negatif)
-                if ($valid_barang_id <= 0) continue; 
+                $barangID = (int) $barang_id;
 
-                // MENGGUNAKAN WHERE->FIRST() UNTUK PENCARIAN ROBUST
-                $barang = Barang::where('barangID', $valid_barang_id)->first(); 
-                
-                // Lewati jika barang tidak ditemukan
-                if (!$barang) continue; 
+                // Skip invalid IDs
+                if ($barangID <= 0) {
+                    continue;
+                }
 
-                // Ambil stok dari sistem (stok_sekarang)
-                $stok_sistem = $barang->stok_sekarang; 
-                $selisih = (int)$stok_fisik - (int)$stok_sistem;
+                $barang = Barang::where('barangID', $barangID)->first();
 
-                // 2.1. Catat Stock Opname Detail
+                if (!$barang) {
+                    continue;
+                }
+
+                $stok_sistem = $barang->stok;
+                $stok_fisik = (int) $stok_fisik;
+                $selisih = $stok_fisik - $stok_sistem;
+
+                // Record stock opname detail
                 StockOpnameDetail::create([
-                    'opnameID' => $opname->opnameID, 
-                    'barangID' => $valid_barang_id, 
-                    'stokSistem' => $stok_sistem,
-                    'stokFisik' => (int)$stok_fisik,
-                    'stokSelisih' => $selisih, 
+                    'opnameID' => $opname->opnameID,
+                    'barangID' => $barangID,
+                    'stok_sistem' => $stok_sistem,
+                    'stok_fisik' => $stok_fisik,
+                    'stok_selisih' => $selisih,
+                    'keterangan' => $request->keterangan ?? null,
                 ]);
 
-                // 2.2. Koreksi Stok dan Catat Transaksi Penyesuaian jika ada selisih
-                if ($selisih != 0) {
-                    // Update stok barang di tabel barangs
-                    $barang->stok_sekarang = (int)$stok_fisik; 
-                    $barang->save();
+                // If difference exists, create adjustment transaction
+                if ($selisih !== 0) {
+                    $totalSelisih += $selisih;
 
-                    // Catat transaksi penyesuaian di tabel transaksis
-                    Transaksi::create([
-                        'barangID' => $valid_barang_id, 
-                        'operatorID' => auth()->id(), 
-                        'jenis' => 'penyesuaian', 
-                        'jumlah' => $selisih,
+                    // Update barang stok
+                    $barang->update(['stok' => $stok_fisik]);
+
+                    // Create adjustment transaction (penyesuaian)
+                    $transaksi = Transaksi::create([
+                        'userID' => $userID,
+                        'tanggal' => $now->toDateString(),
+                        'jenis' => 'penyesuaian',
+                        'sumber' => 'Stock Opname #' . $opname->opnameID,
+                        'keterangan' => 'Penyesuaian stok dari opname',
+                    ]);
+
+                    // Create detail entry
+                    DetailRangging::create([
+                        'transaksiID' => $transaksi->transaksiID,
+                        'barangID' => $barangID,
+                        'jumlah' => abs($selisih),
                         'stok_sebelum' => $stok_sistem,
-                        'stok_sesudah' => (int)$stok_fisik,
-                        'referensi_id' => $opname->opnameID, 
-                        'referensi_jenis' => 'StockOpname', 
+                        'stok_sesudah' => $stok_fisik,
                     ]);
                 }
             }
 
-            // Commit transaksi jika semua berhasil
             DB::commit();
 
-            // Arahkan ke halaman rincian (show)
             return redirect()->route('admin.stock-opname.show', $opname->opnameID)
-                             ->with('success', 'Stock Opname berhasil disimpan dan stok telah disesuaikan.');
-
+                ->with('success', "Stock Opname berhasil disimpan. Total selisih: {$totalSelisih} item");
         } catch (\Exception $e) {
-            // Rollback jika terjadi kesalahan
             DB::rollBack();
-            // Tampilkan pesan error
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan Stock Opname: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
     /**
-     * Menampilkan halaman rincian Stock Opname.
+     * Show stock opname details
      */
-    public function show($id)
+    public function show(StockOpname $opname)
     {
-        // Ambil data opname, beserta relasi operator dan details
-        $opname = StockOpname::with([
-            'operator', 
-            // Memastikan eager loading untuk detail barang dan kategori berjalan
-            'operator.operator',
-            'details.barang.kategori' 
-        ])->findOrFail($id);
+        $opname->load(['user', 'details.barang.kategori']);
 
-        return view('admin.stock-opname.show', compact('opname')); 
+        return view('admin.stock-opname.show', compact('opname'));
+    }
+
+    /**
+     * Delete stock opname (only draft/unclosed)
+     */
+    public function destroy(StockOpname $opname)
+    {
+        try {
+            // Delete related details first
+            StockOpnameDetail::where('opnameID', $opname->opnameID)->delete();
+
+            // Delete the opname record
+            $opname->delete();
+
+            return redirect()->route('admin.stock-opname.index')
+                ->with('success', 'Stock Opname berhasil dihapus');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+        }
     }
 }

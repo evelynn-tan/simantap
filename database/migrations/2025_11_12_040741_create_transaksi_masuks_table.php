@@ -1,5 +1,6 @@
 <?php
-// database/migrations/2024_01_07_create_transaksi_masuks_table.php
+// database/migrations/2025_11_12_040741_create_transaksis_table.php
+// TRANSAKSI TABLE (MERGED) - Menggantikan transaksi_masuks & transaksi_keluars
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -9,18 +10,22 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('transaksi_masuks', function (Blueprint $table) {
-            $table->id('transaksiMasukID');
+        Schema::create('transaksis', function (Blueprint $table) {
+            $table->id('transaksiID');
+            $table->foreignId('userID')->constrained('users', 'userID')->onDelete('restrict');  // Operator yang melakukan
             $table->date('tanggal');
-            $table->string('sumber');
+            $table->enum('jenis', ['masuk', 'keluar', 'penyesuaian'])->default('masuk');  // Tipe transaksi
+            $table->string('sumber')->nullable();  // Untuk masuk: supplier, pembelian, dll
             $table->text('keterangan')->nullable();
-            $table->foreignId('operatorID')->constrained('operators', 'operatorID');
             $table->timestamps();
+
+            $table->index('tanggal');
+            $table->index('jenis');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('transaksi_masuks');
+        Schema::dropIfExists('transaksis');
     }
 };

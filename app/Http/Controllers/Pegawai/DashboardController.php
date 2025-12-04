@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/Pegawai/DashboardController.php
 
 namespace App\Http\Controllers\Pegawai;
 
@@ -12,12 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    // Tambahkan Request $request di sini
     public function index(Request $request)
     {
         $userId = Auth::id();
 
-        // Dapatkan data pegawai berdasarkan userID
+        // Get pegawai data
         $pegawai = Pegawai::where('userID', $userId)->firstOrFail();
 
         if (!$pegawai) {
@@ -26,7 +24,7 @@ class DashboardController extends Controller
 
         $pegawaiID = $pegawai->pegawaiID;
 
-        // Data untuk KPI Cards
+        // KPI Cards
         $barangDigunakan = Pengajuan::where('pegawaiID', $pegawaiID)
             ->where('status', 'disetujui')
             ->count();
@@ -37,30 +35,29 @@ class DashboardController extends Controller
             ->where('status', 'menunggu')
             ->count();
 
-        // ========================================================
-        // DATA UTAMA (PAGINATION)
-        // ========================================================
+        $permintaanDitolak = Pengajuan::where('pegawaiID', $pegawaiID)
+            ->where('status', 'ditolak')
+            ->count();
+
+        // Main Data - Approved Items (AJAX-supported pagination)
         $barangSedangDigunakan = Pengajuan::with(['pengajuanDetails.barang'])
             ->where('pegawaiID', $pegawaiID)
             ->where('status', 'disetujui')
-            ->orderBy('created_at', 'desc')
-            ->paginate(5); 
+            ->orderBy('requested_at', 'desc')
+            ->paginate(5);
 
-        // --- LOGIKA AJAX (AGAR TIDAK RELOAD) ---
-        // Jika request ini berasal dari Javascript (AJAX), kembalikan potongan tabel saja
         if ($request->ajax()) {
             return view('pegawai.partials.barang-saya-table', compact('barangSedangDigunakan'))->render();
         }
-        // ---------------------------------------
 
-        // Riwayat 5 permintaan terakhir
+        // Recent 5 Requests
         $riwayatPermintaan = Pengajuan::with(['pengajuanDetails.barang'])
             ->where('pegawaiID', $pegawaiID)
-            ->orderBy('created_at', 'desc')
-            ->take(5) 
+            ->orderBy('requested_at', 'desc')
+            ->take(5)
             ->get();
 
-        // TOP 5 barang paling sering diminta user
+        // Top 5 Most Requested Items
         $topBarang = Pengajuan::with('pengajuanDetails.barang')
             ->where('pegawaiID', $pegawaiID)
             ->whereHas('pengajuanDetails')
@@ -77,14 +74,13 @@ class DashboardController extends Controller
             ->take(5)
             ->values();
 
-        // Grafik jumlah permintaan per bulan (12 bulan terakhir)
-        $statistikBulanan = Pengajuan::selectRaw('MONTH(created_at) as bulan, COUNT(*) as total')
+        // Monthly Statistics (12 months current year)
+        $statistikBulanan = Pengajuan::selectRaw('MONTH(requested_at) as bulan, COUNT(*) as total')
             ->where('pegawaiID', $pegawaiID)
-            ->whereYear('created_at', date('Y'))
+            ->whereYear('requested_at', date('Y'))
             ->groupBy('bulan')
             ->pluck('total', 'bulan');
 
-        // Format array bulan 1–12
         $bulanLabels = [];
         $bulanData = [];
         for ($i = 1; $i <= 12; $i++) {
@@ -92,11 +88,11 @@ class DashboardController extends Controller
             $bulanData[] = $statistikBulanan[$i] ?? 0;
         }
 
-        // Statistik status permintaan
+        // Status Summary
         $statusCounts = [
-            'disetujui' => Pengajuan::where('pegawaiID', $pegawaiID)->where('status', 'disetujui')->count(),
-            'menunggu'  => Pengajuan::where('pegawaiID', $pegawaiID)->where('status', 'menunggu')->count(),
-            'ditolak'   => Pengajuan::where('pegawaiID', $pegawaiID)->where('status', 'ditolak')->count(),
+            'disetujui' => $barangDigunakan,
+            'menunggu'  => $menungguPersetujuan,
+            'ditolak'   => $permintaanDitolak,
         ];
 
         return view('pegawai.dashboard', compact(

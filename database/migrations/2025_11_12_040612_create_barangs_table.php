@@ -1,5 +1,6 @@
 <?php
-// database/migrations/2024_01_04_create_barangs_table.php
+// database/migrations/2025_11_12_040612_create_barangs_table.php
+// BARANG TABLE - Sesuai ERD baru dengan simplifikasi stok
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,14 +12,13 @@ return new class extends Migration
     {
         Schema::create('barangs', function (Blueprint $table) {
             $table->id('barangID');
-            $table->string('kode_barang')->unique();
+            $table->string('kode_barang');  // Auto-generated: BRG-001, BRG-002, dll
             $table->string('nama_barang');
-            $table->foreignId('kategoriID')->constrained('kategoris', 'kategoriID');
-            $table->string('satuan');
-            $table->integer('stok_awal')->default(0);
-            $table->integer('stok_sekarang')->default(0);
+            $table->foreignId('kategoriID')->constrained('kategoris', 'kategoriID')->onDelete('restrict');
+            $table->enum('satuan', ['rim', 'pcs', 'buah', 'box', 'pack', 'set', 'lembar', 'meter', 'kg', 'liter'])->default('pcs');
+            $table->integer('stok')->default(0);  // SIMPLIFIED: hanya satu kolom stok
             $table->text('deskripsi')->nullable();
-            $table->enum('status', ['tersedia', 'habis', 'restricted'])->default('tersedia');
+            // DIHAPUS: stok_awal, stok_sekarang, status (diganti dengan accessor logic)
             $table->timestamps();
         });
     }

@@ -1,34 +1,45 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StockOpnameDetail extends Model
 {
     use HasFactory;
-    
-    // PERBAIKAN 1: Definisikan Primary Key non-standar
-    // Berdasarkan migrasi, PK-nya adalah 'opnameDetailID'
-    protected $primaryKey = 'opnameDetailID';
-    
-    // PERBAIKAN KRUSIAL 2: Daftarkan semua kolom yang boleh diisi, 
-    // pastikan namanya SAMA dengan database (CamelCase)
-    protected $fillable = [
-        'opnameID', 
-        'barangID', 
-        'stokSistem', 
-        'stokFisik', 
-        'stokSelisih', // Nama kolom yang benar
-        'keterangan', // Dari migrasi
-    ]; 
 
+    protected $primaryKey = 'opnameDetailID';
+    public $incrementing = true;
+
+    protected $fillable = [
+        'opnameID',
+        'barangID',
+        'stok_sistem',
+        'stok_fisik',
+        'stok_selisih',
+        'keterangan',
+    ];
+
+    protected $casts = [
+        'stok_sistem' => 'integer',
+        'stok_fisik' => 'integer',
+        'stok_selisih' => 'integer',
+    ];
+
+    /**
+     * Relasi ke StockOpname
+     */
     public function stockOpname()
     {
-        return $this->belongsTo(StockOpname::class, 'opnameID');
+        return $this->belongsTo(StockOpname::class, 'opnameID', 'opnameID');
     }
-    
+
+    /**
+     * Relasi ke Barang
+     */
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'barangID');
+        return $this->belongsTo(Barang::class, 'barangID', 'barangID');
     }
 }

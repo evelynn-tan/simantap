@@ -1,5 +1,6 @@
 <?php
-// database/migrations/2024_01_02_create_operators_table.php
+// database/migrations/2025_11_12_040534_create_operators_table.php
+// OPERATOR TABLE - Hanya FK ke users (Operator = sistem, bukan personal)
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,12 +11,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('operators', function (Blueprint $table) {
-            $table->id('operatorID');
-            $table->foreignId('userID')->constrained('users', 'userID')->onDelete('cascade');
-            $table->string('nama_lengkap');
-            $table->string('nip')->unique();
-            $table->string('jabatan');
-            $table->timestamps();
+            $table->foreignId('userID')->primary()->constrained('users', 'userID')->onDelete('cascade');
+            // Hanya FK, tidak ada identitas personal
+            // Operator = sistem (operator.bps.go.id)
         });
     }
 

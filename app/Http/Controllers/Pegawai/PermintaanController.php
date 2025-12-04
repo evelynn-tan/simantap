@@ -15,47 +15,58 @@ use Illuminate\Support\Facades\DB;
 class PermintaanController extends Controller
 {
     /**
-     * Menampilkan halaman "Daftar Barang Tersedia"
+     * Show list of available items
      */
     public function daftarBarang(Request $request)
     {
         $userId = Auth::id();
         $pegawai = Pegawai::where('userID', $userId)->first();
         $kategoris = Kategori::orderBy('nama_kategori')->get();
-        $query = Barang::with('kategori')
-            ->where('status', 'tersedia')
-            ->where('stok_sekarang', '>', 0);
 
-        // Logic untuk filter pencarian
+        $query = Barang::with('kategori')
+            ->where('stok', '>', 0)
+            ->orderBy('nama_barang');
+
+        // Search filter
         if ($request->filled('search')) {
-            // Dibungkus closure agar tidak bentrok dengan `orWhere`
-            $query->where(function($q) use ($request) {
-                $q->where('nama_barang', 'like', '%' . $request->search . '%')
-                  ->orWhere('kode_barang', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_barang', 'like', "%{$search}%")
+                    ->orWhere('kode_barang', 'like', "%{$search}%");
             });
         }
 
-        // Logic untuk filter kategori
+        // Category filter
         if ($request->filled('kategori')) {
             $query->where('kategoriID', $request->kategori);
         }
 
-        $barangs = $query->orderBy('nama_barang')->paginate(10);
+        // Status filter (using accessor)
+        if ($request->filled('status')) {
+            $status = $request->status;
+            if ($status === 'tersedia') {
+                $query->where('stok', '>=', 10);
+            } elseif ($status === 'rendah') {
+                $query->whereBetween('stok', [1, 9]);
+            } elseif ($status === 'habis') {
+                $query->where('stok', 0);
+            }
+        }
+
+        $barangs = $query->paginate(10);
 
         return view('pegawai.daftar-barang', compact('barangs', 'pegawai', 'kategoris'));
     }
 
     /**
-     * Menampilkan halaman/form untuk "Mengajukan Permintaan Barang"
+     * Show form to create new request
      */
     public function create()
     {
         $userId = Auth::id();
         $pegawai = Pegawai::where('userID', $userId)->first();
 
-        // Ambil barang yang tersedia saja untuk ditampilkan di form
-        $barangs = Barang::where('status', 'tersedia')
-            ->where('stok_sekarang', '>', 0)
+        $barangs = Barang::where('stok', '>', 0)
             ->orderBy('nama_barang')
             ->get();
 
@@ -63,7 +74,7 @@ class PermintaanController extends Controller
     }
 
     /**
-     * Menyimpan data pengajuan baru dari form
+     * Save new request
      */
     public function ajukan(Request $request)
     {
@@ -74,7 +85,7 @@ class PermintaanController extends Controller
             return redirect()->back()->with('error', 'Data pegawai tidak ditemukan.');
         }
 
-        // 1. Validasi input
+        // Validation
         $request->validate([
             'description' => 'required|string|max:500',
             'items' => 'required|array|min:1',
@@ -86,20 +97,19 @@ class PermintaanController extends Controller
             'items.*.jumlah.min' => 'Jumlah barang tidak boleh 0.',
         ]);
 
-        // 2. Cek apakah stok mencukupi untuk semua item
+        // Check stock availability for all items
         foreach ($request->items as $item) {
-            $barang = Barang::find($item['barangID']);
-            if ($barang->stok_sekarang < $item['jumlah']) {
+            $barang = Barang::findOrFail($item['barangID']);
+            if ($barang->stok < $item['jumlah']) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', 'Stok untuk barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersisa: ' . $barang->stok_sekarang);
+                    ->with('error', "Stok '{$barang->nama_barang}' tidak mencukupi. Tersisa: {$barang->stok}");
             }
         }
 
-        // 3. Gunakan Transaction untuk menyimpan ke 2 tabel
         DB::beginTransaction();
         try {
-            // Buat 1 data Pengajuan
+            // Create pengajuan header
             $pengajuan = Pengajuan::create([
                 'pegawaiID' => $pegawai->pegawaiID,
                 'requested_at' => now(),
@@ -107,26 +117,30 @@ class PermintaanController extends Controller
                 'status' => 'menunggu',
             ]);
 
-            // Loop untuk menyimpan barang-barangnya ke PengajuanDetail
+            // Create detail items (status defaults to 'menunggu')
             foreach ($request->items as $item) {
                 PengajuanDetail::create([
                     'pengajuanID' => $pengajuan->pengajuanID,
                     'barangID' => $item['barangID'],
                     'jumlah' => $item['jumlah'],
+                    'status' => 'menunggu',
                 ]);
             }
 
-            DB::commit(); // Semua berhasil, simpan permanen
+            DB::commit();
 
-            return redirect()->route('pegawai.monitor-permintaan')->with('success', 'Permintaan berhasil diajukan.');
+            return redirect()->route('pegawai.monitor-permintaan')
+                ->with('success', 'Permintaan berhasil diajukan.');
         } catch (\Exception $e) {
-            DB::rollBack(); // Ada error, batalkan semua
-            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
     /**
-     * Menampilkan halaman "Monitor Status Permintaan"
+     * Show request status monitoring
      */
     public function monitor(Request $request)
     {
@@ -140,20 +154,39 @@ class PermintaanController extends Controller
         $query = Pengajuan::with(['pengajuanDetails.barang'])
             ->where('pegawaiID', $pegawai->pegawaiID);
 
-        // Logic untuk filter status
+        // Status filter
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Logic untuk filter tanggal
+        // Date range filter
         if ($request->filled('tanggal_mulai')) {
-            $query->whereDate('created_at', '>=', $request->tanggal_mulai);
+            $query->whereDate('requested_at', '>=', $request->tanggal_mulai);
         }
         if ($request->filled('tanggal_selesai')) {
-            $query->whereDate('created_at', '<=', $request->tanggal_selesai);
+            $query->whereDate('requested_at', '<=', $request->tanggal_selesai);
         }
 
-        $permintaan = $query->orderBy('created_at', 'desc')->paginate(10);
+        $permintaan = $query->orderBy('requested_at', 'desc')->paginate(10);
+
         return view('pegawai.monitor-permintaan', compact('permintaan', 'pegawai'));
+    }
+
+    /**
+     * Cancel a pending request
+     */
+    public function batal(Pengajuan $pengajuan)
+    {
+        if ($pengajuan->status !== 'menunggu') {
+            return redirect()->back()
+                ->with('error', 'Hanya permintaan yang menunggu yang dapat dibatalkan.');
+        }
+
+        $pengajuan->update(['status' => 'dibatalkan']);
+        $pengajuan->pengajuanDetails()
+            ->update(['status' => 'ditolak']);
+
+        return redirect()->route('pegawai.monitor-permintaan')
+            ->with('success', 'Permintaan berhasil dibatalkan.');
     }
 }

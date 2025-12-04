@@ -1,5 +1,6 @@
 <?php
-// database/migrations/2024_01_12_create_stock_opname_details_table.php
+// database/migrations/2025_11_12_040933_create_stock_opname_details_table.php
+// STOCK OPNAME DETAILS TABLE
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,10 +13,10 @@ return new class extends Migration
         Schema::create('stock_opname_details', function (Blueprint $table) {
             $table->id('opnameDetailID');
             $table->foreignId('opnameID')->constrained('stock_opnames', 'opnameID')->onDelete('cascade');
-            $table->foreignId('barangID')->constrained('barangs', 'barangID');
-            $table->integer('stokSistem');
-            $table->integer('stokFisik');
-            $table->integer('stokSelisih');
+            $table->foreignId('barangID')->constrained('barangs', 'barangID')->onDelete('restrict');
+            $table->integer('stok_sistem');  // Stok menurut sistem
+            $table->integer('stok_fisik');   // Stok menurut fisik
+            $table->integer('stok_selisih');  // stok_fisik - stok_sistem
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });

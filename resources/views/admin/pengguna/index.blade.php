@@ -1,149 +1,258 @@
 @extends('layouts.admin')
 @section('title', 'Manajemen Pengguna')
 @section('header', 'Manajemen Pengguna')
+@section('subtitle', 'Kelola akun pengguna sistem SIMANTAP')
 
 @section('content')
-    <div class="max-w-7xl mx-auto">
+<div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow">
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ $totalPengguna }}</h5>
-                    <p class="font-normal text-gray-700">Total Pengguna</p>
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Total Pengguna -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-6 text-white shadow-lg border border-blue-400">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-semibold uppercase mb-2">Total Pengguna</p>
+                    <h3 class="text-4xl font-bold">{{ $totalPengguna }}</h3>
                 </div>
-                <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow">
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ $pegawaiBPS }}</h5>
-                    <p class="font-normal text-gray-700">Pegawai BPS</p>
-                </div>
-                <div class="block p-6 bg-white border border-gray-200 rounded-lg shadow">
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">{{ $operatorBMN }}</h5>
-                    <p class="font-normal text-gray-700">Operator BMN</p>
+                <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-2xl text-white"></i>
                 </div>
             </div>
+        </div>
 
-            <div class="flex justify-between items-center mb-4">
-                <div class="w-1/2">
-                    <form method="GET" action="{{ route('admin.pengguna.index') }}">
-                        <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Cari...</label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            </div>
-                            <input type="search" name="search" id="default-search" value="{{ request('search') }}" class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" placeholder="Cari berdasarkan nama atau email...">
-                            <button type="submit" class="absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 text-white font-medium rounded-lg text-sm px-4 py-2">Cari</button>
-                        </div>
-                    </form>
+        <!-- Pegawai BPS -->
+        <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-6 text-white shadow-lg border border-green-400">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-green-100 text-sm font-semibold uppercase mb-2">Pegawai BPS</p>
+                    <h3 class="text-4xl font-bold">{{ $pegawaiBPS }}</h3>
                 </div>
-                <a href="{{ route('admin.pengguna.create') }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                    + Tambah Pengguna Baru
-                </a>
-            </div>
-
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="relative overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-500">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3">
-                                    <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'nama_lengkap', 'sort_dir' => request('sort_by') == 'nama_lengkap' && request('sort_dir') == 'asc' ? 'desc' : 'asc']) }}" class="flex items-center hover:text-blue-600 cursor-pointer">
-                                        Nama Lengkap
-                                        <svg class="w-4 h-4 ml-1 {{ request('sort_by') == 'nama_lengkap' ? 'text-blue-600' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
-                                            @if(request('sort_by') == 'nama_lengkap' && request('sort_dir') == 'asc')
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @elseif(request('sort_by') == 'nama_lengkap' && request('sort_dir') == 'desc')
-                                                <path d="M5 10l5 5 5-5H5z"/>
-                                            @else
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @endif
-                                        </svg>
-                                    </a>
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'email', 'sort_dir' => request('sort_by') == 'email' && request('sort_dir') == 'asc' ? 'desc' : 'asc']) }}" class="flex items-center hover:text-blue-600 cursor-pointer">
-                                        Email
-                                        <svg class="w-4 h-4 ml-1 {{ request('sort_by') == 'email' ? 'text-blue-600' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
-                                            @if(request('sort_by') == 'email' && request('sort_dir') == 'asc')
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @elseif(request('sort_by') == 'email' && request('sort_dir') == 'desc')
-                                                <path d="M5 10l5 5 5-5H5z"/>
-                                            @else
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @endif
-                                        </svg>
-                                    </a>
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'role', 'sort_dir' => request('sort_by') == 'role' && request('sort_dir') == 'asc' ? 'desc' : 'asc']) }}" class="flex items-center hover:text-blue-600 cursor-pointer">
-                                        Role
-                                        <svg class="w-4 h-4 ml-1 {{ request('sort_by') == 'role' ? 'text-blue-600' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
-                                            @if(request('sort_by') == 'role' && request('sort_dir') == 'asc')
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @elseif(request('sort_by') == 'role' && request('sort_dir') == 'desc')
-                                                <path d="M5 10l5 5 5-5H5z"/>
-                                            @else
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @endif
-                                        </svg>
-                                    </a>
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'jabatan', 'sort_dir' => request('sort_by') == 'jabatan' && request('sort_dir') == 'asc' ? 'desc' : 'asc']) }}" class="flex items-center hover:text-blue-600 cursor-pointer">
-                                        Jabatan
-                                        <svg class="w-4 h-4 ml-1 {{ request('sort_by') == 'jabatan' ? 'text-blue-600' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
-                                            @if(request('sort_by') == 'jabatan' && request('sort_dir') == 'asc')
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @elseif(request('sort_by') == 'jabatan' && request('sort_dir') == 'desc')
-                                                <path d="M5 10l5 5 5-5H5z"/>
-                                            @else
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @endif
-                                        </svg>
-                                    </a>
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    <a href="{{ request()->fullUrlWithQuery(['sort_by' => 'nip', 'sort_dir' => request('sort_by') == 'nip' && request('sort_dir') == 'asc' ? 'desc' : 'asc']) }}" class="flex items-center hover:text-blue-600 cursor-pointer">
-                                        NIP
-                                        <svg class="w-4 h-4 ml-1 {{ request('sort_by') == 'nip' ? 'text-blue-600' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
-                                            @if(request('sort_by') == 'nip' && request('sort_dir') == 'asc')
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @elseif(request('sort_by') == 'nip' && request('sort_dir') == 'desc')
-                                                <path d="M5 10l5 5 5-5H5z"/>
-                                            @else
-                                                <path d="M5 10l5-5 5 5H5z"/>
-                                            @endif
-                                        </svg>
-                                    </a>
-                                </th>
-                                <th scope="col" class="px-6 py-3">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($users as $user)
-                                <tr class="bg-white border-b">
-                                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ $user->pegawai->nama_lengkap ?? $user->operator->nama_lengkap ?? 'N/A' }}</th>
-                                    <td class="px-6 py-4">{{ $user->email }}</td>
-                                    <td class="px-6 py-4">{{ $user->role_display }}</td>
-                                    <td class="px-6 py-4">{{ $user->pegawai->jabatan ?? $user->operator->jabatan ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4">{{ $user->pegawai->nip ?? $user->operator->nip ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 flex gap-2">
-                                        <a href="{{ route('admin.pengguna.edit', $user->userID) }}" class="font-medium text-blue-600 hover:underline">Edit</a>
-                                        <form action="{{ route('admin.pengguna.destroy', $user->userID) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="font-medium text-red-600 hover:underline">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr class="bg-white border-b">
-                                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
-                                        Belum ada data pengguna.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-user-tie text-2xl text-white"></i>
                 </div>
             </div>
+        </div>
 
+        <!-- Operator BMN -->
+        <div class="bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl p-6 text-white shadow-lg border border-orange-400">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm font-semibold uppercase mb-2">Operator BMN</p>
+                    <h3 class="text-4xl font-bold">{{ $operatorBMN }}</h3>
+                </div>
+                <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-warehouse text-2xl text-white"></i>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Search & Add Button -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center gap-4">
+        <div class="flex-1 flex items-center gap-2 bg-slate-50 rounded-lg px-4 py-2.5 border border-slate-200">
+            <i class="fas fa-search text-slate-400"></i>
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Cari nama atau email..." 
+                class="bg-transparent flex-1 text-sm text-slate-700 outline-none"
+                style="font-family: 'Poppins', sans-serif;"
+            >
+        </div>
+        <button 
+            type="button"
+            onclick="openTambahPenggunaModal()"
+            class="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition duration-200">
+            <i class="fas fa-plus mr-2"></i> Tambah Pengguna
+        </button>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm" id="penggunaTable">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Nama</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Email</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Role</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Jabatan</th>
+                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">NIP</th>
+                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    @forelse ($users as $user)
+                    <tr class="hover:bg-slate-50 transition pengguna-row" data-name="{{ strtolower($user->pegawai->nama_lengkap ?? $user->operator->nama_lengkap ?? '') }}" data-email="{{ strtolower($user->email) }}">
+                        <td class="px-6 py-4 font-semibold text-slate-800">
+                            {{ $user->pegawai->nama_lengkap ?? $user->operator->nama_lengkap ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-slate-700">{{ $user->email }}</td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                                @if($user->role_display === 'Admin') bg-red-100 text-red-800
+                                @elseif($user->role_display === 'Pegawai BPS') bg-green-100 text-green-800
+                                @else bg-blue-100 text-blue-800 @endif">
+                                {{ $user->role_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-slate-700">{{ $user->pegawai->jabatan ?? $user->operator->jabatan ?? 'N/A' }}</td>
+                        <td class="px-6 py-4 text-slate-700 font-mono">{{ $user->pegawai->nip ?? $user->operator->nip ?? 'N/A' }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex gap-2 justify-center">
+                                <button 
+                                    type="button"
+                                    onclick="openEditPenggunaModal({{ $user->userID }})"
+                                    class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-sm font-semibold transition duration-200"
+                                    title="Edit">
+                                    <i class="fas fa-pen-to-square"></i>
+                                </button>
+                                <button 
+                                    type="button"
+                                    onclick="openHapusPenggunaModal({{ $user->userID }}, '{{ $user->pegawai->nama_lengkap ?? $user->operator->nama_lengkap ?? $user->email }}')"
+                                    class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-sm font-semibold transition duration-200"
+                                    title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <i class="fas fa-inbox text-4xl text-slate-300 mb-3"></i>
+                            <p class="text-slate-500 font-medium">Belum ada data pengguna</p>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Edit Pengguna -->
+<div id="editPenggunaModal" x-cloak style="display: none;" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fas fa-edit"></i> Edit Pengguna
+            </h3>
+            <button onclick="closeEditPenggunaModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <form id="editPenggunaForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                    <input type="email" id="editEmail" name="email" required class="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" style="font-family: 'Poppins', sans-serif;">
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button type="button" onclick="closeEditPenggunaModal()" class="flex-1 px-4 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Hapus Pengguna -->
+<div id="hapusPenggunaModal" x-cloak style="display: none;" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-md w-full">
+        <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle"></i> Hapus Pengguna
+            </h3>
+            <button onclick="closeHapusPenggunaModal()" class="text-white hover:bg-white hover:bg-opacity-20 rounded-lg p-1 transition">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p class="text-sm text-red-800">
+                    <strong>⚠️ Perhatian!</strong> Anda akan menghapus pengguna:
+                </p>
+                <p class="font-bold text-red-900 mt-2" id="hapusNamaPengguna">-</p>
+            </div>
+            <form id="hapusPenggunaForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeHapusPenggunaModal()" class="flex-1 px-4 py-2.5 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 px-4 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">
+                        <i class="fas fa-trash mr-2"></i> Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah Pengguna (redirect ke create page) -->
+<script style="font-family: 'Poppins', sans-serif;">
+function openEditPenggunaModal(userId) {
+    // Redirect to edit page
+    window.location.href = `/admin/pengguna/${userId}/edit`;
+}
+
+function closeEditPenggunaModal() {
+    document.getElementById('editPenggunaModal').style.display = 'none';
+}
+
+function openHapusPenggunaModal(userId, nama) {
+    document.getElementById('hapusNamaPengguna').textContent = nama;
+    document.getElementById('hapusPenggunaForm').action = `/admin/pengguna/${userId}`;
+    document.getElementById('hapusPenggunaModal').style.display = 'flex';
+}
+
+function closeHapusPenggunaModal() {
+    document.getElementById('hapusPenggunaModal').style.display = 'none';
+}
+
+function openTambahPenggunaModal() {
+    window.location.href = '{{ route("admin.pengguna.create") }}';
+}
+
+// Search functionality
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.pengguna-row');
+    
+    rows.forEach(row => {
+        const name = row.getAttribute('data-name');
+        const email = row.getAttribute('data-email');
+        
+        if (name.includes(searchTerm) || email.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+// Close modals on outside click
+document.addEventListener('click', function(event) {
+    const editModal = document.getElementById('editPenggunaModal');
+    const hapusModal = document.getElementById('hapusPenggunaModal');
+    
+    if (event.target === editModal) {
+        closeEditPenggunaModal();
+    }
+    if (event.target === hapusModal) {
+        closeHapusPenggunaModal();
+    }
+});
+</script>
+
 @endsection

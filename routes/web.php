@@ -46,8 +46,8 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     
     // Permintaan
     Route::get('/permintaan', [ManajemenPermintaanController::class, 'index'])->name('permintaan.index');
-    Route::post('/permintaan/setujui/{id}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui');
-    Route::post('/permintaan/tolak/{id}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak');
+    Route::post('/permintaan/setujui/{pengajuan}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui')->where('pengajuan', '[0-9]+');
+    Route::post('/permintaan/tolak/{pengajuan}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak')->where('pengajuan', '[0-9]+');
     
     // Perbaikan kecil: resource jangan pakai path 'views/admin/...', cukup nama URL saja
     Route::resource('stock-opname', StockOpnameController::class); 
@@ -76,6 +76,5 @@ Route::middleware(['auth:sanctum', 'verified', 'role:pegawai'])->prefix('pegawai
     // Rute tambahan untuk fitur permintaan
     Route::get('/ajukan-permintaan', [PegawaiPermintaanController::class, 'create'])->name('permintaan.create');
     Route::post('/ajukan-permintaan', [PegawaiPermintaanController::class, 'ajukan'])->name('permintaan.ajukan');
-    Route::get('/barang-saya', [PengajuanController::class, 'barangSaya'])->name('barang.saya');
 
 });

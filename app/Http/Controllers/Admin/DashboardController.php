@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/Admin/DashboardController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -15,22 +14,22 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Data untuk KPI Cards
+        // KPI Cards
         $jumlahJenisAset = Barang::count();
         $permintaanBaru = Pengajuan::where('status', 'menunggu')->count();
-        $barangStokRendah = Barang::where('stok_sekarang', '<', 5)->count();
+        $barangHabis = Barang::habis()->count();
+        $barangRendah = Barang::rendah()->count();
+        $totalStok = Barang::sum('stok');
         $totalPermintaan = Pengajuan::count();
 
-        // PERBAIKAN: Hitung total stok semua barang
-        $totalStok = Barang::sum('stok_sekarang');
-
-        // Data untuk charts/tables
+        // Recent Requests (waiting for approval)
         $permintaanTerbaru = Pengajuan::with(['pegawai', 'pengajuanDetails.barang'])
             ->where('status', 'menunggu')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('requested_at', 'desc')
             ->take(5)
             ->get();
 
+        // Top 5 Most Requested Items
         $barangTeratas = Barang::withCount(['pengajuanDetails as total_permintaan' => function ($query) {
             $query->whereHas('pengajuan', function ($q) {
                 $q->where('status', 'disetujui');
@@ -40,16 +39,17 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Hitung permintaan disetujui dan ditolak
+        // Request Statistics
         $permintaanDisetujui = Pengajuan::where('status', 'disetujui')->count();
         $permintaanDitolak = Pengajuan::where('status', 'ditolak')->count();
 
         return view('admin.dashboard', compact(
             'jumlahJenisAset',
             'permintaanBaru',
-            'barangStokRendah',
+            'barangHabis',
+            'barangRendah',
+            'totalStok',
             'totalPermintaan',
-            'totalStok', // TAMBAHKAN INI
             'permintaanTerbaru',
             'barangTeratas',
             'permintaanDisetujui',

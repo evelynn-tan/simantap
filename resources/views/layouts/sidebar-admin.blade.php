@@ -1,62 +1,92 @@
-<aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 bg-blue-900 text-white" aria-label="Sidebar">
-    <div class="h-full flex flex-col">
+<aside id="sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 bg-gradient-to-b from-blue-950 via-blue-900 to-slate-900 text-white" aria-label="Sidebar">
+    <div class="h-full flex flex-col" style="font-family: 'Poppins', sans-serif;">
         <!-- Logo Header -->
-        <div class="p-4 border-b border-blue-800 bg-blue-900">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
-                <img src="{{ asset('images/logo-bps.png') }}" class="h-10 w-10 bg-white rounded-full p-1" alt="Logo" onerror="this.style.display='none'"/>
+        <div class="p-5 border-b border-blue-800 bg-gradient-to-r from-blue-950 to-blue-900 shadow-lg">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 hover:opacity-80 transition">
+                <div class="h-12 w-12 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center font-bold text-blue-950 text-lg shadow-xl border-2 border-yellow-300">
+                    <img src="{{ asset('images/logo-bps.png') }}" alt="Logo BPS" class="h-12 w-auto">
+                </div>
                 <div>
-                    <h1 class="text-xl font-bold text-white tracking-wide">SIMANTAP</h1>
-                    <p class="text-xs text-blue-200">Admin BMN</p>
+                    <h1 class="text-xl font-bold text-white tracking-wider">SIMANTAP</h1>
+                    <p class="text-xs text-blue-200 font-medium">BPS Kota Tanjungpinang - BMN</p>
                 </div>
             </a>
         </div>
 
         <!-- Menu Items -->
-        <div class="px-3 py-4 overflow-y-auto flex-1 bg-blue-900 scrollbar-hide">
-             <ul class="space-y-2 font-medium">
+        <div class="px-3 py-5 overflow-y-auto flex-1 bg-gradient-to-b from-blue-900 to-blue-950 scrollbar-hide">
+            <ul class="space-y-2 font-medium text-sm">
+                <!-- Dashboard -->
                 <li>
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-blue-800 group {{ request()->routeIs('admin.dashboard') ? 'bg-blue-800 border-l-4 border-yellow-400' : 'border-l-4 border-transparent' }}">
-                        <i class="fas fa-tachometer-alt w-5 h-5 text-blue-300 group-hover:text-white"></i>
-                        <span class="ml-3">Dashboard</span>
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
+                        <i class="fas fa-chart-line w-5 h-5 text-yellow-300"></i>
+                        <span class="ml-3 font-semibold">Dashboard</span>
                     </a>
                 </li>
+
+                <!-- Manajemen Permintaan -->
                 <li>
-                    <a href="{{ route('admin.permintaan.index') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-blue-800 group {{ request()->routeIs('admin.permintaan.*') ? 'bg-blue-800 border-l-4 border-yellow-400' : 'border-l-4 border-transparent' }}">
-                        <i class="fas fa-clipboard-list w-5 h-5 text-blue-300 group-hover:text-white"></i>
-                        <span class="ml-3">Manajemen Permintaan</span>
+                    <a href="{{ route('admin.permintaan.index') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.permintaan.*') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
+                        <i class="fas fa-file-alt w-5 h-5 text-emerald-300"></i>
+                        <span class="ml-3 font-semibold">Permintaan</span>
                     </a>
                 </li>
+
+                <!-- Data Barang -->
                 <li>
-                    <a href="{{ route('admin.barang.index') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-blue-800 group {{ request()->routeIs('admin.barang.*') && !request()->routeIs('admin.barang.create') ? 'bg-blue-800 border-l-4 border-yellow-400' : 'border-l-4 border-transparent' }}">
-                        <i class="fas fa-boxes w-5 h-5 text-blue-300 group-hover:text-white"></i>
-                        <span class="ml-3">Data Barang</span>
+                    <a href="{{ route('admin.barang.index') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.barang.index') || (request()->routeIs('admin.barang.*') && !request()->routeIs('admin.barang.create')) ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
+                        <i class="fas fa-box w-5 h-5 text-cyan-300"></i>
+                        <span class="ml-3 font-semibold">Data Barang</span>
                     </a>
                 </li>
+
+                <!-- Tambah Barang -->
                 <li>
-                    <a href="{{ route('admin.barang.create') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-blue-800 group {{ request()->routeIs('admin.barang.create') ? 'bg-blue-800 border-l-4 border-yellow-400' : 'border-l-4 border-transparent' }}">
-                        <i class="fas fa-plus-circle w-5 h-5 text-blue-300 group-hover:text-white"></i>
-                        <span class="ml-3">Tambah Barang Baru</span>
+                    <a href="{{ route('admin.barang.create') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.barang.create') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
+                        <i class="fas fa-plus-circle w-5 h-5 text-lime-300"></i>
+                        <span class="ml-3 font-semibold">Tambah Barang</span>
                     </a>
                 </li>
+
+                <!-- Divider -->
+                <div class="my-3 border-t border-blue-800"></div>
+
+                <!-- Stock Opname -->
                 <li>
-                    <a href="{{ route('admin.stock-opname.index') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-blue-800 group {{ request()->routeIs('admin.stock-opname.*') ? 'bg-blue-800 border-l-4 border-yellow-400' : 'border-l-4 border-transparent' }}">
-                        <i class="fas fa-clipboard-check w-5 h-5 text-blue-300 group-hover:text-white"></i>
-                        <span class="ml-3">Stock Opname</span>
+                    <a href="{{ route('admin.stock-opname.index') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.stock-opname.*') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
+                        <i class="fas fa-check-square w-5 h-5 text-orange-300"></i>
+                        <span class="ml-3 font-semibold">Stock Opname</span>
                     </a>
                 </li>
+
+                <!-- Manajemen Pengguna -->
                 <li>
-                    <a href="{{ route('admin.pengguna.index') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-blue-800 group {{ request()->routeIs('admin.pengguna.*') ? 'bg-blue-800 border-l-4 border-yellow-400' : 'border-l-4 border-transparent' }}">
-                        <i class="fas fa-users w-5 h-5 text-blue-300 group-hover:text-white"></i>
-                        <span class="ml-3">Manajemen Pengguna</span>
+                    <a href="{{ route('admin.pengguna.index') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.pengguna.*') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
+                        <i class="fas fa-users w-5 h-5 text-pink-300"></i>
+                        <span class="ml-3 font-semibold">Pengguna</span>
                     </a>
                 </li>
+
+                <!-- Laporan -->
                 <li>
-                    <a href="{{ route('admin.laporan.index') }}" class="flex items-center p-2 text-white rounded-lg hover:bg-blue-800 group {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-800 border-l-4 border-yellow-400' : 'border-l-4 border-transparent' }}">
-                        <i class="fas fa-chart-bar w-5 h-5 text-blue-300 group-hover:text-white"></i>
-                        <span class="ml-3">Laporan</span>
+                    <a href="{{ route('admin.laporan.index') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
+                        <i class="fas fa-file-pdf w-5 h-5 text-red-300"></i>
+                        <span class="ml-3 font-semibold">Laporan</span>
                     </a>
                 </li>
             </ul>
+        </div>
+
+        <!-- Logout Button - Bottom Left -->
+        <div class="p-4 border-t border-blue-800 bg-blue-950 mt-auto">
+            <form method="POST" action="{{ route('logout') }}" class="w-full">
+                @csrf
+                <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg transition duration-200 shadow-lg border border-red-500">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar Sistem</span>
+                </button>
+            </form>
+            <p class="text-xs text-blue-300 text-center mt-3">© 2025 SIMANTAP</p>
         </div>
     </div>
 </aside>

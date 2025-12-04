@@ -11,21 +11,18 @@ class DataBarangController extends Controller
 {
     /**
      * Menampilkan halaman "Data Barang" (Read)
-     * Sesuai mockup: screencapture-fabric-camel-47506428-figma-site-2025-11-05-09_32_57.jpg
      */
     public function index()
     {
-        // Ambil semua data
         $barangs = Barang::with('kategori')->orderBy('nama_barang')->get();
         $totalBarang = $barangs->count();
         $totalKategori = Kategori::count();
         $kategoriList = Kategori::orderBy('nama_kategori')->get();
 
-        // Logika untuk KPI Card "Barang Habis" dan "Stok Rendah" (misal: rendah < 10)
+        // KPI Metrics
         $barangHabis = $barangs->where('stok', 0)->count();
         $stokRendah = $barangs->where('stok', '>', 0)->where('stok', '<', 10)->count();
 
-        // Kirim data ke view
         return view('admin.barang.index', compact(
             'barangs',
             'totalBarang',
@@ -38,39 +35,54 @@ class DataBarangController extends Controller
 
     /**
      * Menampilkan halaman "Tambah Data Barang Baru" (Create)
-     * Sesuai mockup: screencapture-fabric-camel-47506428-figma-site-2025-11-05-09_33_10.png
      */
     public function create()
     {
         $kategoris = Kategori::orderBy('nama_kategori')->get();
-        return view('admin.barang.create', compact('kategoris'));
+        $satuanOptions = ['rim', 'pcs', 'buah', 'box', 'pack', 'set', 'lembar', 'meter', 'kg', 'liter'];
+
+        return view('admin.barang.create', compact('kategoris', 'satuanOptions'));
     }
 
     /**
      * Menyimpan data barang baru (Create)
+     * - Auto-generate kode barang (BRG-001, dst)
+     * - Cek duplikasi nama barang & suggest duplicate
      */
     public function store(Request $request)
     {
-        // Validasi data (sesuai mockup "Status Validasi")
+        // Validasi
         $request->validate([
-            'kode_barang' => 'required|string|max:255|unique:barangs,kode_barang',
             'nama_barang' => 'required|string|max:255',
             'kategori_id' => 'required|exists:kategoris,kategoriID',
-            'satuan' => 'required|string|max:50',
-            'stok_awal' => 'required|integer|min:0',
+            'satuan' => 'required|in:rim,pcs,buah,box,pack,set,lembar,meter,kg,liter',
+            'stok' => 'required|integer|min:0',
         ]);
 
-        // Simpan data ke database
-        $barang = new Barang();
-        $barang->kode_barang = $request->kode_barang;
-        $barang->nama_barang = $request->nama_barang;
-        $barang->kategoriID = $request->kategori_id;
-        $barang->satuan = $request->satuan;
-        $barang->stok = $request->stok_awal;
-        $barang->deskripsi = $request->deskripsi;
-        $barang->save();
+        // CEK DUPLIKASI BARANG
+        $existingBarang = Barang::where('nama_barang', $request->nama_barang)
+            ->where('kategoriID', $request->kategori_id)
+            ->where('satuan', $request->satuan)
+            ->first();
 
-        return redirect()->route('admin.barang.index')->with('success', 'Barang baru berhasil ditambahkan.');
+        if ($existingBarang) {
+            return redirect()->back()
+                ->withInput()
+                ->with('warning', "Barang '{$existingBarang->nama_barang}' ({$existingBarang->kode_barang}) sudah ada. Stok ditambah? Hubungi operator.");
+        }
+
+        // CREATE BARANG BARU
+        // Kode barang auto-generate di Model::booted()
+        $barang = Barang::create([
+            'nama_barang' => $request->nama_barang,
+            'kategoriID' => $request->kategori_id,
+            'satuan' => $request->satuan,
+            'stok' => $request->stok,
+            'deskripsi' => $request->deskripsi ?? null,
+        ]);
+
+        return redirect()->route('admin.barang.index')
+            ->with('success', "Barang baru '{$barang->nama_barang}' ({$barang->kode_barang}) berhasil ditambahkan.");
     }
 
     /**
@@ -78,11 +90,10 @@ class DataBarangController extends Controller
      */
     public function edit(Barang $barang)
     {
-        // Debug: log barang yang diterima
-        \Log::info('Edit barang:', ['barangID' => $barang->barangID, 'nama' => $barang->nama_barang]);
-        
         $kategoris = Kategori::orderBy('nama_kategori')->get();
-        return view('admin.barang.edit', compact('barang', 'kategoris'));
+        $satuanOptions = ['rim', 'pcs', 'buah', 'box', 'pack', 'set', 'lembar', 'meter', 'kg', 'liter'];
+
+        return view('admin.barang.edit', compact('barang', 'kategoris', 'satuanOptions'));
     }
 
     /**
@@ -91,32 +102,71 @@ class DataBarangController extends Controller
     public function update(Request $request, Barang $barang)
     {
         $request->validate([
-            'kode_barang' => 'required|string|max:255|unique:barangs,kode_barang,' . $barang->barangID . ',barangID',
             'nama_barang' => 'required|string|max:255',
             'kategori_id' => 'required|exists:kategoris,kategoriID',
-            'satuan' => 'required|string|max:50',
+            'satuan' => 'required|in:rim,pcs,buah,box,pack,set,lembar,meter,kg,liter',
             'stok' => 'required|integer|min:0',
         ]);
 
-        $barang->kode_barang = $request->kode_barang;
-        $barang->nama_barang = $request->nama_barang;
-        $barang->kategoriID = $request->kategori_id;
-        $barang->satuan = $request->satuan;
-        $barang->stok = $request->stok;
-        $barang->deskripsi = $request->deskripsi;
-        $barang->save();
+        $barang->update([
+            'nama_barang' => $request->nama_barang,
+            'kategoriID' => $request->kategori_id,
+            'satuan' => $request->satuan,
+            'stok' => $request->stok,
+            'deskripsi' => $request->deskripsi ?? null,
+        ]);
 
-        return redirect()->route('admin.barang.index')->with('success', 'Data barang berhasil diperbarui.');
+        return redirect()->route('admin.barang.index')
+            ->with('success', "Data barang '{$barang->nama_barang}' berhasil diperbarui.");
     }
 
     /**
      * Menghapus data barang (Delete)
+     * CHECK: Jika barang digunakan di pengajuan_details, tidak boleh dihapus
      */
     public function destroy(Barang $barang)
     {
-        // Tambahkan cek jika barang masih ada di pengajuan, dll
+        $nama = $barang->nama_barang;
+        $kode = $barang->kode_barang;
+
+        // CEK apakah barang digunakan di pengajuan_details atau transaksi
+        $pengajuanDetailsCount = $barang->pengajuanDetails()->count();
+        $detailRanggingCount = $barang->detailRangggings()->count();
+        $stockOpnameDetailsCount = $barang->stockOpnameDetails()->count();
+
+        if ($pengajuanDetailsCount > 0 || $detailRanggingCount > 0 || $stockOpnameDetailsCount > 0) {
+            return redirect()->route('admin.barang.index')
+                ->with('error', "Barang '{$nama}' ({$kode}) tidak dapat dihapus karena sudah digunakan dalam permintaan, transaksi, atau stock opname. Hubungi admin untuk menghapus data terkait terlebih dahulu.");
+        }
 
         $barang->delete();
-        return redirect()->route('admin.barang.index')->with('success', 'Data barang berhasil dihapus.');
+
+        return redirect()->route('admin.barang.index')
+            ->with('success', "Barang '{$nama}' ({$kode}) berhasil dihapus.");
+    }
+
+    /**
+     * AJAX Search endpoint
+     */
+    public function search(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $barangs = Barang::where('nama_barang', 'like', "%{$search}%")
+            ->orWhere('kode_barang', 'like', "%{$search}%")
+            ->with('kategori')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'data' => $barangs->map(fn($b) => [
+                'barangID' => $b->barangID,
+                'kode_barang' => $b->kode_barang,
+                'nama_barang' => $b->nama_barang,
+                'stok' => $b->stok,
+                'status' => $b->status,
+                'satuan' => $b->satuan,
+            ])
+        ]);
     }
 }

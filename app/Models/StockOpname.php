@@ -1,35 +1,40 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StockOpname extends Model
 {
     use HasFactory;
-    
-    // PERBAIKAN: Definisikan Primary Key yang non-standar (opnameID)
-    protected $primaryKey = 'opnameID'; //
 
-    // PERBAIKAN: Ganti $guarded agar primary key yang non-standar tidak perlu di mass-assign
-    // Jika Anda ingin menggunakan $guarded
-    protected $guarded = ['opnameID']; 
-    
-    // Atau lebih aman menggunakan $fillable:
-    // protected $fillable = ['operatorID', 'tanggal_opname', 'keterangan']; 
+    protected $primaryKey = 'opnameID';
+    public $incrementing = true;
 
-    protected $casts = [
-        'tanggal_opname' => 'datetime',
+    protected $fillable = [
+        'userID',
+        'tanggal_opname',
+        'keterangan',
     ];
 
-    public function details()
+    protected $casts = [
+        'tanggal_opname' => 'date',
+    ];
+
+    /**
+     * Relasi ke User (Operator yang melakukan opname)
+     */
+    public function user()
     {
-        return $this->hasMany(StockOpnameDetail::class, 'opnameID'); // Tambahkan FK eksplisit ke StockOpnameDetail
+        return $this->belongsTo(User::class, 'userID', 'userID');
     }
 
-    public function operator()
+    /**
+     * Relasi ke StockOpnameDetails
+     */
+    public function details()
     {
-        // MENGUBAH foreign key dari 'operator_id' menjadi 'operatorID' 
-        // agar sesuai dengan nama kolom di database Anda.
-        return $this->belongsTo(User::class, 'operatorID'); 
+        return $this->hasMany(StockOpnameDetail::class, 'opnameID', 'opnameID');
     }
 }
