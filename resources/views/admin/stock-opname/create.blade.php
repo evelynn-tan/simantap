@@ -60,8 +60,8 @@
             {{-- Tambahkan Input Catatan --}}
             <div class="mb-6">
                 <label for="catatan" class="block mb-2 text-sm font-medium text-gray-900">Catatan Stock Opname (Opsional)</label>
-                <textarea name="catatan" id="catatan" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh: Opname dilakukan oleh tim A dan B, fokus pada barang kategori ATK dan Elektronik.">{{ old('catatan') }}</textarea>
-                @error('catatan')
+                <textarea name="keterangan" id="catatan" rows="3" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Contoh: Opname dilakukan oleh tim A dan B, fokus pada barang kategori ATK dan Elektronik.">{{ old('keterangan') }}</textarea>
+                @error('keterangan')
                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -82,7 +82,7 @@
                         @forelse ($barangs as $barang)
                         <tr class="bg-white border-b hover:bg-gray-50" 
                             data-barang-id="{{ $barang->barangID }}" {{-- PERBAIKAN 1: Menggunakan barangID --}}
-                            data-stok-sistem="{{ $barang->stok_sekarang }}">
+                            data-stok-sistem="{{ $barang->stok }}">
                             
                             <td class="py-4 px-4 font-semibold text-gray-800 whitespace-nowrap">
                                 {{ $barang->kode_barang ?? 'ATK000' . $barang->barangID }}
@@ -98,7 +98,7 @@
                             </td>
                             
                             <td class="py-4 px-4 font-medium text-gray-700">
-                                {{ $barang->stok_sekarang }} {{ $barang->satuan ?? 'Unit' }}
+                                {{ $barang->stok }} {{ $barang->satuan ?? 'Unit' }}
                             </td>
                             
                             <td class="py-4 px-4 text-center" style="width: 150px;">
