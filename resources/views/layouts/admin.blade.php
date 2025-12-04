@@ -40,8 +40,8 @@
                     </div>
                     <div class="flex items-center space-x-4">
                         <div class="text-right hidden sm:block">
-                            <div class="text-sm font-semibold text-slate-700">{{ Auth::user()->name ?? 'User' }}</div>
-                            <div class="text-xs text-slate-500">{{ Auth::user()->role ?? 'Role' }}</div>
+                            <div class="text-xl font-semibold text-slate-900">{{ Auth::user()->name ?? 'User' }}</div>
+                            <div class="text-m text-slate-700">{{ Auth::user()->role ?? 'Role' }}</div>
                         </div>
                     </div>
                 </div>

@@ -129,8 +129,8 @@ class DatabaseSeeder extends Seeder
             $kategori = Kategori::where('nama_kategori', $data['kategori'])->first();
 
             Barang::create([
-                'nama_barang' => $data['nama'],
-                'kategoriID' => $kategori->kategoriID,
+                'namaBarang' => $data['nama'],
+                'categoryID' => $kategori->categoryID,
                 'satuan' => $data['satuan'],
                 'stok' => $data['stok'],
                 'deskripsi' => $data['deskripsi'],

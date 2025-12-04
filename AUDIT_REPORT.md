@@ -74,9 +74,9 @@ Audit lengkap terhadap seluruh project Laravel SIMANTAP telah selesai. Hasil aud
 
 ### ✅ 4. `2025_11_12_040551_create_kategoris_table.php`
 **Status**: ✅ SESUAI  
-**Primary Key**: `kategoriID` (custom)  
+**Primary Key**: `categoryID` (custom)  
 **Kolom**:
-- `kategoriID` - INT, Primary Key
+- `categoryID` - INT, Primary Key
 - `nama_kategori` - VARCHAR(255)
 - `deskripsi` - TEXT, Nullable
 - `created_at`, `updated_at` - TIMESTAMP
@@ -93,8 +93,8 @@ Audit lengkap terhadap seluruh project Laravel SIMANTAP telah selesai. Hasil aud
 **Kolom**:
 - `barangID` - INT, Primary Key
 - `kode_barang` - VARCHAR(255), Auto-generated (BRG-001, BRG-002, dll)
-- `nama_barang` - VARCHAR(255)
-- `kategoriID` - INT, Foreign Key
+- `namaBarang` - VARCHAR(255)
+- `categoryID` - INT, Foreign Key
 - `satuan` - ENUM('rim', 'pcs', 'buah', 'box', 'pack', 'set', 'lembar', 'meter', 'kg', 'liter')
 - `stok` - INT, Default 0 ✅ **SIMPLIFIED (hanya 1 kolom)**
 - `deskripsi` - TEXT, Nullable
@@ -313,7 +313,7 @@ Audit lengkap terhadap seluruh project Laravel SIMANTAP telah selesai. Hasil aud
 ### ✅ Kategori Model
 **File**: `app/Models/Kategori.php`  
 **Status**: ✅ SESUAI  
-**Primary Key**: `kategoriID` (custom)  
+**Primary Key**: `categoryID` (custom)  
 **Fillable**: nama_kategori, deskripsi  
 **Relationships**:
 - `barangs()` - hasMany Barang
@@ -324,7 +324,7 @@ Audit lengkap terhadap seluruh project Laravel SIMANTAP telah selesai. Hasil aud
 **File**: `app/Models/Barang.php`  
 **Status**: ✅ SESUAI (FIXED - Duplicate method removed)  
 **Primary Key**: `barangID` (custom)  
-**Fillable**: kode_barang, nama_barang, kategoriID, satuan, stok, deskripsi  
+**Fillable**: kode_barang, namaBarang, categoryID, satuan, stok, deskripsi  
 **Casts**: stok (integer), satuan (string)  
 
 **Relationships**:

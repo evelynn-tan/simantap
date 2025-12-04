@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-4xl">
     <div class="mb-6">
-        <p class="text-gray-600">{{ $barang->nama_barang }}</p>
+        <p class="text-gray-600">{{ $barang->namaBarang }}</p>
     </div>
 
     @if ($errors->any())
@@ -32,9 +32,9 @@
                 </div>
 
                 <div>
-                    <label for="nama_barang" class="block mb-2 text-sm font-medium text-gray-900">Nama Barang *</label>
-                    <input type="text" name="nama_barang" id="nama_barang" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value="{{ old('nama_barang', $barang->nama_barang) }}" required>
-                    @error('nama_barang')
+                    <label for="namaBarang" class="block mb-2 text-sm font-medium text-gray-900">Nama Barang *</label>
+                    <input type="text" name="namaBarang" id="namaBarang" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" value="{{ old('namaBarang', $barang->namaBarang) }}" required>
+                    @error('namaBarang')
                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -44,7 +44,7 @@
                     <select id="kategori_id" name="kategori_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                         <option value="">Pilih kategori barang</option>
                         @foreach ($kategoris as $kategori)
-                            <option value="{{ $kategori->kategoriID }}" @selected(old('kategori_id', $barang->kategoriID) == $kategori->kategoriID)>
+                            <option value="{{ $kategori->categoryID }}" @selected(old('kategori_id', $barang->categoryID) == $kategori->categoryID)>
                                 {{ $kategori->nama_kategori }}
                             </option>
                         @endforeach

@@ -90,7 +90,7 @@
                             <div class="space-y-1">
                                 @foreach($permintaan->pengajuanDetails as $detail)
                                     <div class="text-slate-700">
-                                        <span class="font-medium">{{ $detail->barang->nama_barang ?? 'N/A' }}</span>
+                                        <span class="font-medium">{{ $detail->barang->namaBarang ?? 'N/A' }}</span>
                                         <span class="text-slate-500 text-xs">({{ $detail->jumlah }} {{ $detail->barang->satuan ?? 'unit' }})</span>
                                     </div>
                                 @endforeach
@@ -226,7 +226,7 @@ const pengajuanData = {
             @foreach($p->pengajuanDetails as $detail)
             {
                 id: {{ $detail->pengajuanDetailID }},
-                nama: '{{ $detail->barang->nama_barang ?? "N/A" }}',
+                nama: '{{ $detail->barang->namaBarang ?? "N/A" }}',
                 jumlah: {{ $detail->jumlah }},
                 satuan: '{{ $detail->barang->satuan ?? "unit" }}'
             },

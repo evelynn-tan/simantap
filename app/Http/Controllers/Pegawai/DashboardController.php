@@ -66,7 +66,7 @@ class DashboardController extends Controller
             ->groupBy('barangID')
             ->map(function ($items) {
                 return [
-                    'nama_barang' => $items->first()->barang->nama_barang,
+                    'namaBarang' => $items->first()->barang->namaBarang,
                     'total' => $items->sum('jumlah')
                 ];
             })

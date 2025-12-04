@@ -30,7 +30,7 @@
     </style>
     @stack('styles')
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased" x-data="{ sidebarOpen: false }">
+<body class="bg-slate-50 text-slate-800 antialiased" x-data="{ sidebarOpen: false, profileOpen: false, showPhotoModal: false }">
 
     <div class="lg:hidden flex justify-between items-center bg-white p-4 shadow-sm sticky top-0 z-20">
         <div class="flex items-center gap-2">
@@ -129,32 +129,113 @@
                         </p>
                     </div>
                     
-                    <div class="w-10 h-10 rounded-full bg-emerald-100 border-2 border-white shadow-sm flex items-center justify-center text-emerald-700 font-bold text-lg">
-                        {{ substr($pegawai->nama_lengkap ?? 'P', 0, 1) }}
+                    {{-- Profile Avatar with Dropdown --}}
+                    <div class="relative">
+                        <button @click="profileOpen = !profileOpen" class="focus:outline-none">
+                            @if(isset($pegawai) && $pegawai->foto)
+                                <img src="{{ asset('storage/' . $pegawai->foto) }}" 
+                                     alt="Foto Profil" 
+                                     class="w-10 h-10 rounded-full object-cover border-2 border-emerald-200 shadow-sm hover:border-emerald-400 transition cursor-pointer">
+                            @else
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-white shadow-sm flex items-center justify-center text-white font-bold text-lg hover:from-emerald-500 hover:to-teal-600 transition cursor-pointer">
+                                    {{ substr($pegawai->nama_lengkap ?? 'P', 0, 1) }}
+                                </div>
+                            @endif
+                        </button>
+
+                        {{-- Dropdown Menu --}}
+                        <div x-show="profileOpen" 
+                             @click.away="profileOpen = false"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-50"
+                             style="display: none;">
+                            
+                            {{-- Header dengan foto --}}
+                            <div class="px-4 py-3 border-b border-slate-100">
+                                <div class="flex items-center gap-3">
+                                    @if(isset($pegawai) && $pegawai->foto)
+                                        <img src="{{ asset('storage/' . $pegawai->foto) }}" 
+                                             alt="Foto Profil" 
+                                             class="w-12 h-12 rounded-full object-cover border-2 border-emerald-200 cursor-pointer hover:opacity-80 transition"
+                                             @click="profileOpen = false; showPhotoModal = true">
+                                    @else
+                                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-xl">
+                                            {{ substr($pegawai->nama_lengkap ?? 'P', 0, 1) }}
+                                        </div>
+                                    @endif
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold text-slate-800 truncate">{{ $pegawai->nama_lengkap ?? 'Pegawai' }}</p>
+                                        <p class="text-xs text-slate-500 truncate">{{ Auth::user()->email }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Menu Items --}}
+                            @if(isset($pegawai) && $pegawai->foto)
+                            <button @click="profileOpen = false; showPhotoModal = true" class="w-full px-4 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+                                <i class="fas fa-image w-5 text-center text-slate-400"></i>
+                                Lihat Foto Profil
+                            </button>
+                            @endif
+                            <a href="{{ route('pegawai.edit-profil') }}" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+                                <i class="fas fa-user-edit w-5 text-center text-slate-400"></i>
+                                Edit Profil
+                            </a>
+                            <a href="{{ route('pegawai.dashboard') }}" class="block px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-3">
+                                <i class="fas fa-tachometer-alt w-5 text-center text-slate-400"></i>
+                                Dashboard
+                            </a>
+                            <div class="border-t border-slate-100 mt-2 pt-2">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-3">
+                                        <i class="fas fa-sign-out-alt w-5 text-center"></i>
+                                        Keluar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </header>
 
             <main class="flex-1 overflow-y-auto overflow-x-hidden p-6 lg:p-8 bg-slate-50">
                 <div class="max-w-7xl mx-auto">
-                    {{-- Pesan Sukses/Error Global --}}
-                    @if (session('success'))
-                        <div class="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 flex items-center gap-3 shadow-sm" x-data="{ show: true }" x-show="show">
-                            <i class="fas fa-check-circle text-xl"></i>
-                            <div>
-                                <span class="font-bold block">Berhasil!</span>
-                                <span class="text-sm">{{ session('success') }}</span>
-                            </div>
-                            <button @click="show = false" class="ml-auto text-emerald-400 hover:text-emerald-700"><i class="fas fa-times"></i></button>
-                        </div>
-                    @endif
-
                     @yield('content')
                 </div>
             </main>
 
         </div>
     </div>
+
+    {{-- Modal Preview Foto Full --}}
+    @if(isset($pegawai) && $pegawai->foto)
+    <div x-show="showPhotoModal" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         x-cloak>
+        <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" @click="showPhotoModal = false"></div>
+        <div class="relative z-10 max-w-lg w-full"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-90"
+             x-transition:enter-end="opacity-100 scale-100">
+            <button @click="showPhotoModal = false" class="absolute -top-12 right-0 text-white hover:text-red-400 transition text-xl">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <img src="{{ asset('storage/' . $pegawai->foto) }}" 
+                 alt="Foto Profil" 
+                 class="w-full rounded-2xl shadow-2xl border-4 border-white">
+            <div class="text-center mt-4">
+                <p class="text-white font-bold text-lg">{{ $pegawai->nama_lengkap }}</p>
+                <p class="text-white/70 text-sm">{{ $pegawai->jabatan }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
 
     @yield('scripts')
 </body>

@@ -83,15 +83,17 @@ class ManajemenPenggunaController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'jabatan' => 'required|string|max:255',
-            'nip' => 'required|string|max:255|unique:pegawais,nip|unique:operators,nip',
             'role' => 'required|in:operator,pegawai',
         ];
 
+        // Pegawai butuh field tambahan (nama, nip, jabatan, divisi)
+        // Operator hanya butuh email/password (tanpa identitas personal)
         if ($request->role == 'pegawai') {
+            $rules['name'] = 'required|string|max:255';
+            $rules['jabatan'] = 'required|string|max:255';
+            $rules['nip'] = 'required|string|max:255|unique:pegawais,nip';
             $rules['divisi'] = 'required|string|max:255';
         }
 
@@ -112,11 +114,9 @@ class ManajemenPenggunaController extends Controller
                 'divisi' => $request->divisi ?? '',
             ]);
         } elseif ($request->role == 'operator') {
+            // Operator hanya butuh FK ke users (tanpa identitas personal)
             Operator::create([
                 'userID' => $user->userID,
-                'nama_lengkap' => $request->name,
-                'nip' => $request->nip,
-                'jabatan' => $request->jabatan,
             ]);
         }
 
@@ -138,15 +138,16 @@ class ManajemenPenggunaController extends Controller
     public function update(Request $request, User $pengguna)
     {
         $rules = [
-            'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $pengguna->userID . ',userID',
-            'jabatan' => 'required|string|max:255',
-            'nip' => 'required|string|max:255|unique:pegawais,nip,' . ($pengguna->pegawai ? $pengguna->pegawai->pegawaiID : 'NULL') . ',pegawaiID|unique:operators,nip,' . ($pengguna->operator ? $pengguna->operator->operatorID : 'NULL') . ',operatorID',
             'role' => 'required|in:operator,pegawai',
             'password' => 'nullable|string|min:8|confirmed', // Password opsional
         ];
 
+        // Pegawai butuh field tambahan
         if ($request->role == 'pegawai') {
+            $rules['name'] = 'required|string|max:255';
+            $rules['jabatan'] = 'required|string|max:255';
+            $rules['nip'] = 'required|string|max:255|unique:pegawais,nip,' . ($pengguna->pegawai ? $pengguna->pegawai->pegawaiID : 'NULL') . ',pegawaiID';
             $rules['divisi'] = 'required|string|max:255';
         }
 
@@ -183,23 +184,15 @@ class ManajemenPenggunaController extends Controller
                 }
             }
         } elseif ($request->role == 'operator') {
-            if ($pengguna->operator) {
-                $pengguna->operator->update([
-                    'nama_lengkap' => $request->name,
-                    'nip' => $request->nip,
-                    'jabatan' => $request->jabatan,
-                ]);
-            } else {
+            // Operator tidak punya field personal, hanya userID
+            if (!$pengguna->operator) {
                 Operator::create([
                     'userID' => $pengguna->userID,
-                    'nama_lengkap' => $request->name,
-                    'nip' => $request->nip,
-                    'jabatan' => $request->jabatan,
                 ]);
-                // If was pegawai, delete pegawai
-                if ($pengguna->pegawai) {
-                    $pengguna->pegawai->delete();
-                }
+            }
+            // Jika sebelumnya pegawai, hapus data pegawai
+            if ($pengguna->pegawai) {
+                $pengguna->pegawai->delete();
             }
         }
 

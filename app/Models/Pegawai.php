@@ -18,6 +18,7 @@ class Pegawai extends Model
         'nip',
         'jabatan',
         'divisi',
+        'foto',
     ];
 
     // Relasi ke User

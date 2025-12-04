@@ -7,165 +7,389 @@
 @section('content')
 <div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
     
-    <!-- KPI Cards -->
+    <!-- Welcome Banner (Fixed: tidak overlap dengan header) -->
+    <div class="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 rounded-2xl shadow-xl p-5 text-white relative overflow-hidden">
+        <div class="absolute right-0 top-0 opacity-10">
+            <svg width="200" height="120" viewBox="0 0 200 120">
+                <circle cx="150" cy="60" r="50" fill="white"/>
+                <circle cx="180" cy="30" r="25" fill="white"/>
+            </svg>
+        </div>
+        <div class="relative z-10 flex items-center gap-4">
+            <div class="hidden sm:flex h-12 w-12 bg-white/20 rounded-xl items-center justify-center backdrop-blur-sm flex-shrink-0">
+                <i class="fas fa-chart-pie text-2xl"></i>
+            </div>
+            <div class="flex-1">
+                <h2 class="text-xl font-bold">Selamat Datang, Operator!</h2>
+                <p class="text-blue-200 text-xs mt-0.5">SIMANTAP - BPS Kota Tanjungpinang</p>
+                <p class="text-blue-100 text-xs mt-2 flex flex-wrap items-center gap-3">
+                    <span>📅 {{ \Carbon\Carbon::now()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('l, d F Y') }}</span>
+                    <span>🕐 <span id="live-clock"></span> WIB</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards Row 1 (dengan Tooltip Info) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Total Jenis Aset -->
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-sm border border-blue-200 hover:shadow-lg transition duration-200">
+        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl shadow-sm border border-blue-200 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer group relative">
+            <!-- Info Tooltip -->
+            <div class="absolute top-3 right-3 group/tooltip">
+                <span class="h-5 w-5 bg-blue-200 hover:bg-blue-300 rounded-full flex items-center justify-center cursor-help transition">
+                    <i class="fas fa-info text-xs text-blue-700"></i>
+                </span>
+                <div class="absolute right-0 top-6 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 hidden group-hover/tooltip:block z-20 shadow-xl">
+                    <p class="font-semibold mb-1">📦 Jenis Barang</p>
+                    <p class="text-slate-300">Menampilkan total jenis barang yang terdaftar dalam sistem inventaris dan total keseluruhan unit stok.</p>
+                </div>
+            </div>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-blue-600 text-sm font-semibold uppercase tracking-wider">Jenis Aset</p>
-                    <p class="text-4xl font-bold text-blue-900 mt-2">{{ $jumlahJenisAset ?? 0 }}</p>
-                    <p class="text-xs text-blue-700 mt-2">Total stok: <span class="font-bold">{{ $totalStok ?? 0 }} unit</span></p>
+                    <p class="text-blue-600 text-xs font-semibold uppercase tracking-wider">Jenis Barang</p>
+                    <p class="text-3xl font-bold text-blue-900 mt-1 group-hover:text-blue-700 transition">{{ $jumlahJenisAset ?? 0 }}</p>
+                    <p class="text-xs text-blue-700 mt-2">Total: <span class="font-bold">{{ number_format($totalStok ?? 0) }} unit</span></p>
                 </div>
-                <div class="h-14 w-14 bg-blue-200 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-boxes text-3xl text-blue-700"></i>
+                <div class="h-12 w-12 bg-blue-200 group-hover:bg-blue-300 rounded-xl flex items-center justify-center transition">
+                    <i class="fas fa-boxes text-2xl text-blue-700"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Permintaan Baru -->
-        <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 rounded-xl shadow-sm border border-yellow-200 hover:shadow-lg transition duration-200">
+        <!-- Menunggu Proses -->
+        <a href="{{ route('admin.permintaan.index') }}" class="bg-gradient-to-br from-yellow-50 to-amber-100 p-5 rounded-xl shadow-sm border border-yellow-200 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group relative {{ ($permintaanBaru ?? 0) > 0 ? 'animate-pulse' : '' }}">
+            <!-- Info Tooltip -->
+            <div class="absolute top-3 right-3 group/tooltip" onclick="event.preventDefault(); event.stopPropagation();">
+                <span class="h-5 w-5 bg-yellow-200 hover:bg-yellow-300 rounded-full flex items-center justify-center cursor-help transition">
+                    <i class="fas fa-info text-xs text-yellow-700"></i>
+                </span>
+                <div class="absolute right-0 top-6 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 hidden group-hover/tooltip:block z-20 shadow-xl">
+                    <p class="font-semibold mb-1">⏳ Menunggu Proses</p>
+                    <p class="text-slate-300">Jumlah permintaan barang dari pegawai yang belum ditinjau. Klik untuk langsung memproses.</p>
+                </div>
+            </div>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-yellow-700 text-sm font-semibold uppercase tracking-wider">Menunggu Proses</p>
-                    <p class="text-4xl font-bold text-yellow-900 mt-2">{{ $permintaanBaru ?? 0 }}</p>
+                    <p class="text-yellow-700 text-xs font-semibold uppercase tracking-wider">Menunggu Proses</p>
+                    <p class="text-3xl font-bold text-yellow-900 mt-1">{{ $permintaanBaru ?? 0 }}</p>
                     <p class="text-xs text-yellow-800 mt-2 font-semibold">⚠️ Perlu tindakan</p>
                 </div>
-                <div class="h-14 w-14 bg-yellow-200 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-hourglass text-3xl text-yellow-700"></i>
+                <div class="h-12 w-12 bg-yellow-200 group-hover:bg-yellow-300 rounded-xl flex items-center justify-center transition">
+                    <i class="fas fa-hourglass-half text-2xl text-yellow-700"></i>
                 </div>
             </div>
-        </div>
+        </a>
 
-        <!-- Perlu Restock -->
-        <div class="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-xl shadow-sm border border-red-200 hover:shadow-lg transition duration-200">
+        <!-- Stok Rendah -->
+        <div class="bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-xl shadow-sm border border-red-200 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer group relative">
+            <!-- Info Tooltip -->
+            <div class="absolute top-3 right-3 group/tooltip">
+                <span class="h-5 w-5 bg-red-200 hover:bg-red-300 rounded-full flex items-center justify-center cursor-help transition">
+                    <i class="fas fa-info text-xs text-red-700"></i>
+                </span>
+                <div class="absolute right-0 top-6 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 hidden group-hover/tooltip:block z-20 shadow-xl">
+                    <p class="font-semibold mb-1">🚨 Stok Kritis</p>
+                    <p class="text-slate-300">Barang dengan stok habis (0) atau rendah (&lt;5 unit). Perlu segera ditambah stoknya untuk mencegah kekosongan.</p>
+                </div>
+            </div>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-red-700 text-sm font-semibold uppercase tracking-wider">Stok Rendah</p>
-                    <p class="text-4xl font-bold text-red-900 mt-2">{{ $barangStokRendah ?? 0 }}</p>
-                    <p class="text-xs text-red-800 mt-2">Kurang dari 10 unit</p>
+                    <p class="text-red-700 text-xs font-semibold uppercase tracking-wider">Stok Kritis</p>
+                    <p class="text-3xl font-bold text-red-900 mt-1">{{ ($barangRendah ?? 0) + ($barangHabis ?? 0) }}</p>
+                    <p class="text-xs text-red-800 mt-2"><span class="font-bold">{{ $barangHabis ?? 0 }}</span> habis · <span class="font-bold">{{ $barangRendah ?? 0 }}</span> rendah</p>
                 </div>
-                <div class="h-14 w-14 bg-red-200 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-exclamation-circle text-3xl text-red-700"></i>
+                <div class="h-12 w-12 bg-red-200 group-hover:bg-red-300 rounded-xl flex items-center justify-center transition">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-700"></i>
                 </div>
             </div>
         </div>
 
         <!-- Total Permintaan -->
-        <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl shadow-sm border border-green-200 hover:shadow-lg transition duration-200">
+        <div class="bg-gradient-to-br from-green-50 to-emerald-100 p-5 rounded-xl shadow-sm border border-green-200 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer group relative">
+            <!-- Info Tooltip -->
+            <div class="absolute top-3 right-3 group/tooltip">
+                <span class="h-5 w-5 bg-green-200 hover:bg-green-300 rounded-full flex items-center justify-center cursor-help transition">
+                    <i class="fas fa-info text-xs text-green-700"></i>
+                </span>
+                <div class="absolute right-0 top-6 w-56 bg-slate-800 text-white text-xs rounded-lg p-3 hidden group-hover/tooltip:block z-20 shadow-xl">
+                    <p class="font-semibold mb-1">📊 Total Permintaan</p>
+                    <p class="text-slate-300">Total seluruh permintaan barang yang masuk, dengan rincian jumlah yang disetujui (✓) dan ditolak (✗).</p>
+                </div>
+            </div>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-green-700 text-sm font-semibold uppercase tracking-wider">Total Permintaan</p>
-                    <p class="text-4xl font-bold text-green-900 mt-2">{{ $totalPermintaan ?? 0 }}</p>
+                    <p class="text-green-700 text-xs font-semibold uppercase tracking-wider">Total Permintaan</p>
+                    <p class="text-3xl font-bold text-green-900 mt-1">{{ $totalPermintaan ?? 0 }}</p>
                     <p class="text-xs text-green-800 mt-2">
-                        <span class="font-bold">{{ $permintaanDisetujui ?? 0 }}</span> ✓ | 
-                        <span class="font-bold">{{ $permintaanDitolak ?? 0 }}</span> ✗
+                        <span class="text-green-600 font-bold">✓{{ $permintaanDisetujui ?? 0 }}</span> · 
+                        <span class="text-red-600 font-bold">✗{{ $permintaanDitolak ?? 0 }}</span>
                     </p>
                 </div>
-                <div class="h-14 w-14 bg-green-200 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-chart-line text-3xl text-green-700"></i>
+                <div class="h-12 w-12 bg-green-200 group-hover:bg-green-300 rounded-xl flex items-center justify-center transition">
+                    <i class="fas fa-chart-line text-2xl text-green-700"></i>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- KPI Cards Row 2 (Mini dengan Tooltip) -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-purple-300 transition relative group/card">
+            <div class="absolute top-2 right-2 group/tooltip">
+                <span class="h-4 w-4 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center cursor-help">
+                    <i class="fas fa-info text-[8px] text-slate-500"></i>
+                </span>
+                <div class="absolute right-0 top-5 w-48 bg-slate-800 text-white text-xs rounded-lg p-2.5 hidden group-hover/tooltip:block z-20 shadow-xl">
+                    <p class="text-slate-300">Total pegawai yang terdaftar dan dapat mengajukan permintaan barang.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-purple-600"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-slate-800">{{ $totalPegawai ?? 0 }}</p>
+                    <p class="text-xs text-slate-500">Pegawai</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-teal-300 transition relative group/card">
+            <div class="absolute top-2 right-2 group/tooltip">
+                <span class="h-4 w-4 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center cursor-help">
+                    <i class="fas fa-info text-[8px] text-slate-500"></i>
+                </span>
+                <div class="absolute right-0 top-5 w-48 bg-slate-800 text-white text-xs rounded-lg p-2.5 hidden group-hover/tooltip:block z-20 shadow-xl">
+                    <p class="text-slate-300">Jumlah kategori untuk pengelompokan jenis barang inventaris.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-teal-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-layer-group text-teal-600"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-slate-800">{{ $totalKategori ?? 0 }}</p>
+                    <p class="text-xs text-slate-500">Kategori</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-orange-300 transition relative group/card">
+            <div class="absolute top-2 right-2 group/tooltip">
+                <span class="h-4 w-4 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center cursor-help">
+                    <i class="fas fa-info text-[8px] text-slate-500"></i>
+                </span>
+                <div class="absolute right-0 top-5 w-48 bg-slate-800 text-white text-xs rounded-lg p-2.5 hidden group-hover/tooltip:block z-20 shadow-xl">
+                    <p class="text-slate-300">Jumlah sesi stock opname yang tercatat untuk audit stok fisik.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clipboard-check text-orange-600"></i>
+                </div>
+                <div>
+                    <p class="text-2xl font-bold text-slate-800">{{ $recentOpname->count() ?? 0 }}</p>
+                    <p class="text-xs text-slate-500">Opname</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-pink-300 transition relative group/card">
+            <div class="absolute top-2 right-2 group/tooltip">
+                <span class="h-4 w-4 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center cursor-help">
+                    <i class="fas fa-info text-[8px] text-slate-500"></i>
+                </span>
+                <div class="absolute right-0 top-5 w-48 bg-slate-800 text-white text-xs rounded-lg p-2.5 hidden group-hover/tooltip:block z-20 shadow-xl">
+                    <p class="text-slate-300">Persentase permintaan yang disetujui dari total permintaan. Indikator kinerja pelayanan.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="h-10 w-10 bg-pink-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-percentage text-pink-600"></i>
+                </div>
+                <div>
+                    @php $approvalRate = $totalPermintaan > 0 ? round(($permintaanDisetujui / $totalPermintaan) * 100) : 0; @endphp
+                    <p class="text-2xl font-bold text-slate-800">{{ $approvalRate }}%</p>
+                    <p class="text-xs text-slate-500">Approval</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row (DIPERKECIL) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Trend 7 Hari Terakhir -->
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800">📈 Trend Permintaan (7 Hari)</h3>
+                </div>
+                <span class="text-xs text-slate-400">Real-time</span>
+            </div>
+            <div class="p-4">
+                <canvas id="trendChart" height="70"></canvas>
+            </div>
+        </div>
+
+        <!-- Status Distribution (Donut) -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3 border-b border-slate-200">
+                <h3 class="text-sm font-bold text-slate-800">📊 Status Permintaan</h3>
+            </div>
+            <div class="p-4 flex items-center justify-center">
+                <div style="width: 150px; height: 150px;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+            <div class="px-4 pb-3 flex justify-center gap-3 text-xs">
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span> Menunggu</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Disetujui</span>
+                <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Ditolak</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 (DIPERKECIL) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Statistik Bulanan -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3 border-b border-slate-200">
+                <h3 class="text-sm font-bold text-slate-800">📅 Statistik Bulanan {{ date('Y') }}</h3>
+            </div>
+            <div class="p-4">
+                <canvas id="monthlyChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <!-- Stok per Kategori -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3 border-b border-slate-200">
+                <h3 class="text-sm font-bold text-slate-800">📦 Stok per Kategori (Top 6)</h3>
+            </div>
+            <div class="p-4">
+                <canvas id="kategoriChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Two Columns Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         
         <!-- Permintaan Terbaru -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-            <div class="px-6 py-4 border-b border-slate-200">
-                <h3 class="text-lg font-bold text-slate-800">📋 Permintaan Terbaru</h3>
-                <p class="text-xs text-slate-500 mt-1">5 permintaan terbaru yang masuk</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3 border-b border-slate-200 bg-gradient-to-r from-yellow-50 to-amber-50">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <span class="h-6 w-6 bg-yellow-400 rounded-lg flex items-center justify-center text-white text-xs">
+                        <i class="fas fa-bell"></i>
+                    </span>
+                    Permintaan Menunggu
+                </h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm">
                     <thead class="bg-slate-50 border-b border-slate-200">
                         <tr>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Tanggal</th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Pegawai</th>
-                            <th class="px-4 py-3 text-center text-xs font-bold text-slate-600 uppercase">Status</th>
+                            <th class="px-4 py-2.5 text-left text-xs font-bold text-slate-600 uppercase">Tanggal</th>
+                            <th class="px-4 py-2.5 text-left text-xs font-bold text-slate-600 uppercase">Pegawai</th>
+                            <th class="px-4 py-2.5 text-center text-xs font-bold text-slate-600 uppercase">Item</th>
+                            <th class="px-4 py-2.5 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
                         @forelse($permintaanTerbaru ?? [] as $permintaan)
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="px-4 py-3 text-slate-700 font-medium whitespace-nowrap">
-                                {{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('d M H:i') }}
+                        <tr class="hover:bg-yellow-50 transition">
+                            <td class="px-4 py-2.5 text-slate-700 font-medium whitespace-nowrap">
+                                <div>{{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('d M') }}</div>
+                                <div class="text-xs text-slate-400">{{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('H:i') }}</div>
                             </td>
-                            <td class="px-4 py-3 text-slate-700">
-                                {{ $permintaan->pegawai->nama_lengkap ?? $permintaan->user->name ?? '-' }}
+                            <td class="px-4 py-2.5 text-slate-700">
+                                <div class="font-medium text-sm">{{ $permintaan->pegawai->nama_lengkap ?? '-' }}</div>
+                                <div class="text-xs text-slate-400">{{ $permintaan->pegawai->divisi ?? '' }}</div>
                             </td>
-                            <td class="px-4 py-3 text-center">
-                                @if($permintaan->status == 'menunggu')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                        <i class="fas fa-hourglass mr-1"></i> Menunggu
-                                    </span>
-                                @elseif($permintaan->status == 'disetujui')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                        <i class="fas fa-check mr-1"></i> OK
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
-                                        <i class="fas fa-times mr-1"></i> Tolak
-                                    </span>
-                                @endif
+                            <td class="px-4 py-2.5 text-center">
+                                <span class="inline-flex items-center justify-center h-5 w-5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
+                                    {{ $permintaan->pengajuanDetails->count() }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-2.5 text-center">
+                                <a href="{{ route('admin.permintaan.index') }}" class="text-blue-600 hover:text-blue-800 font-semibold text-xs">
+                                    Tinjau <i class="fas fa-arrow-right ml-1"></i>
+                                </a>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="px-4 py-8 text-center text-slate-500 italic">
-                                <i class="fas fa-inbox text-2xl opacity-50 mb-2 block"></i>
-                                Tidak ada permintaan
+                            <td colspan="4" class="px-4 py-6 text-center text-slate-400">
+                                <div class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                                    <i class="fas fa-check text-xl text-green-500"></i>
+                                </div>
+                                <p class="font-medium text-green-600 text-sm">Semua sudah diproses!</p>
                             </td>
                         </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="px-6 py-3 border-t border-slate-200 text-right">
-                <a href="{{ route('admin.permintaan.index') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700 transition">
-                    Lihat Semua <i class="fas fa-arrow-right ml-1"></i>
+            @if(($permintaanTerbaru ?? collect())->count() > 0)
+            <div class="px-5 py-2.5 border-t border-slate-200 text-right bg-slate-50">
+                <a href="{{ route('admin.permintaan.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition">
+                    Lihat Semua ({{ $permintaanBaru }}) <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
+            @endif
         </div>
 
         <!-- Barang Paling Sering Diminta -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-            <div class="px-6 py-4 border-b border-slate-200">
-                <h3 class="text-lg font-bold text-slate-800">⭐ Barang Paling Sering Diminta</h3>
-                <p class="text-xs text-slate-500 mt-1">Top 5 barang yang paling sering diajukan</p>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3 border-b border-slate-200 bg-gradient-to-r from-orange-50 to-amber-50">
+                <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <span class="h-6 w-6 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xs">
+                        <i class="fas fa-fire"></i>
+                    </span>
+                    Barang Populer (Top 5)
+                </h3>
             </div>
-            <div class="p-4 space-y-3 max-h-96 overflow-y-auto">
+            <div class="p-3 space-y-2">
                 @forelse($barangTeratas ?? [] as $index => $barang)
-                <div class="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 rounded-lg border border-slate-200 hover:border-blue-300 hover:shadow-md transition duration-200">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center justify-center h-8 w-8 bg-blue-600 text-white text-sm font-bold rounded-full">
+                <div class="flex items-center gap-3 p-2.5 bg-gradient-to-r from-slate-50 to-white rounded-lg border border-slate-100 hover:border-orange-200 hover:shadow transition-all duration-200">
+                    <div class="flex-shrink-0">
+                        @if($index == 0)
+                            <span class="inline-flex items-center justify-center h-8 w-8 bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow">
+                                🥇
+                            </span>
+                        @elseif($index == 1)
+                            <span class="inline-flex items-center justify-center h-8 w-8 bg-gradient-to-br from-slate-300 to-slate-400 text-white text-xs font-bold rounded-full">
+                                🥈
+                            </span>
+                        @elseif($index == 2)
+                            <span class="inline-flex items-center justify-center h-8 w-8 bg-gradient-to-br from-amber-600 to-amber-700 text-white text-xs font-bold rounded-full">
+                                🥉
+                            </span>
+                        @else
+                            <span class="inline-flex items-center justify-center h-8 w-8 bg-blue-600 text-white text-xs font-bold rounded-full">
                                 {{ $index + 1 }}
                             </span>
-                            <div>
-                                <p class="font-semibold text-slate-800">{{ $barang->nama_barang ?? 'N/A' }}</p>
-                                <p class="text-xs text-slate-500 mt-0.5">Stok: <span class="font-semibold">{{ $barang->stok ?? 0 }}</span> {{ $barang->satuan ?? 'unit' }}</p>
-                            </div>
-                        </div>
+                        @endif
                     </div>
-                    <div class="text-right">
-                        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-100 text-orange-800 rounded-lg text-sm font-bold">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-slate-800 text-sm truncate">{{ $barang->namaBarang ?? 'N/A' }}</p>
+                        <p class="text-xs text-slate-500">
+                            Stok: <span class="font-semibold {{ $barang->stok < 5 ? 'text-red-600' : 'text-green-600' }}">{{ $barang->stok ?? 0 }}</span> {{ $barang->satuan ?? 'unit' }}
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-100 text-orange-800 rounded-lg text-xs font-bold">
                             <i class="fas fa-fire text-orange-500"></i>
                             {{ $barang->total_permintaan ?? 0 }}x
                         </span>
                     </div>
                 </div>
                 @empty
-                <div class="text-center py-8 text-slate-400">
-                    <i class="fas fa-chart-bar text-3xl mb-2 opacity-50"></i>
-                    <p class="text-sm">Belum ada data permintaan</p>
+                <div class="text-center py-6 text-slate-400">
+                    <i class="fas fa-chart-bar text-2xl mb-2 opacity-50"></i>
+                    <p class="text-sm">Belum ada data</p>
                 </div>
                 @endforelse
             </div>
-            <div class="px-6 py-3 border-t border-slate-200 text-right">
-                <a href="{{ route('admin.barang.index') }}" class="text-sm font-semibold text-blue-600 hover:text-blue-700 transition">
+            <div class="px-5 py-2.5 border-t border-slate-200 text-right bg-slate-50">
+                <a href="{{ route('admin.barang.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition">
                     Kelola Barang <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
@@ -173,5 +397,178 @@
 
     </div>
 
+    <!-- Quick Actions -->
+    <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl shadow-lg p-5 text-white">
+        <h3 class="text-sm font-bold mb-3">⚡ Aksi Cepat</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <a href="{{ route('admin.barang.create') }}" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
+                <div class="h-9 w-9 bg-blue-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="fas fa-plus text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="font-semibold text-sm">Tambah Barang</p>
+                    <p class="text-xs text-slate-400">Input barang baru</p>
+                </div>
+            </a>
+            <a href="{{ route('admin.permintaan.index') }}" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
+                <div class="h-9 w-9 bg-yellow-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="fas fa-clipboard-list text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="font-semibold text-sm">Proses Permintaan</p>
+                    <p class="text-xs text-slate-400">{{ $permintaanBaru }} menunggu</p>
+                </div>
+            </a>
+            <a href="{{ route('admin.stock-opname.create') }}" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
+                <div class="h-9 w-9 bg-teal-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="fas fa-clipboard-check text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="font-semibold text-sm">Stock Opname</p>
+                    <p class="text-xs text-slate-400">Cek stok fisik</p>
+                </div>
+            </a>
+            <a href="{{ route('admin.laporan.index') }}" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
+                <div class="h-9 w-9 bg-purple-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="fas fa-file-alt text-white text-sm"></i>
+                </div>
+                <div>
+                    <p class="font-semibold text-sm">Buat Laporan</p>
+                    <p class="text-xs text-slate-400">Export PDF/Excel</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
 </div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Live Clock
+function updateClock() {
+    const now = new Date();
+    const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    document.getElementById('live-clock').textContent = now.toLocaleTimeString('id-ID', options);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Chart Color Palette
+const colors = {
+    primary: 'rgb(59, 130, 246)',
+    primaryLight: 'rgba(59, 130, 246, 0.1)',
+    success: 'rgb(34, 197, 94)',
+    warning: 'rgb(250, 204, 21)',
+    danger: 'rgb(239, 68, 68)',
+    purple: 'rgb(168, 85, 247)',
+    teal: 'rgb(20, 184, 166)',
+    orange: 'rgb(249, 115, 22)',
+    pink: 'rgb(236, 72, 153)',
+    slate: 'rgb(100, 116, 139)'
+};
+
+// 1. Trend Chart (Line - 7 days)
+new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+        labels: {!! json_encode($trendLabels) !!},
+        datasets: [{
+            label: 'Permintaan',
+            data: {!! json_encode($trendHarian) !!},
+            borderColor: colors.primary,
+            backgroundColor: colors.primaryLight,
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: colors.primary,
+            pointRadius: 4,
+            pointHoverRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } },
+            x: { ticks: { font: { size: 10 } } }
+        }
+    }
+});
+
+// 2. Status Chart (Doughnut)
+new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Menunggu', 'Disetujui', 'Ditolak'],
+        datasets: [{
+            data: [{{ $statusDistribution['menunggu'] }}, {{ $statusDistribution['disetujui'] }}, {{ $statusDistribution['ditolak'] }}],
+            backgroundColor: [colors.warning, colors.success, colors.danger],
+            borderWidth: 0,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        cutout: '65%',
+        plugins: { legend: { display: false } }
+    }
+});
+
+// 3. Monthly Chart (Bar)
+new Chart(document.getElementById('monthlyChart'), {
+    type: 'bar',
+    data: {
+        labels: {!! json_encode($bulanLabels) !!},
+        datasets: [{
+            label: 'Permintaan',
+            data: {!! json_encode($bulanData) !!},
+            backgroundColor: [
+                colors.primary, colors.teal, colors.success, colors.warning,
+                colors.orange, colors.pink, colors.purple, colors.danger,
+                colors.primary, colors.teal, colors.success, colors.slate
+            ],
+            borderRadius: 4,
+            borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } },
+            x: { ticks: { font: { size: 9 } } }
+        }
+    }
+});
+
+// 4. Kategori Chart (Horizontal Bar)
+new Chart(document.getElementById('kategoriChart'), {
+    type: 'bar',
+    data: {
+        labels: {!! json_encode($stokPerKategori->pluck('nama')) !!},
+        datasets: [{
+            label: 'Total Stok',
+            data: {!! json_encode($stokPerKategori->pluck('stok')) !!},
+            backgroundColor: [colors.primary, colors.teal, colors.purple, colors.orange, colors.pink, colors.success],
+            borderRadius: 4
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { beginAtZero: true, ticks: { font: { size: 10 } } },
+            y: { ticks: { font: { size: 10 } } }
+        }
+    }
+});
+</script>
+
 @endsection

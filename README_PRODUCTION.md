@@ -45,7 +45,7 @@ SIMANTAP adalah sistem web untuk manajemen aset dan inventory barang di BPS Kota
 | `laporans` | - | Generated reports (workflow: draft→final→approved) |
 
 ### Special Features
-- ✅ **Custom Primary Keys**: barangID, kategoriID, pengajuanID, etc.
+- ✅ **Custom Primary Keys**: barangID, categoryID, pengajuanID, etc.
 - ✅ **ENUM Types**: role, status, jenis, satuan, divisi
 - ✅ **Audit Trail**: stok_sebelum, stok_sesudah, workflow status
 - ✅ **Per-Item Tracking**: PengajuanDetail dengan per-item status
@@ -325,8 +325,8 @@ PUT    /pegawai/edit-profil/update               - Update profile
 ### Create Barang
 ```php
 $barang = Barang::create([
-    'nama_barang' => 'Kertas HVS A4',
-    'kategoriID' => 1,
+    'namaBarang' => 'Kertas HVS A4',
+    'categoryID' => 1,
     'satuan' => 'rim',
     'stok' => 50,
 ]);

@@ -9,7 +9,7 @@ class Kategori extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'kategoriID';
+    protected $primaryKey = 'categoryID';
     public $incrementing = true;
 
     protected $fillable = [
@@ -20,6 +20,6 @@ class Kategori extends Model
     // Relasi ke Barang
     public function barangs()
     {
-        return $this->hasMany(Barang::class, 'kategoriID', 'kategoriID');
+        return $this->hasMany(Barang::class, 'categoryID', 'categoryID');
     }
 }

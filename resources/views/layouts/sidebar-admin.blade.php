@@ -3,9 +3,9 @@
         <!-- Logo Header -->
         <div class="p-5 border-b border-blue-800 bg-gradient-to-r from-blue-950 to-blue-900 shadow-lg">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 hover:opacity-80 transition">
-                <div class="h-12 w-12 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center font-bold text-blue-950 text-lg shadow-xl border-2 border-yellow-300">
-                    <img src="{{ asset('images/logo-bps.png') }}" alt="Logo BPS" class="h-12 w-auto">
-                </div>
+        <div class="flex items-center gap-2">
+            <img src="{{ asset('images/logo-bps.png') }}" alt="Logo" class="w-8 h-8">
+        </div>
                 <div>
                     <h1 class="text-xl font-bold text-white tracking-wider">SIMANTAP</h1>
                     <p class="text-xs text-blue-200 font-medium">BPS Kota Tanjungpinang - BMN</p>
@@ -28,7 +28,7 @@
                 <li>
                     <a href="{{ route('admin.permintaan.index') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.permintaan.*') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
                         <i class="fas fa-file-alt w-5 h-5 text-emerald-300"></i>
-                        <span class="ml-3 font-semibold">Permintaan</span>
+                        <span class="ml-3 font-semibold">Proses Permintaan</span>
                     </a>
                 </li>
 
@@ -63,7 +63,7 @@
                 <li>
                     <a href="{{ route('admin.pengguna.index') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.pengguna.*') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
                         <i class="fas fa-users w-5 h-5 text-pink-300"></i>
-                        <span class="ml-3 font-semibold">Pengguna</span>
+                        <span class="ml-3 font-semibold">Manajemen Pengguna</span>
                     </a>
                 </li>
 
@@ -71,7 +71,7 @@
                 <li>
                     <a href="{{ route('admin.laporan.index') }}" class="flex items-center px-4 py-3 text-blue-100 rounded-lg transition duration-200 {{ request()->routeIs('admin.laporan.*') ? 'bg-blue-700 border-l-4 border-yellow-400 shadow-lg text-white' : 'hover:bg-blue-800 border-l-4 border-transparent hover:text-white' }}">
                         <i class="fas fa-file-pdf w-5 h-5 text-red-300"></i>
-                        <span class="ml-3 font-semibold">Laporan</span>
+                        <span class="ml-3 font-semibold">Buat Laporan</span>
                     </a>
                 </li>
             </ul>

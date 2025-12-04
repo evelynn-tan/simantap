@@ -52,9 +52,11 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     // Perbaikan kecil: resource jangan pakai path 'views/admin/...', cukup nama URL saja
     Route::resource('stock-opname', StockOpnameController::class); 
     
-    // Laporan (Gunakan ini saja)
+    // Laporan
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::post('/laporan/generate', [LaporanController::class, 'generate'])->name('laporan.generate');
+    Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.export-excel');
+    Route::get('/laporan/export-pdf', [LaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
 
 });
 

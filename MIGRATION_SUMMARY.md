@@ -90,7 +90,7 @@ All migrations restructured according to new schema:
 
 1. **DataBarangController** (`Admin/DataBarangController.php`)
    - ✅ Auto-generate kode_barang via model booted() hook
-   - ✅ Duplicate detection: checks nama_barang + kategori + satuan
+   - ✅ Duplicate detection: checks namaBarang + kategori + satuan
    - ✅ Suggestion: "Barang sudah ada, stok ditambah?"
    - ✅ Simplified stok: single column instead of awal/sekarang
    - ✅ Search endpoint for AJAX

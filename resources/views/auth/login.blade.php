@@ -1,5 +1,6 @@
 @push('styles')
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
     /* Global */
@@ -14,7 +15,7 @@
         --bps-blue-2:#0072d4;
         --bps-green:#28A745;
         --bps-orange:#F6921E;
-        --card-bg: rgba(255,255,255,0.85);
+        --card-bg: rgba(255,255,255,0.95);
     }
 
     /* Page background: signature BPS gradient + subtle pattern */
@@ -28,31 +29,98 @@
         overflow: hidden;
     }
 
-    /* faint watermark (BPS emblem or dots) */
-    .watermark {
+    /* Animated background shapes */
+    .bg-shapes {
         position: absolute;
         inset: 0;
         pointer-events: none;
-        opacity: .04;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        overflow: hidden;
     }
-    .watermark svg { width: 520px; height: 520px; transform: rotate(-12deg); }
+    
+    .bg-shape {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.05;
+        animation: float 20s ease-in-out infinite;
+    }
+    
+    .bg-shape-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--bps-blue);
+        top: -100px;
+        right: -100px;
+        animation-delay: 0s;
+    }
+    
+    .bg-shape-2 {
+        width: 300px;
+        height: 300px;
+        background: var(--bps-green);
+        bottom: -50px;
+        left: -50px;
+        animation-delay: -5s;
+    }
+    
+    .bg-shape-3 {
+        width: 200px;
+        height: 200px;
+        background: var(--bps-orange);
+        top: 50%;
+        right: 20%;
+        animation-delay: -10s;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(30px, -30px) scale(1.05); }
+        66% { transform: translate(-20px, 20px) scale(0.95); }
+    }
 
-    /* card */
+    /* Left panel styling */
+    .left-panel {
+        background: linear-gradient(160deg, var(--bps-blue) 0%, #004494 40%, var(--bps-green) 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .left-panel::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        animation: pulse-bg 4s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-bg {
+        0%, 100% { opacity: 0.5; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.1); }
+    }
+
+    /* Glass card effect */
     .v3-card {
         background: var(--card-bg);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        border-radius: 1.6rem;
-        border: 1px solid rgba(255,255,255,0.45);
-        box-shadow: 0 10px 30px rgba(8,15,35,0.08), 0 3px 10px rgba(2,6,23,0.04);
-        transition: transform .36s cubic-bezier(.2,.9,.2,1), box-shadow .36s;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 1.8rem;
+        border: 1px solid rgba(255,255,255,0.6);
+        box-shadow: 
+            0 25px 50px rgba(8,15,35,0.1),
+            0 10px 20px rgba(0,87,183,0.05),
+            inset 0 1px 0 rgba(255,255,255,0.8);
+        transition: transform .4s cubic-bezier(.2,.9,.2,1), box-shadow .4s;
     }
-    .v3-card:hover { transform: translateY(-6px); box-shadow: 0 22px 48px rgba(8,15,35,0.12); }
+    .v3-card:hover { 
+        transform: translateY(-8px); 
+        box-shadow: 
+            0 35px 60px rgba(8,15,35,0.15),
+            0 15px 30px rgba(0,87,183,0.08);
+    }
 
-    /* gradient border glow */
+    /* Gradient glow effect */
     .v3-glow {
         position: relative;
         overflow: visible;
@@ -60,88 +128,147 @@
     .v3-glow::before {
         content: "";
         position: absolute;
-        inset: 0;
-        border-radius: 1.6rem;
-        padding: 2px;
-        background: linear-gradient(90deg, var(--bps-blue), var(--bps-green), var(--bps-orange));
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        opacity: .35;
-        filter: blur(6px);
-        transition: opacity .3s;
+        inset: -3px;
+        border-radius: 2rem;
+        background: linear-gradient(135deg, var(--bps-blue), var(--bps-green), var(--bps-orange), var(--bps-blue));
+        background-size: 300% 300%;
+        animation: gradient-shift 6s ease infinite;
+        opacity: 0;
+        filter: blur(15px);
+        transition: opacity .4s;
+        z-index: -1;
     }
-    .v3-glow:hover::before { opacity: .7; }
+    .v3-glow:hover::before { opacity: 0.6; }
+    
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
 
     /* inputs & interactions */
     .v3-input {
-        background: rgba(255,255,255,0.85);
-        border: 1px solid rgba(15,23,42,0.1);
-        padding: .72rem 1rem .72rem 3rem;
-        border-radius: .9rem;
-        transition: box-shadow .18s, border-color .18s, transform .18s;
+        background: rgba(255,255,255,0.9);
+        border: 2px solid rgba(15,23,42,0.08);
+        padding: .85rem 1rem .85rem 3.2rem;
+        border-radius: 1rem;
+        transition: all .25s ease;
         outline: none;
         width: 100%;
         font-size: 1rem;
         box-sizing: border-box;
     }
     .v3-input:focus {
-        box-shadow: 0 6px 18px rgba(0,87,183,0.08);
+        box-shadow: 0 0 0 4px rgba(0,87,183,0.1), 0 8px 20px rgba(0,87,183,0.08);
         border-color: var(--bps-blue);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        background: #fff;
+    }
+    .v3-input::placeholder {
+        color: #9ca3af;
     }
 
     .v3-label { 
         display:block; 
-        margin-bottom:.35rem; 
+        margin-bottom:.5rem; 
         color: #1f2937; 
         font-weight:600; 
-        font-size:.92rem; 
+        font-size:.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .v3-label i {
+        color: var(--bps-blue);
+        font-size: 0.85rem;
     }
 
     /* icon container */
     .v3-icon {
         position: absolute; 
-        left: 1rem; 
+        left: 1.1rem; 
         top: 50%; 
         transform: translateY(-50%); 
         color: #6b7280;
         pointer-events: none;
+        transition: color .2s;
+    }
+    
+    .v3-input:focus + .v3-icon,
+    .input-wrapper:focus-within .v3-icon {
+        color: var(--bps-blue);
     }
 
     /* button */
     .v3-btn {
         border-radius: 1rem;
-        padding: .72rem 1rem;
+        padding: 1rem 1.5rem;
         font-weight: 700;
-        letter-spacing:.2px;
-        transition: transform .18s, box-shadow .22s, filter .18s;
-        box-shadow: 0 8px 20px rgba(3,55,102,0.12);
+        letter-spacing:.3px;
+        transition: all .3s ease;
+        box-shadow: 0 10px 25px rgba(0,87,183,0.25);
         border: none;
         cursor: pointer;
-        font-size: 1rem;
+        font-size: 1.05rem;
         width: 100%;
+        position: relative;
+        overflow: hidden;
     }
-    .v3-btn:active { transform: translateY(1px); }
-    .v3-btn:focus { outline: 3px solid rgba(0,87,183,0.14); outline-offset: 3px; }
+    
+    .v3-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left .5s ease;
+    }
+    
+    .v3-btn:hover::before {
+        left: 100%;
+    }
+    
+    .v3-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0,87,183,0.35);
+    }
+    
+    .v3-btn:active { 
+        transform: translateY(0); 
+        box-shadow: 0 5px 15px rgba(0,87,183,0.2);
+    }
 
     /* micro helper text */
-    .v3-hint { color:#6b7280; font-size:.86rem; }
+    .v3-hint { 
+        color:#6b7280; 
+        font-size:.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    
+    .v3-hint i {
+        font-size: 0.75rem;
+        color: var(--bps-blue);
+    }
 
     /* small screens: compact the card */
     @media (max-width: 1024px) {
-        .v3-card { padding: 1.25rem; border-radius: 1.1rem; }
+        .v3-card { padding: 1.5rem; border-radius: 1.3rem; }
+        .left-panel { display: none; }
     }
 
     /* subtle decoration under title */
     .v3-accent {
-        height: 6px; 
-        width: 72px; 
+        height: 5px; 
+        width: 80px; 
         border-radius: 999px;
-        background: linear-gradient(90deg,var(--bps-blue),var(--bps-green));
+        background: linear-gradient(90deg, var(--bps-blue), var(--bps-green), var(--bps-orange));
         margin: .75rem auto 0;
         opacity: .95;
-        box-shadow: 0 6px 18px rgba(3,55,102,0.06);
+        box-shadow: 0 4px 15px rgba(0,87,183,0.15);
     }
 
     /* password toggle button */
@@ -154,19 +281,17 @@
         border: none;
         cursor: pointer;
         color: #6b7280;
-        padding: 0;
+        padding: 0.3rem;
         display: flex;
         align-items: center;
         justify-content: center;
+        border-radius: 0.5rem;
+        transition: all .2s;
     }
     
     .password-toggle:hover {
-        color: #374151;
-    }
-    
-    .password-toggle:focus {
-        outline: 2px solid rgba(0,87,183,0.3);
-        border-radius: 4px;
+        color: var(--bps-blue);
+        background: rgba(0,87,183,0.08);
     }
 
     /* input wrapper */
@@ -175,122 +300,258 @@
         display: flex;
         align-items: center;
     }
-
-    /* accessibility: high contrast focus fallback */
-    :focus { outline: none; }
+    
+    /* Feature cards on left panel */
+    .feature-card {
+        background: rgba(255,255,255,0.12);
+        backdrop-filter: blur(10px);
+        border-radius: 1rem;
+        padding: 1rem 1.25rem;
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: all .3s ease;
+        cursor: default;
+    }
+    
+    .feature-card:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateX(5px);
+        border-color: rgba(255,255,255,0.4);
+    }
+    
+    /* Stats section */
+    .stat-item {
+        text-align: center;
+        padding: 0.75rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 800;
+        display: block;
+        background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+        opacity: 0.85;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
     
     /* error styling */
     .validation-errors {
         color: #dc2626;
         font-size: 0.875rem;
         margin-bottom: 1rem;
-        padding: 0.75rem;
-        background-color: #fef2f2;
-        border-radius: 0.5rem;
+        padding: 0.85rem 1rem;
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border-radius: 0.75rem;
         border-left: 4px solid #dc2626;
+        animation: shake 0.5s ease;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
     }
     
     .validation-errors ul {
         margin: 0;
         padding-left: 1rem;
     }
+    
+    /* Logo animation */
+    .logo-container {
+        animation: fadeInDown 0.8s ease;
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Footer links */
+    .footer-link {
+        color: #6b7280;
+        font-size: 0.8rem;
+        transition: color .2s;
+    }
+    
+    .footer-link:hover {
+        color: var(--bps-blue);
+    }
+    
+    /* Live clock */
+    .live-clock {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: 'Poppins', monospace;
+        background: rgba(255,255,255,0.15);
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    /* Typing animation */
+    .typing-text {
+        overflow: hidden;
+        white-space: nowrap;
+        animation: typing 3s steps(40) 1s forwards;
+        width: 0;
+    }
+    
+    @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+    }
 </style>
 @endpush
 
 <x-guest-layout>
     <div class="page-bg min-h-screen">
-        {{-- watermark centered faint --}}
-        <div class="watermark" aria-hidden="true">
-            <!-- simple circular emblem / dots watermark -->
-            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor">
-                <defs>
-                    <linearGradient id="g1" x1="0" x2="1">
-                        <stop offset="0" stop-color="#0057B7"/>
-                        <stop offset="1" stop-color="#f6921e"/>
-                    </linearGradient>
-                </defs>
-                <circle cx="100" cy="100" r="80" stroke="url(#g1)" stroke-width="2" opacity="0.08"/>
-                <g transform="translate(50,50)" fill="none" stroke="url(#g1)" opacity="0.07">
-                    <circle r="40" stroke-width="1.2"></circle>
-                </g>
-            </svg>
+        <!-- Animated Background Shapes -->
+        <div class="bg-shapes" aria-hidden="true">
+            <div class="bg-shape bg-shape-1"></div>
+            <div class="bg-shape bg-shape-2"></div>
+            <div class="bg-shape bg-shape-3"></div>
         </div>
 
         <div class="min-h-screen w-full grid lg:grid-cols-2">
 
             {{-- LEFT PANEL: Brand Info --}}
-            <aside class="hidden lg:flex items-center justify-center px-12"
-                   style="background: linear-gradient(135deg, var(--bps-blue), var(--bps-green) 50%, var(--bps-orange));">
-                <div class="text-white max-w-lg w-full">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="bg-white/20 p-3 rounded-2xl">
-                            <img src="{{ asset('images/logo-bps.png') }}" class="h-16 w-auto" alt="Logo BPS Kota Tanjungpinang"/>
+            <aside class="left-panel hidden lg:flex items-center justify-center px-10 py-12">
+                <div class="text-white max-w-md w-full relative z-10">
+                    <!-- Logo & Title -->
+                    <div class="flex items-center gap-4 mb-8 logo-container">
+                        <div class="bg-white/20 p-3.5 rounded-2xl backdrop-blur-sm border border-white/20 shadow-lg">
+                            <img src="{{ asset('images/logo-bps.png') }}" class="h-14 w-auto" alt="Logo BPS Kota Tanjungpinang"/>
                         </div>
                         <div>
-                            <h1 class="text-4xl font-extrabold tracking-tight">SIMANTAP</h1>
-                            <div class="text-sm opacity-90 mt-1">Sistem Informasi Manajemen Aset Negara</div>
+                            <h1 class="text-4xl font-extrabold tracking-tight drop-shadow-lg">SIMANTAP</h1>
+                            <div class="text-sm opacity-90 mt-1 flex items-center gap-2">
+                                <i class="fas fa-building text-xs"></i>
+                                Sistem Informasi Manajemen Aset Negara
+                            </div>
                         </div>
                     </div>
 
-                    <p class="mb-6 text-lg opacity-95">Mendukung Sensus Ekonomi 2026 — Aplikasi resmi BPS Kota Tanjungpinang</p>
+                    <!-- Tagline -->
+                    <div class="mb-8">
+                        <p class="text-xl font-medium opacity-95 leading-relaxed">
+                            Mendukung <span class="font-bold text-yellow-300">Sensus Ekonomi 2026</span>
+                        </p>
+                        <p class="text-sm opacity-80 mt-1">Aplikasi resmi BPS Kota Tanjungpinang</p>
+                    </div>
 
-                    <ul class="space-y-4 text-lg">
-                        <li class="flex items-start gap-3">
-                            <span class="rounded-full p-2 bg-white/20">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="white">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                </svg>
-                            </span>
-                            <div>Manajemen Aset Digital Terintegrasi</div>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="rounded-full p-2 bg-white/20">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="white">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6-4h.01M12 16h.01"/>
-                                </svg>
-                            </span>
-                            <div>Monitoring Real-time & Laporan Lengkap</div>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="rounded-full p-2 bg-white/20">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="white">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                </svg>
-                            </span>
-                            <div>Sistem Approval & Stock Opname</div>
-                        </li>
-                    </ul>
+                    <!-- Feature Cards -->
+                    <div class="space-y-3 mb-8">
+                        <div class="feature-card flex items-center gap-4">
+                            <div class="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-boxes-stacked text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Manajemen Aset Digital</p>
+                                <p class="text-xs opacity-80">Kelola inventaris secara terintegrasi</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-card flex items-center gap-4">
+                            <div class="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-chart-line text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Monitoring Real-time</p>
+                                <p class="text-xs opacity-80">Dashboard & laporan lengkap</p>
+                            </div>
+                        </div>
+                        
+                        <div class="feature-card flex items-center gap-4">
+                            <div class="h-10 w-10 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-clipboard-check text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="font-semibold">Stock Opname Otomatis</p>
+                                <p class="text-xs opacity-80">Penyesuaian stok langsung tercatat</p>
+                            </div>
+                        </div>
+                    </div>
 
-                    <div class="mt-10 text-sm opacity-90">
-                        <div class="font-semibold">BPS Kota Tanjungpinang</div>
-                        <div class="mt-1">Siap mendukung sensus dan pengelolaan data aset BPS Kota Tanjungpinang.</div>
+                    <!-- Stats -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 mb-8">
+                        <div class="grid grid-cols-3 divide-x divide-white/20">
+                            <div class="stat-item">
+                                <span class="stat-number">100+</span>
+                                <span class="stat-label">Jenis Aset</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">50+</span>
+                                <span class="stat-label">Pegawai</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number">24/7</span>
+                                <span class="stat-label">Akses</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Info -->
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-semibold flex items-center gap-2">
+                                <i class="fas fa-map-marker-alt text-sm"></i>
+                                BPS Kota Tanjungpinang
+                            </div>
+                            <div class="text-xs opacity-75 mt-1">Kepulauan Riau, Indonesia</div>
+                        </div>
+                        <div class="live-clock">
+                            <i class="far fa-clock"></i>
+                            <span id="live-clock-left">--:--:--</span>
+                        </div>
                     </div>
                 </div>
             </aside>
 
             {{-- RIGHT PANEL: Login Form --}}
-            <main class="flex items-center justify-center py-12 px-6">
-                <div class="w-full max-w-lg v3-glow v3-card p-10">
+            <main class="flex items-center justify-center py-10 px-6 relative">
+                <div class="w-full max-w-md v3-glow v3-card p-8 md:p-10">
 
                     {{-- Header --}}
-                    <div class="text-center mb-6">
-                        <div class="bg-gradient-to-r from-[var(--bps-blue)] to-[var(--bps-green)] p-2 rounded-2xl inline-block mb-3">
-                            <img src="{{ asset('images/logo-bps.png') }}" alt="Logo BPS" class="h-12" />
+                    <div class="text-center mb-8">
+                        <div class="logo-container inline-block mb-4">
+                            <div class="bg-gradient-to-br from-[var(--bps-blue)] to-[var(--bps-green)] p-3 rounded-2xl inline-block shadow-lg">
+                                <img src="{{ asset('images/logo-bps.png') }}" alt="Logo BPS" class="h-12" />
+                            </div>
                         </div>
                         <h2 class="text-3xl font-extrabold text-gray-900">Selamat Datang</h2>
                         <div class="v3-accent"></div>
-                        <p class="text-gray-500 mt-2">Masuk ke akun SIMANTAP Anda</p>
+                        <p class="text-gray-500 mt-3 text-sm">Masuk ke akun SIMANTAP Anda</p>
                     </div>
 
                     {{-- Status / Errors --}}
                     @if (session('status'))
-                        <div role="status" class="mb-4 p-3 text-sm text-green-700 bg-green-50 rounded-lg border border-green-200">
+                        <div role="status" class="mb-4 p-4 text-sm text-green-700 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 flex items-center gap-3">
+                            <i class="fas fa-check-circle text-green-500"></i>
                             {{ session('status') }}
                         </div>
                     @endif
                     
                     @if ($errors->any())
                         <div class="validation-errors mb-4">
+                            <div class="flex items-center gap-2 font-semibold mb-1">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Terjadi kesalahan
+                            </div>
                             <ul>
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
@@ -305,65 +566,99 @@
 
                         {{-- Email --}}
                         <div>
-                            <label for="email" class="v3-label">Alamat Email</label>
+                            <label for="email" class="v3-label">
+                                <i class="fas fa-envelope"></i>
+                                Alamat Email
+                            </label>
                             <div class="input-wrapper">
                                 <span class="v3-icon" aria-hidden="true">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                    </svg>
+                                    <i class="fas fa-at"></i>
                                 </span>
-
                                 <input id="email" name="email" type="email" required autofocus
                                     placeholder="nama@bps.go.id"
                                     class="v3-input"
                                     value="{{ old('email') }}"
                                     aria-describedby="emailHelp" />
                             </div>
-                            <p id="emailHelp" class="v3-hint mt-2">Gunakan akun BPS Anda (format: nama@bps.go.id)</p>
+                            <p id="emailHelp" class="v3-hint mt-2">
+                                <i class="fas fa-info-circle"></i>
+                                Gunakan akun resmi BPS Anda
+                            </p>
                         </div>
 
                         {{-- Password --}}
                         <div>
-                            <label for="password" class="v3-label">Password</label>
+                            <label for="password" class="v3-label">
+                                <i class="fas fa-lock"></i>
+                                Password
+                            </label>
                             <div class="input-wrapper">
                                 <span class="v3-icon" aria-hidden="true">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c-1.657 0-3 1.343-3 3v2h6v-2c0-1.657-1.343-3-3-3z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11V8a5 5 0 0110 0v3"/>
-                                    </svg>
+                                    <i class="fas fa-key"></i>
                                 </span>
 
                                 <input id="password" name="password" type="password" required
-                                    placeholder="Masukkan password Anda"
+                                    placeholder="••••••••"
                                     class="v3-input pr-12" />
 
                                 {{-- show/hide button --}}
                                 <button type="button" id="togglePassword" aria-label="Tampilkan password"
                                         class="password-toggle">
-                                    <svg id="eyeOpen" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                    <svg id="eyeClosed" class="w-5 h-5 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M3.53 2.47a.75.75 0 10-1.06 1.06l1.16 1.16A11.955 11.955 0 001.46 12c1.274 4.057 5.065 7 9.542 7 2.2 0 4.219-.64 5.96-1.73l1.02 1.02a.75.75 0 101.06-1.06L3.53 2.47zM7.1 9.02l1.34 1.34a3 3 0 004.06 4.06l1.34 1.34A8.008 8.008 0 0112 19c-3.31 0-6.14-1.99-7.41-4.88 1.18-2.35 3.17-4.25 5.51-5.1z"/>
-                                    </svg>
+                                    <i id="eyeIcon" class="fas fa-eye"></i>
                                 </button>
                             </div>
                         </div>
 
+                        {{-- Remember Me --}}
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="remember" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition">
+                                <span class="text-sm text-gray-600">Ingat saya</span>
+                            </label>
+                            {{-- @if (Route::has('password.request'))
+                            <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium transition">
+                                Lupa password?
+                            </a>
+                            @endif --}}
+                        </div>
+
                         {{-- Submit --}}
-                        <div>
+                        <div class="pt-2">
                             <button type="submit"
-                                class="v3-btn bg-gradient-to-r from-[var(--bps-blue)] via-[var(--bps-blue-2)] to-[var(--bps-blue)] text-white shadow-md hover:shadow-lg">
+                                class="v3-btn bg-gradient-to-r from-[var(--bps-blue)] via-[var(--bps-blue-2)] to-[var(--bps-blue)] text-white flex items-center justify-center gap-2">
+                                <i class="fas fa-sign-in-alt"></i>
                                 Masuk ke Sistem
                             </button>
                         </div>
                     </form>
 
+                    {{-- Divider --}}
+                    <div class="flex items-center my-6">
+                        <div class="flex-1 border-t border-gray-200"></div>
+                        <span class="px-4 text-xs text-gray-400 uppercase">atau</span>
+                        <div class="flex-1 border-t border-gray-200"></div>
+                    </div>
+                    
+                    {{-- Help Section --}}
+                    <div class="text-center text-sm text-gray-500">
+                        <p>Belum punya akun? <span class="text-blue-600 font-medium">Hubungi Operator</span></p>
+                    </div>
+
                     {{-- Footer note --}}
-                    <p class="text-center text-gray-400 text-xs mt-6">
-                        © {{ now()->year }} BPS Kota Tanjungpinang. All rights reserved.
-                    </p>
+                    <div class="text-center mt-8 pt-6 border-t border-gray-100">
+                        <div class="flex items-center justify-center gap-4 mb-3">
+                            <a href="#" class="footer-link flex items-center gap-1">
+                                <i class="fas fa-question-circle"></i> Bantuan
+                            </a>
+                            <span class="text-gray-300">|</span>
+                            <a href="#" class="footer-link flex items-center gap-1">
+                                <i class="fas fa-shield-alt"></i> Kebijakan
+                            </a>
+                        </div>
+                        <p class="text-gray-400 text-xs">
+                            © {{ now()->year }} BPS Kota Tanjungpinang. All rights reserved.
+                        </p>
+                    </div>
                 </div>
             </main>
         </div>
@@ -373,46 +668,63 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle
             const toggle = document.getElementById('togglePassword');
-            if(!toggle) return;
+            if(toggle) {
+                const pwd = document.getElementById('password');
+                const eyeIcon = document.getElementById('eyeIcon');
 
-            const pwd = document.getElementById('password');
-            const eyeOpen = document.getElementById('eyeOpen');
-            const eyeClosed = document.getElementById('eyeClosed');
+                toggle.addEventListener('click', function(){
+                    if (pwd.type === 'password') {
+                        pwd.type = 'text';
+                        eyeIcon.classList.remove('fa-eye');
+                        eyeIcon.classList.add('fa-eye-slash');
+                        toggle.setAttribute('aria-label','Sembunyikan password');
+                    } else {
+                        pwd.type = 'password';
+                        eyeIcon.classList.remove('fa-eye-slash');
+                        eyeIcon.classList.add('fa-eye');
+                        toggle.setAttribute('aria-label','Tampilkan password');
+                    }
+                });
+            }
 
-            toggle.addEventListener('click', function(){
-                if (pwd.type === 'password') {
-                    pwd.type = 'text';
-                    eyeOpen.classList.add('hidden');
-                    eyeClosed.classList.remove('hidden');
-                    toggle.setAttribute('aria-label','Sembunyikan password');
-                } else {
-                    pwd.type = 'password';
-                    eyeOpen.classList.remove('hidden');
-                    eyeClosed.classList.add('hidden');
-                    toggle.setAttribute('aria-label','Tampilkan password');
-                }
-            });
+            // Live clock
+            function updateClock() {
+                const now = new Date();
+                const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' };
+                const timeString = now.toLocaleTimeString('id-ID', options);
+                
+                const clockLeft = document.getElementById('live-clock-left');
+                if(clockLeft) clockLeft.textContent = timeString;
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
 
-            // small accessibility: pressing Enter on toggle focuses password
-            toggle.addEventListener('keydown', function(e){
-                if(e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggle.click();
-                }
-            });
-
-            // Add subtle animation to form elements on page load
-            const formElements = document.querySelectorAll('.v3-input, .v3-btn');
-            formElements.forEach((el, index) => {
+            // Animate form elements on load
+            const animateElements = document.querySelectorAll('.v3-input, .v3-btn, .v3-label');
+            animateElements.forEach((el, index) => {
                 el.style.opacity = '0';
-                el.style.transform = 'translateY(10px)';
+                el.style.transform = 'translateY(15px)';
                 
                 setTimeout(() => {
-                    el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+                    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
                     el.style.opacity = '1';
                     el.style.transform = 'translateY(0)';
-                }, 100 * index);
+                }, 80 * index);
+            });
+
+            // Feature cards animation
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateX(-20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateX(0)';
+                }, 200 + (100 * index));
             });
         });
     </script>

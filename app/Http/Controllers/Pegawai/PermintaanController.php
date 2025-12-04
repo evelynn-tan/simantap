@@ -23,25 +23,23 @@ class PermintaanController extends Controller
         $pegawai = Pegawai::where('userID', $userId)->first();
         $kategoris = Kategori::orderBy('nama_kategori')->get();
 
-        $query = Barang::with('kategori')
-            ->where('stok', '>', 0)
-            ->orderBy('nama_barang');
+        $query = Barang::with('kategori');
 
         // Search filter
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('nama_barang', 'like', "%{$search}%")
+                $q->where('namaBarang', 'like', "%{$search}%")
                     ->orWhere('kode_barang', 'like', "%{$search}%");
             });
         }
 
         // Category filter
         if ($request->filled('kategori')) {
-            $query->where('kategoriID', $request->kategori);
+            $query->where('categoryID', $request->kategori);
         }
 
-        // Status filter (using accessor)
+        // Status filter (stok > 0 by default, unless habis selected)
         if ($request->filled('status')) {
             $status = $request->status;
             if ($status === 'tersedia') {
@@ -51,7 +49,27 @@ class PermintaanController extends Controller
             } elseif ($status === 'habis') {
                 $query->where('stok', 0);
             }
+        } else {
+            // Default: only show items with stock > 0
+            $query->where('stok', '>', 0);
         }
+
+        // Sorting
+        $sortColumn = $request->get('sort', 'namaBarang');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        // Validate sort column
+        $allowedSorts = ['kode_barang', 'namaBarang', 'stok', 'categoryID'];
+        if (!in_array($sortColumn, $allowedSorts)) {
+            $sortColumn = 'namaBarang';
+        }
+        
+        // Validate direction
+        if (!in_array($sortDirection, ['asc', 'desc'])) {
+            $sortDirection = 'asc';
+        }
+
+        $query->orderBy($sortColumn, $sortDirection);
 
         $barangs = $query->paginate(10);
 
@@ -67,7 +85,7 @@ class PermintaanController extends Controller
         $pegawai = Pegawai::where('userID', $userId)->first();
 
         $barangs = Barang::where('stok', '>', 0)
-            ->orderBy('nama_barang')
+            ->orderBy('namaBarang')
             ->get();
 
         return view('pegawai.permintaan.create', compact('barangs', 'pegawai'));
@@ -103,7 +121,7 @@ class PermintaanController extends Controller
             if ($barang->stok < $item['jumlah']) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('error', "Stok '{$barang->nama_barang}' tidak mencukupi. Tersisa: {$barang->stok}");
+                    ->with('error', "Stok '{$barang->namaBarang}' tidak mencukupi. Tersisa: {$barang->stok}");
             }
         }
 

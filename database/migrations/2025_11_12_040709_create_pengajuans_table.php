@@ -1,6 +1,4 @@
 <?php
-// database/migrations/2025_11_12_040709_create_pengajuans_table.php
-// PENGAJUAN TABLE - Ubah approved_by ke userID (bukan operatorID)
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

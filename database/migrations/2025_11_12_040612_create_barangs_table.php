@@ -13,8 +13,8 @@ return new class extends Migration
         Schema::create('barangs', function (Blueprint $table) {
             $table->id('barangID');
             $table->string('kode_barang');  // Auto-generated: BRG-001, BRG-002, dll
-            $table->string('nama_barang');
-            $table->foreignId('kategoriID')->constrained('kategoris', 'kategoriID')->onDelete('restrict');
+            $table->string('namaBarang');
+            $table->foreignId('categoryID')->constrained('kategoris', 'categoryID')->onDelete('restrict');
             $table->enum('satuan', ['rim', 'pcs', 'buah', 'box', 'pack', 'set', 'lembar', 'meter', 'kg', 'liter'])->default('pcs');
             $table->integer('stok')->default(0);  // SIMPLIFIED: hanya satu kolom stok
             $table->text('deskripsi')->nullable();

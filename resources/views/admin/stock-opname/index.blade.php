@@ -7,28 +7,74 @@
 @section('content')
 <div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
 
-    <!-- Info Card -->
-    <div class="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6">
-        <div class="flex items-start gap-4">
-            <div class="h-12 w-12 bg-blue-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i class="fas fa-clipboard-check text-2xl text-blue-700"></i>
+    <!-- Info Card - New Session -->
+    <div class="bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-lg p-6 text-white">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-start gap-4">
+                <div class="h-14 w-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                    <i class="fas fa-clipboard-check text-3xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-1">Mulai Sesi Stock Opname</h3>
+                    <p class="text-teal-100 text-sm mb-2">
+                        Lakukan pengecekan fisik untuk <strong class="text-white">{{ \App\Models\Barang::count() }} barang</strong> dalam sistem
+                    </p>
+                    <p class="text-teal-200 text-xs flex items-center gap-1">
+                        <i class="fas fa-info-circle"></i>
+                        Stock opname akan mencatat perbedaan stok dan membuat transaksi penyesuaian otomatis
+                    </p>
+                </div>
             </div>
-            <div class="flex-1">
-                <h3 class="text-lg font-bold text-blue-900 mb-1">Sesi Stock Opname Baru</h3>
-                <p class="text-sm text-blue-800 mb-3">
-                    Lakukan pengecekan fisik untuk <strong>{{ \App\Models\Barang::count() }} barang</strong> dalam sistem
-                </p>
-                <p class="text-xs text-blue-700 mb-3">⚠️ Stock opname akan mencatat semua perbedaan stok dan membuat transaksi penyesuaian otomatis</p>
-                <a href="{{ route('admin.stock-opname.create') }}" class="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition duration-200">
-                    <i class="fas fa-plus mr-2"></i> Mulai Sesi Opname Baru
-                </a>
+            <a href="{{ route('admin.stock-opname.create') }}" class="inline-flex items-center px-6 py-3 bg-white text-teal-700 hover:bg-teal-50 font-bold rounded-xl text-sm transition duration-200 shadow-lg hover:shadow-xl whitespace-nowrap">
+                <i class="fas fa-plus-circle mr-2 text-lg"></i> Mulai Opname Baru
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-500 text-sm font-medium">Total Opname</p>
+                    <p class="text-3xl font-bold text-slate-800 mt-1">{{ $riwayatOpname->total() }}</p>
+                </div>
+                <div class="h-12 w-12 bg-teal-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clipboard-list text-xl text-teal-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-500 text-sm font-medium">Bulan Ini</p>
+                    <p class="text-3xl font-bold text-blue-600 mt-1">
+                        {{ \App\Models\StockOpname::whereMonth('tanggal_opname', now()->month)->whereYear('tanggal_opname', now()->year)->count() }}
+                    </p>
+                </div>
+                <div class="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-calendar-check text-xl text-blue-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-500 text-sm font-medium">Total Barang</p>
+                    <p class="text-3xl font-bold text-slate-800 mt-1">{{ \App\Models\Barang::count() }}</p>
+                </div>
+                <div class="h-12 w-12 bg-slate-100 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-boxes text-xl text-slate-600"></i>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Riwayat Opname -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-        <div class="px-6 py-5 border-b border-slate-200">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
             <h3 class="text-lg font-bold text-slate-800">📋 Riwayat Stock Opname</h3>
             <p class="text-sm text-slate-500 mt-1">Daftar semua sesi stock opname yang telah dilakukan</p>
         </div>
@@ -48,44 +94,51 @@
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                     @foreach($riwayatOpname as $opname)
+                    @php
+                        $selisihCount = $opname->details()->where('stok_selisih', '!=', 0)->count();
+                        $totalItems = $opname->details()->count();
+                    @endphp
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 font-mono font-bold text-slate-800">OP-{{ str_pad($opname->opnameID, 4, '0', STR_PAD_LEFT) }}</td>
+                        <td class="px-6 py-4">
+                            <span class="font-mono font-bold text-teal-700 bg-teal-50 px-2 py-1 rounded">
+                                OP-{{ str_pad($opname->opnameID, 4, '0', STR_PAD_LEFT) }}
+                            </span>
+                        </td>
                         <td class="px-6 py-4 text-slate-700">
-                            {{ \Carbon\Carbon::parse($opname->tanggal_opname)->timezone('Asia/Jakarta')->format('d M Y H:i') }}
+                            <div class="font-medium">{{ $opname->tanggal_opname->timezone('Asia/Jakarta')->format('d M Y') }}</div>
+                            <div class="text-xs text-slate-500">{{ $opname->tanggal_opname->timezone('Asia/Jakarta')->format('H:i') }} WIB</div>
                         </td>
                         <td class="px-6 py-4 text-slate-700 font-medium">
-                            {{ $opname->user->name ?? '-' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-slate-800 font-semibold">
-                            {{ $opname->details->count() ?? 0 }}
+                            {{ $opname->user->email ?? '-' }}
                         </td>
                         <td class="px-6 py-4 text-center">
-                            @php
-                                $selisihCount = $opname->details()->where('stok_selisih', '!=', 0)->count();
-                            @endphp
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold" 
-                                :class="$selisihCount > 0 ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'">
-                                @if($selisihCount > 0)
+                            <span class="font-semibold text-slate-800">{{ $totalItems }}</span>
+                            <span class="text-slate-500 text-xs">barang</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            @if($selisihCount > 0)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">
                                     <i class="fas fa-exclamation-circle mr-1"></i> {{ $selisihCount }} item
-                                @else
+                                </span>
+                            @else
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
                                     <i class="fas fa-check-circle mr-1"></i> Sesuai
-                                @endif
-                            </span>
+                                </span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex gap-2 justify-center">
                                 <a 
                                     href="{{ route('admin.stock-opname.show', $opname->opnameID) }}"
-                                    class="inline-flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-sm font-semibold transition duration-200"
+                                    class="inline-flex items-center px-3 py-1.5 bg-teal-100 text-teal-700 hover:bg-teal-200 rounded-lg text-sm font-semibold transition duration-200"
                                     title="Lihat Detail">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <form action="{{ route('admin.stock-opname.destroy', $opname->opnameID) }}" method="POST" class="inline">
+                                <form action="{{ route('admin.stock-opname.destroy', $opname->opnameID) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus record Stock Opname ini?\n\nPerhatian: Stok barang yang sudah disesuaikan tidak akan dikembalikan!')">
                                     @csrf
                                     @method('DELETE')
                                     <button 
                                         type="submit" 
-                                        onclick="return confirm('Yakin ingin menghapus record ini?')"
                                         class="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-sm font-semibold transition duration-200"
                                         title="Hapus">
                                         <i class="fas fa-trash"></i>
@@ -100,14 +153,21 @@
         </div>
 
         <!-- Pagination -->
-        <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end">
+        <div class="px-6 py-4 border-t border-slate-200 bg-slate-50">
             {{ $riwayatOpname->links() }}
         </div>
         @else
-        <div class="px-6 py-12 text-center">
-            <i class="fas fa-inbox text-4xl text-slate-300 mb-3"></i>
-            <p class="text-slate-500 font-medium">Belum ada riwayat stock opname</p>
-            <p class="text-sm text-slate-400 mt-1">Mulai sesi opname baru untuk mencatat perbedaan stok</p>
+        <div class="px-6 py-16 text-center">
+            <div class="max-w-sm mx-auto">
+                <div class="h-20 w-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clipboard-list text-4xl text-slate-400"></i>
+                </div>
+                <h4 class="text-lg font-semibold text-slate-700 mb-2">Belum Ada Riwayat</h4>
+                <p class="text-sm text-slate-500 mb-4">Belum ada sesi stock opname yang tercatat. Mulai sesi opname pertama Anda!</p>
+                <a href="{{ route('admin.stock-opname.create') }}" class="inline-flex items-center px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg text-sm transition">
+                    <i class="fas fa-plus mr-2"></i> Mulai Opname
+                </a>
+            </div>
         </div>
         @endif
     </div>

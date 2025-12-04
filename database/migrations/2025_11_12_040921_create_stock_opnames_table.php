@@ -1,5 +1,4 @@
 <?php
-// database/migrations/2025_11_12_040921_create_stock_opnames_table.php
 // STOCK OPNAME TABLE - Ubah operatorID ke userID
 
 use Illuminate\Database\Migrations\Migration;

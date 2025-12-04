@@ -1,7 +1,6 @@
 <?php
-// database/migrations/2025_11_12_040821_create_detail_rangggings_table.php
 // DETAIL TRANSAKSI (JUNCTION) - Untuk detail items dalam transaksi
-
+// yang awalnya ada 2 table detail barang masuk dan keluar dijadikan 1 table
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

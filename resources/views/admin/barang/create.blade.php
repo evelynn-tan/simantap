@@ -22,17 +22,17 @@
                     
                     <!-- Nama Barang -->
                     <div>
-                        <label for="nama_barang" class="block text-sm font-semibold text-slate-700 mb-2">Nama Barang *</label>
+                        <label for="namaBarang" class="block text-sm font-semibold text-slate-700 mb-2">Nama Barang *</label>
                         <input 
                             type="text" 
-                            name="nama_barang" 
-                            id="nama_barang" 
+                            name="namaBarang" 
+                            id="namaBarang" 
                             class="block w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" 
                             placeholder="Contoh: Kertas HVS A4 80 gram" 
-                            value="{{ old('nama_barang') }}" 
+                            value="{{ old('namaBarang') }}" 
                             required
                         >
-                        @error('nama_barang')
+                        @error('namaBarang')
                             <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                         @enderror
                     </div>
@@ -49,7 +49,7 @@
                             >
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach($kategoris as $kategori)
-                                    <option value="{{ $kategori->kategoriID }}" {{ old('kategori_id') == $kategori->kategoriID ? 'selected' : '' }}>
+                                    <option value="{{ $kategori->categoryID }}" {{ old('kategori_id') == $kategori->categoryID ? 'selected' : '' }}>
                                         {{ $kategori->nama_kategori }}
                                     </option>
                                 @endforeach

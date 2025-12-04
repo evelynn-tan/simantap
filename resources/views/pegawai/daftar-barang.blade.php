@@ -10,59 +10,85 @@
     {{-- Card utama --}}
     <div class="bg-white rounded-2xl shadow-sm border border-slate-100">
         
-        {{-- Form Filter --}}
-        <form method="GET" action="{{ route('pegawai.daftar-barang') }}">
-            <input type="hidden" name="sort" value="{{ request('sort') }}">
-            <input type="hidden" name="direction" value="{{ request('direction') }}">
+        {{-- Header dengan Search & Filter --}}
+        <div class="px-6 py-5 border-b border-slate-100">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="h-8 w-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-boxes text-emerald-600"></i>
+                        </span>
+                        Daftar Barang Tersedia
+                    </h3>
+                    <p class="text-sm text-slate-500 mt-1">Pilih barang dan ajukan permintaan</p>
+                </div>
 
-            <div class="px-6 py-5 border-b border-slate-100">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h3 class="text-lg font-bold text-slate-800">Daftar Barang Tersedia</h3>
-                        <p class="text-sm text-slate-500">Lihat dan ajukan permintaan untuk barang yang tersedia</p>
-                    </div>
-
-                    <div class="flex items-center gap-3">
-                        {{-- Search --}}
-                        <div class="relative">
-                            <input 
-                                type="text"
-                                name="search"
-                                value="{{ request('search') }}"
-                                placeholder="Cari barang..."
-                                class="pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent w-64 text-sm"
-                            >
-                            <i class="fas fa-search absolute left-3 top-3 text-slate-400 text-xs"></i>
-                        </div>
-
-                        {{-- Kategori --}}
-                        <select 
-                            name="kategori"
-                            class="px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm text-slate-600 cursor-pointer"
+                <div class="flex flex-wrap items-center gap-3">
+                    {{-- Live Search --}}
+                    <div class="relative">
+                        <input 
+                            type="text"
+                            x-model="searchQuery"
+                            @input.debounce.300ms="liveSearch()"
+                            placeholder="Cari barang..."
+                            class="pl-10 pr-10 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent w-64 text-sm transition"
                         >
-                            <option value="">Semua Kategori</option>
-                            @foreach($kategoris as $kategori)
-                                <option 
-                                    value="{{ $kategori->kategoriID }}"
-                                    {{ request('kategori') == $kategori->kategoriID ? 'selected' : '' }}
-                                >
-                                    {{ $kategori->nama_kategori }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        {{-- Tombol filter --}}
-                        <button type="submit" class="bg-emerald-600 text-white px-5 py-2 rounded-xl hover:bg-emerald-700 text-sm font-semibold transition-colors shadow-sm">
-                            Cari
+                        <i class="fas fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <button 
+                            x-show="searchQuery.length > 0"
+                            @click="clearSearch()"
+                            class="absolute right-3 top-3 text-slate-300 hover:text-slate-500"
+                        >
+                            <i class="fas fa-times text-xs"></i>
                         </button>
-
-                        <a href="{{ route('pegawai.daftar-barang') }}" class="text-sm text-slate-500 hover:text-red-500 transition-colors" title="Reset Filter">
-                            <i class="fas fa-undo"></i>
-                        </a>
                     </div>
+
+                    {{-- Kategori Filter --}}
+                    <select 
+                        x-model="kategoriFilter"
+                        @change="applyFilters()"
+                        class="px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm text-slate-600 cursor-pointer bg-white"
+                    >
+                        <option value="">Semua Kategori</option>
+                        @foreach($kategoris as $kategori)
+                            <option value="{{ $kategori->categoryID }}">{{ $kategori->nama_kategori }}</option>
+                        @endforeach
+                    </select>
+
+                    {{-- Reset Filter --}}
+                    <button 
+                        @click="resetFilters()"
+                        class="px-4 py-2.5 text-sm text-slate-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition flex items-center gap-1"
+                        title="Reset Filter"
+                    >
+                        <i class="fas fa-undo"></i>
+                        <span class="hidden sm:inline">Reset</span>
+                    </button>
                 </div>
             </div>
-        </form>
+
+            {{-- Active Filters Indicator --}}
+            <div x-show="searchQuery || kategoriFilter || currentSort !== 'namaBarang'" class="mt-3 flex flex-wrap gap-2">
+                <span class="text-xs text-slate-500">Filter aktif:</span>
+                <template x-if="searchQuery">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs">
+                        <i class="fas fa-search"></i> "<span x-text="searchQuery"></span>"
+                        <button @click="clearSearch()" class="ml-1 hover:text-red-500">&times;</button>
+                    </span>
+                </template>
+                <template x-if="kategoriFilter">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs">
+                        <i class="fas fa-folder"></i> Kategori
+                        <button @click="kategoriFilter = ''; applyFilters()" class="ml-1 hover:text-red-500">&times;</button>
+                    </span>
+                </template>
+                <template x-if="currentSort !== 'namaBarang'">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-purple-50 text-purple-700 rounded-lg text-xs">
+                        <i class="fas fa-sort"></i> Sorted: <span x-text="getSortLabel()"></span>
+                    </span>
+                </template>
+            </div>
+        </div>
 
         {{-- Tabel --}}
         <div class="overflow-x-auto">
@@ -70,79 +96,107 @@
                 <thead class="bg-slate-50 text-slate-500 border-b border-slate-100">
                     <tr>
                         {{-- KODE --}}
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors group">
-                            <a href="{{ route('pegawai.daftar-barang', array_merge(request()->query(), ['sort' => 'kode_barang', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}" class="flex items-center gap-2">
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
+                            @click="sortBy('kode_barang')">
+                            <span class="flex items-center gap-2">
                                 <span>Kode</span>
-                                <span class="flex flex-col text-[10px] leading-3 text-slate-300">
-                                    <i class="fas fa-caret-up {{ request('sort') == 'kode_barang' && request('direction') == 'asc' ? 'text-emerald-600' : '' }}"></i>
-                                    <i class="fas fa-caret-down {{ request('sort') == 'kode_barang' && request('direction') == 'desc' ? 'text-emerald-600' : '' }}"></i>
+                                <span class="flex flex-col text-[10px] leading-3">
+                                    <i class="fas fa-caret-up" :class="currentSort === 'kode_barang' && sortDirection === 'asc' ? 'text-emerald-600' : 'text-slate-300'"></i>
+                                    <i class="fas fa-caret-down" :class="currentSort === 'kode_barang' && sortDirection === 'desc' ? 'text-emerald-600' : 'text-slate-300'"></i>
                                 </span>
-                            </a>
+                            </span>
                         </th>
 
                         {{-- NAMA BARANG --}}
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors group">
-                            <a href="{{ route('pegawai.daftar-barang', array_merge(request()->query(), ['sort' => 'nama_barang', 'direction' => request('direction') == 'asc' ? 'desc' : 'asc'])) }}" class="flex items-center gap-2">
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
+                            @click="sortBy('namaBarang')">
+                            <span class="flex items-center gap-2">
                                 <span>Nama Barang</span>
-                                <span class="flex flex-col text-[10px] leading-3 text-slate-300">
-                                    <i class="fas fa-caret-up {{ request('sort') == 'nama_barang' && request('direction') == 'asc' ? 'text-emerald-600' : '' }}"></i>
-                                    <i class="fas fa-caret-down {{ request('sort') == 'nama_barang' && request('direction') == 'desc' ? 'text-emerald-600' : '' }}"></i>
+                                <span class="flex flex-col text-[10px] leading-3">
+                                    <i class="fas fa-caret-up" :class="currentSort === 'namaBarang' && sortDirection === 'asc' ? 'text-emerald-600' : 'text-slate-300'"></i>
+                                    <i class="fas fa-caret-down" :class="currentSort === 'namaBarang' && sortDirection === 'desc' ? 'text-emerald-600' : 'text-slate-300'"></i>
                                 </span>
-                            </a>
+                            </span>
                         </th>
 
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">Kategori</th>
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider">Stok</th>
+                        {{-- KATEGORI --}}
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
+                            @click="sortBy('categoryID')">
+                            <span class="flex items-center gap-2">
+                                <span>Kategori</span>
+                                <span class="flex flex-col text-[10px] leading-3">
+                                    <i class="fas fa-caret-up" :class="currentSort === 'categoryID' && sortDirection === 'asc' ? 'text-emerald-600' : 'text-slate-300'"></i>
+                                    <i class="fas fa-caret-down" :class="currentSort === 'categoryID' && sortDirection === 'desc' ? 'text-emerald-600' : 'text-slate-300'"></i>
+                                </span>
+                            </span>
+                        </th>
+
+                        {{-- STOK --}}
+                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
+                            @click="sortBy('stok')">
+                            <span class="flex items-center gap-2">
+                                <span>Stok</span>
+                                <span class="flex flex-col text-[10px] leading-3">
+                                    <i class="fas fa-caret-up" :class="currentSort === 'stok' && sortDirection === 'asc' ? 'text-emerald-600' : 'text-slate-300'"></i>
+                                    <i class="fas fa-caret-down" :class="currentSort === 'stok' && sortDirection === 'desc' ? 'text-emerald-600' : 'text-slate-300'"></i>
+                                </span>
+                            </span>
+                        </th>
                         
-                        {{-- HEADER AKSI: Diubah jadi text-center (Tengah) --}}
+                        {{-- AKSI --}}
                         <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider text-center">Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody class="bg-white divide-y divide-slate-50">
                     @forelse($barangs as $barang)
-                    <tr class="hover:bg-slate-50/80 transition duration-200">
-                        <td class="px-6 py-4 text-sm font-medium text-slate-700 font-mono">
-                            {{ $barang->kode_barang }}
+                    <tr class="hover:bg-emerald-50/50 transition duration-200 group">
+                        <td class="px-6 py-4 text-sm font-medium text-slate-700">
+                            <span class="font-mono bg-slate-100 px-2 py-1 rounded text-xs">{{ $barang->kode_barang }}</span>
                         </td>
 
-                        <td class="px-6 py-4 text-sm text-slate-700 font-semibold">
-                            {{ $barang->nama_barang }}
+                        <td class="px-6 py-4 text-sm text-slate-700">
+                            <div class="font-semibold group-hover:text-emerald-700 transition">{{ $barang->namaBarang }}</div>
                         </td>
 
                         <td class="px-6 py-4 text-sm text-gray-500">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-white-100 text-black-800">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs bg-slate-100 text-slate-700">
+                                <i class="fas fa-folder text-slate-400 mr-1.5"></i>
                                 {{ $barang->kategori->nama_kategori }}
                             </span>
                         </td>
 
                         <td class="px-6 py-4 text-sm">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium 
-                                {{ $barang->stok < 5 ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100' }}">
+                            <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold 
+                                {{ $barang->stok < 5 ? 'bg-red-50 text-red-600 border border-red-200' : ($barang->stok < 10 ? 'bg-yellow-50 text-yellow-600 border border-yellow-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200') }}">
+                                <i class="fas fa-cubes mr-1.5"></i>
                                 {{ $barang->stok }} {{ $barang->satuan }}
                             </span>
                         </td>
                         
-                        {{-- BODY AKSI: Diubah jadi text-center (Tengah) --}}
                         <td class="px-6 py-4 text-center">
                             <button 
                                 type="button"
                                 @click="openModal({!! htmlspecialchars(json_encode($barang), ENT_QUOTES, 'UTF-8') !!})"
-                                class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-white transition-all duration-200 
-                                       bg-emerald-600 rounded-xl 
-                                       hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-200 
+                                class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-bold text-white transition-all duration-200 
+                                       bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl 
+                                       hover:from-emerald-600 hover:to-teal-600 hover:shadow-lg hover:shadow-emerald-200 
                                        active:scale-95 focus:outline-none"
                             >
-                                <i class="fas fa-paper-plane mr-2 text-xs"></i> Ajukan Permintaan
+                                <i class="fas fa-paper-plane mr-2 text-xs"></i> Ajukan
                             </button>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-slate-400">
-                            <i class="fas fa-box-open text-4xl mb-3 opacity-50"></i>
-                            <p class="font-medium">Tidak ada barang ditemukan</p>
-                            <p class="text-xs mt-1">Coba ubah filter pencarian Anda.</p>
+                        <td colspan="5" class="px-6 py-16 text-center text-slate-400">
+                            <div class="flex flex-col items-center">
+                                <div class="h-16 w-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                                    <i class="fas fa-box-open text-3xl text-slate-300"></i>
+                                </div>
+                                <p class="font-semibold text-slate-600">Tidak ada barang ditemukan</p>
+                                <p class="text-sm mt-1">Coba ubah filter pencarian Anda</p>
+                            </div>
                         </td>
                     </tr>
                     @endforelse
@@ -150,8 +204,13 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
-        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end">
+        {{-- Footer dengan Pagination & Info --}}
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="text-sm text-slate-500">
+                Menampilkan <span class="font-semibold text-slate-700">{{ $barangs->firstItem() ?? 0 }}</span> - 
+                <span class="font-semibold text-slate-700">{{ $barangs->lastItem() ?? 0 }}</span> dari 
+                <span class="font-semibold text-slate-700">{{ $barangs->total() }}</span> barang
+            </div>
             {{ $barangs->appends(request()->query())->links() }}
         </div>
     </div>
@@ -174,7 +233,7 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+            class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
             @click="closeModal"
         ></div>
 
@@ -190,24 +249,33 @@
             class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg border border-slate-100"
         >
             {{-- Header Modal --}}
-            <div class="flex justify-between items-center px-8 py-5 border-b border-slate-100">
-                <h3 class="text-xl font-bold text-slate-800">
-                    Form Pengajuan
-                </h3>
-                <button @click="closeModal" class="text-slate-400 hover:text-red-500 transition-colors text-xl">
-                    <i class="fas fa-times"></i>
-                </button>
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-5">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 bg-white/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-paper-plane text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Form Pengajuan</h3>
+                            <p class="text-sm text-emerald-100">Ajukan permintaan barang</p>
+                        </div>
+                    </div>
+                    <button @click="closeModal" class="text-white/70 hover:text-white transition text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
 
             {{-- Body Modal --}}
-            <div class="p-8">
+            <div class="p-6">
                 
                 {{-- Info Barang Terpilih --}}
-                <div class="mb-6 p-4 bg-white rounded-xl border border-slate-200 flex items-center gap-4">
-                    <div>
-                        <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Barang Dipilih</p>
-                        <h4 class="font-bold text-slate-800 text-lg" x-text="selectedBarang.nama_barang"></h4>
-                    </div>
+                <div class="mb-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
+                    <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Barang Dipilih</p>
+                    <h4 class="font-bold text-slate-800 text-lg" x-text="selectedBarang.namaBarang"></h4>
+                    <p class="text-sm text-slate-500 mt-1">
+                        <span class="font-mono bg-white px-2 py-0.5 rounded text-xs" x-text="selectedBarang.kode_barang"></span>
+                    </p>
                 </div>
 
                 <form method="POST" action="{{ route('pegawai.permintaan.ajukan') }}">
@@ -215,16 +283,11 @@
 
                     <input type="hidden" name="items[0][barangID]" x-bind:value="selectedBarang.barangID">
 
-                    {{-- Nama Barang (Hidden) --}}
-                    <div class="hidden">
-                        <label class="block text-sm font-medium text-gray-700">Nama Barang</label>
-                        <input type="text" x-bind:value="selectedBarang.nama_barang" disabled 
-                            class="mt-1 block w-full bg-gray-100 border-gray-300 rounded-md shadow-sm">
-                    </div>
-
                     {{-- Stok Info (Readonly) --}}
                     <div class="mb-5">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Stok Tersedia</label>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">
+                            <i class="fas fa-cubes text-emerald-500 mr-1"></i> Stok Tersedia
+                        </label>
                         <input type="text" 
                             x-bind:value="selectedBarang.stok + ' ' + selectedBarang.satuan"
                             disabled 
@@ -234,7 +297,9 @@
 
                     {{-- Jumlah --}}
                     <div class="mb-5">
-                        <label for="jumlah" class="block text-sm font-bold text-slate-700 mb-2">Jumlah Diajukan</label>
+                        <label for="jumlah" class="block text-sm font-bold text-slate-700 mb-2">
+                            <i class="fas fa-sort-numeric-up text-emerald-500 mr-1"></i> Jumlah Diajukan
+                        </label>
                         <input 
                             type="number" 
                             id="jumlah" 
@@ -244,13 +309,16 @@
                             x-bind:max="selectedBarang.stok"
                             @input="validateJumlah"
                             required
-                            class="block w-full border-slate-200 rounded-xl shadow-sm focus:ring-emerald-500 focus:border-emerald-500 px-4 py-3 transition-all"
+                            class="block w-full border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent px-4 py-3 transition-all"
                         >
+                        <p class="text-xs text-slate-400 mt-1">Maksimal: <span x-text="selectedBarang.stok"></span> <span x-text="selectedBarang.satuan"></span></p>
                     </div>
 
                     {{-- Keperluan --}}
-                    <div class="mb-8">
-                        <label class="block text-sm font-bold text-slate-700 mb-2">Keperluan</label>
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">
+                            <i class="fas fa-clipboard text-emerald-500 mr-1"></i> Keperluan
+                        </label>
                         <textarea 
                             id="keperluan" 
                             name="description" 
@@ -258,17 +326,17 @@
                             rows="3" 
                             required 
                             placeholder="Jelaskan keperluan Anda..."
-                            class="block w-full border-slate-200 rounded-xl shadow-sm focus:ring-emerald-500 focus:border-emerald-500 px-4 py-3 transition-all resize-none"
+                            class="block w-full border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent px-4 py-3 transition-all resize-none"
                         ></textarea>
                     </div>
 
                     {{-- Tombol Aksi --}}
-                    <div class="flex justify-end space-x-3 pt-2">
-                        <button type="button" @click="closeModal" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold px-6 py-2.5 rounded-xl transition-all">
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" @click="closeModal" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-xl transition-all">
                             Batal
                         </button>
-                        <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md hover:shadow-emerald-200 transition-all">
-                            Kirim Pengajuan
+                        <button type="submit" class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-200 transition-all flex items-center gap-2">
+                            <i class="fas fa-paper-plane"></i> Kirim Pengajuan
                         </button>
                     </div>
 
@@ -289,8 +357,14 @@ function barangPage() {
             jumlah: 1,
             keperluan: "",
         },
+        searchQuery: "{{ request('search', '') }}",
+        kategoriFilter: "{{ request('kategori', '') }}",
+        currentSort: "{{ request('sort', 'namaBarang') }}",
+        sortDirection: "{{ request('direction', 'asc') }}",
 
-        init() {},
+        init() {
+            // Initialize from URL params
+        },
 
         openModal(barang) {
             this.selectedBarang = barang;
@@ -310,6 +384,53 @@ function barangPage() {
             if (this.formData.jumlah < 1) {
                 this.formData.jumlah = 1;
             }
+        },
+
+        sortBy(column) {
+            if (this.currentSort === column) {
+                this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.currentSort = column;
+                this.sortDirection = 'asc';
+            }
+            this.applyFilters();
+        },
+
+        getSortLabel() {
+            const labels = {
+                'kode_barang': 'Kode',
+                'namaBarang': 'Nama',
+                'categoryID': 'Kategori',
+                'stok': 'Stok'
+            };
+            return labels[this.currentSort] + ' (' + (this.sortDirection === 'asc' ? '↑' : '↓') + ')';
+        },
+
+        liveSearch() {
+            this.applyFilters();
+        },
+
+        clearSearch() {
+            this.searchQuery = '';
+            this.applyFilters();
+        },
+
+        resetFilters() {
+            this.searchQuery = '';
+            this.kategoriFilter = '';
+            this.currentSort = 'namaBarang';
+            this.sortDirection = 'asc';
+            this.applyFilters();
+        },
+
+        applyFilters() {
+            const params = new URLSearchParams();
+            if (this.searchQuery) params.set('search', this.searchQuery);
+            if (this.kategoriFilter) params.set('kategori', this.kategoriFilter);
+            if (this.currentSort) params.set('sort', this.currentSort);
+            if (this.sortDirection) params.set('direction', this.sortDirection);
+            
+            window.location.href = "{{ route('pegawai.daftar-barang') }}?" + params.toString();
         }
     }
 }

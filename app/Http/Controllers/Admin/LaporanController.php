@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Pegawai;
 use App\Models\Kategori;
 use App\Models\Pengajuan;
 use App\Models\Laporan;
@@ -12,6 +13,7 @@ use App\Models\Barang;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 
 class LaporanController extends Controller
 {
@@ -20,53 +22,165 @@ class LaporanController extends Controller
      */
     public function index(Request $request)
     {
-        $pegawais = User::where('role', 'pegawai')->orderBy('email')->get();
+        $pegawais = Pegawai::with('user')->orderBy('nama_lengkap')->get();
         $kategoris = Kategori::orderBy('nama_kategori')->get();
 
-        $hasilLaporan = collect([]);
-        $jenisLaporan = $request->get('jenis_laporan', 'umum');
+        $hasilLaporanUmum = collect([]);
+        $hasilLaporanPegawai = collect([]);
+        $jenisLaporan = $request->get('jenis_laporan', '');
+        $selectedPegawai = null;
 
-        if ($request->has('jenis_laporan') && in_array($jenisLaporan, ['umum', 'pegawai', 'stok'])) {
-
-            // Base Query
+        // Laporan Umum
+        if ($jenisLaporan === 'umum') {
             $query = Pengajuan::with(['pegawai', 'pengajuanDetails.barang', 'approver'])
                 ->where('status', 'disetujui');
 
-            // Filter by Request Type
-            if ($jenisLaporan == 'pegawai') {
-                if ($request->filled('pegawai_id')) {
-                    $query->where('pegawaiID', $request->pegawai_id);
-                }
+            // Date Range Filter
+            if ($request->filled('tanggal_mulai')) {
+                $query->whereDate('approved_at', '>=', $request->tanggal_mulai);
+            }
+            if ($request->filled('tanggal_selesai')) {
+                $endDate = Carbon::parse($request->tanggal_selesai)->endOfDay();
+                $query->where('approved_at', '<=', $endDate);
+            }
 
-                // Filter by Period
-                if ($request->filled('periode')) {
-                    $days = (int) $request->periode;
-                    if ($days > 0) {
-                        $query->where('approved_at', '>=', Carbon::now()->subDays($days));
-                    }
-                }
-            } elseif ($jenisLaporan == 'umum') {
-                // Date Range Filter
-                if ($request->filled('tanggal_mulai')) {
-                    $query->whereDate('approved_at', '>=', $request->tanggal_mulai);
-                }
-                if ($request->filled('tanggal_selesai')) {
-                    $endDate = Carbon::parse($request->tanggal_selesai)->endOfDay();
-                    $query->where('approved_at', '<=', $endDate);
-                }
-            } elseif ($jenisLaporan == 'stok') {
-                // Stock Report by Category
-                if ($request->filled('kategori_id')) {
-                    $query->whereHas('pengajuanDetails.barang', function ($q) use ($request) {
-                        $q->where('kategoriID', $request->kategori_id);
-                    });
+            // Category Filter
+            if ($request->filled('kategori_id')) {
+                $query->whereHas('pengajuanDetails.barang', function ($q) use ($request) {
+                    $q->where('categoryID', $request->kategori_id);
+                });
+            }
+
+            $hasilLaporanUmum = $query->orderBy('approved_at', 'desc')->get();
+        }
+
+        // Laporan Per Pegawai
+        if ($jenisLaporan === 'pegawai' && $request->filled('pegawai_id')) {
+            $selectedPegawai = Pegawai::with('user')->find($request->pegawai_id);
+            
+            $query = Pengajuan::with(['pegawai', 'pengajuanDetails.barang', 'approver'])
+                ->where('pegawaiID', $request->pegawai_id)
+                ->where('status', 'disetujui');
+
+            // Filter by Period
+            if ($request->filled('periode')) {
+                $days = (int) $request->periode;
+                if ($days > 0) {
+                    $query->where('approved_at', '>=', Carbon::now()->subDays($days));
                 }
             }
 
-            $hasilLaporan = $query->orderBy('approved_at', 'desc')->get();
+            $hasilLaporanPegawai = $query->orderBy('approved_at', 'desc')->get();
         }
 
-        return view('admin.laporan.index', compact('pegawais', 'kategoris', 'hasilLaporan', 'jenisLaporan'));
+        return view('admin.laporan.index', compact(
+            'pegawais', 
+            'kategoris', 
+            'hasilLaporanUmum', 
+            'hasilLaporanPegawai', 
+            'jenisLaporan',
+            'selectedPegawai'
+        ));
+    }
+
+    /**
+     * Export to Excel (CSV format)
+     */
+    public function exportExcel(Request $request)
+    {
+        $jenisLaporan = $request->get('jenis_laporan', 'umum');
+        $data = $this->getReportData($request, $jenisLaporan);
+        
+        $filename = 'laporan_' . $jenisLaporan . '_' . date('Y-m-d_His') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function() use ($data, $jenisLaporan) {
+            $file = fopen('php://output', 'w');
+            // Add BOM for Excel UTF-8
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            // Header row
+            fputcsv($file, ['No', 'Tanggal', 'Pegawai', 'NIP', 'Barang', 'Jumlah', 'Satuan', 'Keperluan', 'Status']);
+            
+            $no = 1;
+            foreach ($data as $item) {
+                foreach ($item->pengajuanDetails as $detail) {
+                    fputcsv($file, [
+                        $no++,
+                        $item->approved_at ? $item->approved_at->format('d/m/Y') : '-',
+                        $item->pegawai->nama_lengkap ?? '-',
+                        $item->pegawai->nip ?? '-',
+                        $detail->barang->namaBarang ?? '-',
+                        $detail->jumlah ?? 0,
+                        $detail->barang->satuan ?? '-',
+                        $item->description ?? '-',
+                        ucfirst($item->status),
+                    ]);
+                }
+            }
+            
+            fclose($file);
+        };
+
+        return Response::stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export to PDF (HTML format for print)
+     */
+    public function exportPdf(Request $request)
+    {
+        $jenisLaporan = $request->get('jenis_laporan', 'umum');
+        $data = $this->getReportData($request, $jenisLaporan);
+        $selectedPegawai = null;
+
+        if ($jenisLaporan === 'pegawai' && $request->filled('pegawai_id')) {
+            $selectedPegawai = Pegawai::find($request->pegawai_id);
+        }
+
+        $tanggalMulai = $request->get('tanggal_mulai', '-');
+        $tanggalSelesai = $request->get('tanggal_selesai', '-');
+
+        return view('admin.laporan.pdf', compact('data', 'jenisLaporan', 'selectedPegawai', 'tanggalMulai', 'tanggalSelesai'));
+    }
+
+    /**
+     * Get report data based on filters
+     */
+    private function getReportData(Request $request, $jenisLaporan)
+    {
+        $query = Pengajuan::with(['pegawai', 'pengajuanDetails.barang', 'approver'])
+            ->where('status', 'disetujui');
+
+        if ($jenisLaporan === 'umum') {
+            if ($request->filled('tanggal_mulai')) {
+                $query->whereDate('approved_at', '>=', $request->tanggal_mulai);
+            }
+            if ($request->filled('tanggal_selesai')) {
+                $endDate = Carbon::parse($request->tanggal_selesai)->endOfDay();
+                $query->where('approved_at', '<=', $endDate);
+            }
+            if ($request->filled('kategori_id')) {
+                $query->whereHas('pengajuanDetails.barang', function ($q) use ($request) {
+                    $q->where('categoryID', $request->kategori_id);
+                });
+            }
+        } elseif ($jenisLaporan === 'pegawai' && $request->filled('pegawai_id')) {
+            $query->where('pegawaiID', $request->pegawai_id);
+            
+            if ($request->filled('periode')) {
+                $days = (int) $request->periode;
+                if ($days > 0) {
+                    $query->where('approved_at', '>=', Carbon::now()->subDays($days));
+                }
+            }
+        }
+
+        return $query->orderBy('approved_at', 'desc')->get();
     }
 
     /**
@@ -98,7 +212,7 @@ class LaporanController extends Controller
             $totalItems = $items->count();
             $isi = $items->map(fn($p) => [
                 'pengajuanID' => $p->pengajuanID,
-                'pegawai' => $p->pegawai->nama_lengkap,
+                'pegawai' => $p->pegawai->nama_lengkap ?? '-',
                 'tanggal' => $p->requested_at->format('Y-m-d'),
                 'items_count' => $p->pengajuanDetails->count(),
                 'total_jumlah' => $p->pengajuanDetails->sum('jumlah'),
@@ -110,8 +224,8 @@ class LaporanController extends Controller
             $isi = $items->map(fn($b) => [
                 'barangID' => $b->barangID,
                 'kode_barang' => $b->kode_barang,
-                'nama_barang' => $b->nama_barang,
-                'kategori' => $b->kategori->nama_kategori,
+                'namaBarang' => $b->namaBarang,
+                'kategori' => $b->kategori->nama_kategori ?? '-',
                 'stok' => $b->stok,
                 'status' => $b->status,
                 'satuan' => $b->satuan,
@@ -125,9 +239,9 @@ class LaporanController extends Controller
             $isi = $items->flatMap(function ($p) {
                 return $p->pengajuanDetails->map(fn($d) => [
                     'pengajuanID' => $p->pengajuanID,
-                    'barang' => $d->barang->nama_barang,
+                    'barang' => $d->barang->namaBarang ?? '-',
                     'jumlah' => $d->jumlah,
-                    'satuan' => $d->barang->satuan,
+                    'satuan' => $d->barang->satuan ?? '-',
                     'tanggal' => $p->requested_at->format('Y-m-d'),
                 ]);
             })->toArray();
@@ -186,13 +300,5 @@ class LaporanController extends Controller
     {
         $laporan->load('user');
         return view('admin.laporan.show', compact('laporan'));
-    }
-
-    /**
-     * Legacy generate endpoint (redirect)
-     */
-    public function generateLegacy(Request $request)
-    {
-        return redirect()->route('admin.laporan.index', $request->except('action'));
     }
 }

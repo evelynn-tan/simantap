@@ -54,7 +54,7 @@ Telah dilakukan audit **LENGKAP MENYELURUH** terhadap seluruh kode backend SIMAN
 
 ### Custom Primary Keys
 ```
-✅ barangID, kategoriID, pengajuanID, pegawaiID, opnameID, laporanID
+✅ barangID, categoryID, pengajuanID, pegawaiID, opnameID, laporanID
 ✅ transaksiID, pengajuanDetailID, detailRanggingID, opnameDetailID
 ```
 

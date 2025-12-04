@@ -80,7 +80,7 @@
                     <td class="px-6 py-4 text-sm text-gray-900">
                         @foreach($p->pengajuanDetails as $detail)
                         <div class="mb-1">
-                            <span class="font-medium">{{ $detail->barang->nama_barang }}</span>
+                            <span class="font-medium">{{ $detail->barang->namaBarang }}</span>
                             <br>
                             <span class="text-xs text-gray-500">Kode: {{ $detail->barang->kode_barang }}</span>
                         </div>

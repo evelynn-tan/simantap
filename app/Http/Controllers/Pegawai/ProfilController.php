@@ -8,6 +8,7 @@ use App\Models\Pegawai;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class ProfilController extends Controller
@@ -74,6 +75,45 @@ class ProfilController extends Controller
             $user->save();
 
             return redirect()->route('pegawai.edit-profil')->with('success', 'Password berhasil diperbarui.');
+        }
+
+        // Cek apakah ini update foto
+        if ($request->has('update_foto')) {
+
+            $request->validate([
+                'foto' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
+            ], [
+                'foto.required' => 'Pilih file foto terlebih dahulu.',
+                'foto.image' => 'File harus berupa gambar.',
+                'foto.mimes' => 'Format foto harus JPG, JPEG, PNG, atau WEBP.',
+                'foto.max' => 'Ukuran foto maksimal 2MB.',
+            ]);
+
+            // Hapus foto lama jika ada
+            if ($pegawai->foto && Storage::disk('public')->exists($pegawai->foto)) {
+                Storage::disk('public')->delete($pegawai->foto);
+            }
+
+            // Simpan foto baru
+            $fileName = 'profil_' . $pegawai->pegawaiID . '_' . time() . '.' . $request->foto->extension();
+            $path = $request->foto->storeAs('profil', $fileName, 'public');
+
+            // Update database
+            $pegawai->update(['foto' => $path]);
+
+            return redirect()->route('pegawai.edit-profil')->with('success', 'Foto profil berhasil diperbarui.');
+        }
+
+        // Cek apakah ini hapus foto
+        if ($request->has('hapus_foto')) {
+            
+            if ($pegawai->foto && Storage::disk('public')->exists($pegawai->foto)) {
+                Storage::disk('public')->delete($pegawai->foto);
+            }
+
+            $pegawai->update(['foto' => null]);
+
+            return redirect()->route('pegawai.edit-profil')->with('success', 'Foto profil berhasil dihapus.');
         }
 
         return redirect()->route('pegawai.edit-profil');

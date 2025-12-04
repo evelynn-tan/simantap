@@ -14,7 +14,7 @@ class DataBarangController extends Controller
      */
     public function index()
     {
-        $barangs = Barang::with('kategori')->orderBy('nama_barang')->get();
+        $barangs = Barang::with('kategori')->orderBy('namaBarang')->get();
         $totalBarang = $barangs->count();
         $totalKategori = Kategori::count();
         $kategoriList = Kategori::orderBy('nama_kategori')->get();
@@ -53,36 +53,46 @@ class DataBarangController extends Controller
     {
         // Validasi
         $request->validate([
-            'nama_barang' => 'required|string|max:255',
-            'kategori_id' => 'required|exists:kategoris,kategoriID',
+            'namaBarang' => 'required|string|max:255',
+            'kategori_id' => 'required|exists:kategoris,categoryID',
             'satuan' => 'required|in:rim,pcs,buah,box,pack,set,lembar,meter,kg,liter',
             'stok' => 'required|integer|min:0',
         ]);
 
         // CEK DUPLIKASI BARANG
-        $existingBarang = Barang::where('nama_barang', $request->nama_barang)
-            ->where('kategoriID', $request->kategori_id)
+        $existingBarang = Barang::where('namaBarang', $request->namaBarang)
+            ->where('categoryID', $request->kategori_id)
             ->where('satuan', $request->satuan)
             ->first();
 
         if ($existingBarang) {
             return redirect()->back()
                 ->withInput()
-                ->with('warning', "Barang '{$existingBarang->nama_barang}' ({$existingBarang->kode_barang}) sudah ada. Stok ditambah? Hubungi operator.");
+                ->with('warning', "Barang '{$existingBarang->namaBarang}' ({$existingBarang->kode_barang}) sudah ada. Stok ditambah? Hubungi operator.");
         }
 
         // CREATE BARANG BARU
         // Kode barang auto-generate di Model::booted()
         $barang = Barang::create([
-            'nama_barang' => $request->nama_barang,
-            'kategoriID' => $request->kategori_id,
+            'namaBarang' => $request->namaBarang,
+            'categoryID' => $request->kategori_id,
             'satuan' => $request->satuan,
             'stok' => $request->stok,
             'deskripsi' => $request->deskripsi ?? null,
         ]);
 
         return redirect()->route('admin.barang.index')
-            ->with('success', "Barang baru '{$barang->nama_barang}' ({$barang->kode_barang}) berhasil ditambahkan.");
+            ->with('success', "Barang baru '{$barang->namaBarang}' ({$barang->kode_barang}) berhasil ditambahkan.");
+    }
+
+    /**
+     * Menampilkan detail barang (Show)
+     * Redirect ke edit karena tidak ada halaman show khusus
+     */
+    public function show(Barang $barang)
+    {
+        // Redirect ke edit page karena tidak ada halaman detail khusus
+        return redirect()->route('admin.barang.edit', $barang->barangID);
     }
 
     /**
@@ -102,22 +112,22 @@ class DataBarangController extends Controller
     public function update(Request $request, Barang $barang)
     {
         $request->validate([
-            'nama_barang' => 'required|string|max:255',
-            'kategori_id' => 'required|exists:kategoris,kategoriID',
+            'namaBarang' => 'required|string|max:255',
+            'kategori_id' => 'required|exists:kategoris,categoryID',
             'satuan' => 'required|in:rim,pcs,buah,box,pack,set,lembar,meter,kg,liter',
             'stok' => 'required|integer|min:0',
         ]);
 
         $barang->update([
-            'nama_barang' => $request->nama_barang,
-            'kategoriID' => $request->kategori_id,
+            'namaBarang' => $request->namaBarang,
+            'categoryID' => $request->kategori_id,
             'satuan' => $request->satuan,
             'stok' => $request->stok,
             'deskripsi' => $request->deskripsi ?? null,
         ]);
 
         return redirect()->route('admin.barang.index')
-            ->with('success', "Data barang '{$barang->nama_barang}' berhasil diperbarui.");
+            ->with('success', "Data barang '{$barang->namaBarang}' berhasil diperbarui.");
     }
 
     /**
@@ -126,7 +136,7 @@ class DataBarangController extends Controller
      */
     public function destroy(Barang $barang)
     {
-        $nama = $barang->nama_barang;
+        $nama = $barang->namaBarang;
         $kode = $barang->kode_barang;
 
         // CEK apakah barang digunakan di pengajuan_details atau transaksi
@@ -152,7 +162,7 @@ class DataBarangController extends Controller
     {
         $search = $request->get('q', '');
 
-        $barangs = Barang::where('nama_barang', 'like', "%{$search}%")
+        $barangs = Barang::where('namaBarang', 'like', "%{$search}%")
             ->orWhere('kode_barang', 'like', "%{$search}%")
             ->with('kategori')
             ->limit(10)
@@ -162,7 +172,7 @@ class DataBarangController extends Controller
             'data' => $barangs->map(fn($b) => [
                 'barangID' => $b->barangID,
                 'kode_barang' => $b->kode_barang,
-                'nama_barang' => $b->nama_barang,
+                'namaBarang' => $b->namaBarang,
                 'stok' => $b->stok,
                 'status' => $b->status,
                 'satuan' => $b->satuan,

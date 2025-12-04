@@ -57,7 +57,7 @@ Relationships:
 ### Kategori (ERD) → kategoris (DB)
 ```
 ERD Fields:                    Implementation:
-✅ kategoriID : INT (PK)      → kategoriID INT PRIMARY KEY
+✅ categoryID : INT (PK)      → categoryID INT PRIMARY KEY
 ✅ nama_kategori : VARCHAR    → nama_kategori VARCHAR(255)
 ✅ deskripsi : TEXT           → deskripsi TEXT NULLABLE
 ✅ created_at : TIMESTAMP     → created_at TIMESTAMP
@@ -73,8 +73,8 @@ ERD Fields:                    Implementation:
 ✅ barangID : INT (PK)        → barangID INT PRIMARY KEY
 ✅ kode_barang : VARCHAR      → kode_barang VARCHAR(255) 
    Note: Auto-generated BRG-001, BRG-002, dll
-✅ nama_barang : VARCHAR(50)  → nama_barang VARCHAR(255)
-✅ kategoriID : INT (FK)      → kategoriID INT FK
+✅ namaBarang : VARCHAR(50)  → namaBarang VARCHAR(255)
+✅ categoryID : INT (FK)      → categoryID INT FK
 ✅ satuan : ENUM              → satuan ENUM(rim,pcs,buah,box,pack,set,lembar,meter,kg,liter)
 ✅ stok : INT                 → stok INT DEFAULT 0 ✅ SIMPLIFIED
 ✅ deskripsi : TEXT           → deskripsi TEXT NULLABLE
@@ -355,7 +355,7 @@ Benefit: Audit workflow, approval tracking, version control
 - [x] No timestamps
 
 ### Kategori Table
-- [x] kategoriID (PK)
+- [x] categoryID (PK)
 - [x] nama_kategori - VARCHAR
 - [x] deskripsi - TEXT nullable
 - [x] timestamps
@@ -363,8 +363,8 @@ Benefit: Audit workflow, approval tracking, version control
 ### Barang Table
 - [x] barangID (PK)
 - [x] kode_barang - VARCHAR (auto-generated)
-- [x] nama_barang - VARCHAR
-- [x] kategoriID (FK)
+- [x] namaBarang - VARCHAR
+- [x] categoryID (FK)
 - [x] satuan - ENUM
 - [x] stok - INT (simplified) ✅
 - [x] deskripsi - TEXT

@@ -45,7 +45,7 @@
                                 <select :name="'items[' + index + '][barangID]'" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
                                     <option value="">-- Pilih Barang --</option>
                                     @foreach($barangs as $barang)
-                                        <option value="{{ $barang->barangID }}">{{ $barang->nama_barang }} (Stok: {{ $barang->stok_sekarang }})</option>
+                                        <option value="{{ $barang->barangID }}">{{ $barang->namaBarang }} (Stok: {{ $barang->stok_sekarang }})</option>
                                     @endforeach
                                 </select>
                             </div>

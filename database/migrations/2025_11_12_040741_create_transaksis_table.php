@@ -1,6 +1,4 @@
 <?php
-// database/migrations/2025_11_12_040741_create_transaksis_table.php
-// TRANSAKSI TABLE (MERGED) - Menggantikan transaksi_masuks & transaksi_keluars
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
