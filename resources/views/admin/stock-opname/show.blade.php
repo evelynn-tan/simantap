@@ -6,12 +6,10 @@
 @section('content')
 <div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
 
-    <!-- Back Button -->
     <a href="{{ route('admin.stock-opname.index') }}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition">
         <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar
     </a>
 
-    <!-- Header Info Card -->
     <div class="bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-lg p-6 text-white">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -20,7 +18,7 @@
                         <i class="fas fa-clipboard-check text-2xl"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-bold">OP-{{ str_pad($opname->opnameID, 4, '0', STR_PAD_LEFT) }}</h2>
+                        <h2 class="text-2xl font-bold">OP-{{ str_pad($opname->opnameID ?? 0, 4, '0', STR_PAD_LEFT) }}</h2>
                         <p class="text-teal-100 text-sm">ID Stock Opname</p>
                     </div>
                 </div>
@@ -28,7 +26,7 @@
             <div class="flex flex-wrap gap-4 text-sm">
                 <div class="bg-white/20 rounded-lg px-4 py-2 backdrop-blur-sm">
                     <p class="text-teal-100 text-xs">Tanggal Opname</p>
-                    <p class="font-semibold">{{ $opname->tanggal_opname->timezone('Asia/Jakarta')->format('d M Y') }}</p>
+                    <p class="font-semibold">{{ $opname->tanggal_opname?->timezone('Asia/Jakarta')->format('d M Y') ?? 'N/A' }}</p>
                 </div>
                 <div class="bg-white/20 rounded-lg px-4 py-2 backdrop-blur-sm">
                     <p class="text-teal-100 text-xs">Operator</p>
@@ -42,7 +40,6 @@
         </div>
     </div>
 
-    <!-- Summary Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 hover:shadow-md transition">
             <div class="flex items-center justify-between">
@@ -86,7 +83,6 @@
         </div>
     </div>
 
-    <!-- Keterangan -->
     @if($opname->keterangan)
     <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
         <div class="flex items-start gap-3">
@@ -99,7 +95,6 @@
     </div>
     @endif
 
-    <!-- Detail Table -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
             <h3 class="text-lg font-bold text-slate-800">📋 Daftar Barang yang Diperiksa</h3>
@@ -166,7 +161,6 @@
         </div>
     </div>
 
-    <!-- Action Buttons -->
     <div class="flex justify-end gap-3">
         <a href="{{ route('admin.stock-opname.index') }}" class="inline-flex items-center px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-sm transition">
             <i class="fas fa-list mr-2"></i> Lihat Semua Opname

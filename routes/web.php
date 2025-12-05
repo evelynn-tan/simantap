@@ -50,7 +50,9 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     Route::post('/permintaan/tolak/{pengajuan}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak')->where('pengajuan', '[0-9]+');
     
     // Perbaikan kecil: resource jangan pakai path 'views/admin/...', cukup nama URL saja
-    Route::resource('stock-opname', StockOpnameController::class); 
+    Route::resource('stock-opname', StockOpnameController::class)->parameters([
+        'stock-opname' => 'opname'
+    ]);
     
     // Laporan
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');

@@ -23,6 +23,15 @@ class StockOpname extends Model
     ];
 
     /**
+     * Mengoverride Route Key Name untuk Route Model Binding.
+     * Ini memastikan Laravel selalu menggunakan 'opnameID' saat mencari model melalui rute.
+     */
+    public function getRouteKeyName()
+    {
+        return 'opnameID';
+    }
+
+    /**
      * Relasi ke User (Operator yang melakukan opname)
      */
     public function user()
