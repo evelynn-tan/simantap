@@ -105,9 +105,13 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-slate-700">
-                            <div class="font-medium">{{ $opname->tanggal_opname->timezone('Asia/Jakarta')->format('d M Y') }}</div>
-                            <div class="text-xs text-slate-500">{{ $opname->tanggal_opname->timezone('Asia/Jakarta')->format('H:i') }} WIB</div>
-                        </td>
+    <div class="font-medium">
+        {{ $opname->tanggal_opname?->timezone('Asia/Jakarta')->format('d M Y') ?? 'N/A' }}
+    </div>
+    <div class="text-xs text-slate-500">
+        {{ $opname->created_at?->timezone('Asia/Jakarta')->format('H:i') ?? 'N/A' }} WIB
+    </div>
+</td>
                         <td class="px-6 py-4 text-slate-700 font-medium">
                             {{ $opname->user->email ?? '-' }}
                         </td>
