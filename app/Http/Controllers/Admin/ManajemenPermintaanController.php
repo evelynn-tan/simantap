@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\Pengajuan;
 use App\Models\PengajuanDetail;
 use App\Models\Barang;
@@ -36,7 +37,12 @@ class ManajemenPermintaanController extends Controller
      * Menyetujui pengajuan
      * - Set status pengajuan = 'disetujui'
      * - Set per-item status = 'disetujui'
-     * - Kurangi stok barang
+     * - Kurangi stok barang (dengan validasi dan partial approval)
+     * 
+     * PERBAIKAN:
+     * - Database transaction dengan row locking untuk mencegah race condition
+     * - Validasi stok sebelum decrement
+     * - Support partial approval (jumlah_disetujui <= jumlah)
      */
     public function setujui(Request $request, Pengajuan $pengajuan)
     {
@@ -44,33 +50,77 @@ class ManajemenPermintaanController extends Controller
             'items' => 'required|array',
             'items.*.pengajuanDetailID' => 'required|exists:pengajuan_details,pengajuanDetailID',
             'items.*.approve' => 'boolean',
+            'items.*.jumlah_disetujui' => 'nullable|integer|min:0',
         ]);
 
         $userID = auth()->id();
         $now = now();
 
-        foreach ($request->items as $item) {
-            $detail = PengajuanDetail::findOrFail($item['pengajuanDetailID']);
+        try {
+            // Gunakan database transaction dengan row locking
+            DB::transaction(function () use ($request, $pengajuan, $userID, $now) {
+                $errors = [];
+                $hasApprovedItems = false;
 
-            if ($item['approve'] ?? false) {
-                // Setujui item ini
-                $detail->update(['status' => 'disetujui']);
+                foreach ($request->items as $item) {
+                    $detail = PengajuanDetail::findOrFail($item['pengajuanDetailID']);
 
-                // Kurangi stok barang
-                $barang = $detail->barang;
-                $barang->decrement('stok', $detail->jumlah);
-            }
+                    if ($item['approve'] ?? false) {
+                        // Lock row untuk mencegah race condition
+                        $barang = Barang::lockForUpdate()->find($detail->barangID);
+
+                        // Tentukan jumlah yang disetujui (default: jumlah yang diminta)
+                        $jumlahDiminta = $detail->jumlah;
+                        $jumlahDisetujui = isset($item['jumlah_disetujui']) 
+                            ? (int) $item['jumlah_disetujui'] 
+                            : $jumlahDiminta;
+                        
+                        // Pastikan tidak melebihi jumlah yang diminta
+                        $jumlahDisetujui = min($jumlahDisetujui, $jumlahDiminta);
+                        
+                        // Validasi ketersediaan stok
+                        if ($barang->stok < $jumlahDisetujui) {
+                            $errors[] = "Stok '{$barang->namaBarang}' tidak cukup (diminta: {$jumlahDisetujui}, tersedia: {$barang->stok})";
+                            // Tolak item ini karena stok tidak cukup
+                            $detail->update(['status' => 'ditolak']);
+                            continue;
+                        }
+
+                        // Setujui item dengan jumlah yang disetujui
+                        $detail->update([
+                            'status' => 'disetujui',
+                            'jumlah_disetujui' => $jumlahDisetujui
+                        ]);
+
+                        // Kurangi stok barang
+                        $barang->decrement('stok', $jumlahDisetujui);
+                        $hasApprovedItems = true;
+                    } else {
+                        // Item tidak dicentang = ditolak
+                        $detail->update(['status' => 'ditolak']);
+                    }
+                }
+
+                // Update status pengajuan
+                $pengajuan->update([
+                    'status' => $hasApprovedItems ? 'disetujui' : 'ditolak',
+                    'approved_by' => $userID,
+                    'approved_at' => $now,
+                ]);
+
+                // Jika ada error stok, lempar exception untuk rollback
+                if (!empty($errors)) {
+                    throw new \Exception(implode('; ', $errors));
+                }
+            });
+
+            return redirect()->route('admin.permintaan.index')
+                ->with('success', 'Pengajuan telah diproses.');
+
+        } catch (\Exception $e) {
+            return redirect()->route('admin.permintaan.index')
+                ->with('warning', 'Pengajuan diproses dengan catatan: ' . $e->getMessage());
         }
-
-        // Update pengajuan status & approved_by
-        $pengajuan->update([
-            'status' => 'disetujui',
-            'approved_by' => $userID,
-            'approved_at' => $now,
-        ]);
-
-        return redirect()->route('admin.permintaan.index')
-            ->with('success', 'Pengajuan telah disetujui.');
     }
 
     /**

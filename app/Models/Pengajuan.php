@@ -19,6 +19,8 @@ class Pengajuan extends Model
 
     protected $fillable = [
         'pegawaiID',
+        'nama_pegawai_snapshot',  // Snapshot nama saat pengajuan dibuat
+        'nip_snapshot',           // Snapshot NIP saat pengajuan dibuat
         'requested_at',
         'description',
         'status',
@@ -26,6 +28,22 @@ class Pengajuan extends Model
         'approved_by',
         'approved_at',
     ];
+
+    /**
+     * Get nama pegawai untuk laporan (prioritaskan snapshot)
+     */
+    public function getNamaPegawaiAttribute()
+    {
+        return $this->nama_pegawai_snapshot ?? $this->pegawai->nama_lengkap ?? '-';
+    }
+
+    /**
+     * Get NIP untuk laporan (prioritaskan snapshot)
+     */
+    public function getNipAttribute()
+    {
+        return $this->nip_snapshot ?? $this->pegawai->nip ?? '-';
+    }
 
     /**
      * Relasi ke Pegawai

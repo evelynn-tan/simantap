@@ -16,6 +16,7 @@ class PengajuanDetail extends Model
         'pengajuanID',
         'barangID',
         'jumlah',
+        'jumlah_disetujui',  // Jumlah yang disetujui (bisa lebih kecil dari jumlah diminta)
         'status',  // NEW: menunggu, disetujui, ditolak
     ];
 

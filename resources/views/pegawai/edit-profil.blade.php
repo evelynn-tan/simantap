@@ -265,14 +265,14 @@
             
             {{-- Card Foto Profil --}}
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div class="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-4">
+                <div class="bg-gradient-to-r from-blue-500 to-green-500 px-6 py-4">
                     <div class="flex items-center gap-3">
                         <div class="h-10 w-10 bg-white/20 rounded-xl flex items-center justify-center">
                             <i class="fas fa-camera text-white text-lg"></i>
                         </div>
                         <div>
                             <h3 class="text-lg font-bold text-white">Foto Profil</h3>
-                            <p class="text-sm text-purple-100">Upload atau ganti foto Anda</p>
+                            <p class="text-sm text-green-100">Upload atau ganti foto Anda</p>
                         </div>
                     </div>
                 </div>
@@ -283,10 +283,10 @@
                             @if($pegawai->foto)
                                 <img src="{{ asset('storage/' . $pegawai->foto) }}" 
                                      alt="Foto Profil" 
-                                     class="w-32 h-32 rounded-full object-cover border-4 border-purple-200 shadow-lg"
+                                     class="w-32 h-32 rounded-full object-cover border-4 border-orange-200 shadow-lg"
                                      id="previewImage">
                             @else
-                                <div class="w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg border-4 border-purple-200" id="avatarInitial">
+                                <div class="w-32 h-32 bg-gradient-to-br from-orange-400 to-yellow-500 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg border-4 border-purple-200" id="avatarInitial">
                                     {{ strtoupper(substr($pegawai->nama_lengkap, 0, 1)) }}{{ strtoupper(substr(explode(' ', $pegawai->nama_lengkap)[1] ?? '', 0, 1)) }}
                                 </div>
                                 <img src="" alt="Foto Profil" class="w-32 h-32 rounded-full object-cover border-4 border-purple-200 shadow-lg hidden" id="previewImage">

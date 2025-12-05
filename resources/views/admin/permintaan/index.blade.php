@@ -228,7 +228,8 @@ const pengajuanData = {
                 id: {{ $detail->pengajuanDetailID }},
                 nama: '{{ $detail->barang->namaBarang ?? "N/A" }}',
                 jumlah: {{ $detail->jumlah }},
-                satuan: '{{ $detail->barang->satuan ?? "unit" }}'
+                satuan: '{{ $detail->barang->satuan ?? "unit" }}',
+                stok: {{ $detail->barang->stok ?? 0 }}
             },
             @endforeach
         ]
@@ -242,20 +243,59 @@ function openSetujuiModal(pengajuanID) {
 
     document.getElementById('pengajuanIDSetujui').value = pengajuanID;
     
-    // Build items HTML
+    // Build items HTML dengan input jumlah dan info stok
     let itemsHTML = '';
+    let hasInsufficientStock = false;
+    
     data.details.forEach(item => {
+        const maxApproval = Math.min(item.jumlah, item.stok);
+        const isInsufficient = item.stok < item.jumlah;
+        if (isInsufficient) hasInsufficientStock = true;
+        
         itemsHTML += `
-            <div class="flex items-center justify-between py-3 border-b border-slate-200 last:border-0">
+            <div class="flex items-center gap-4 py-3 border-b border-slate-200 last:border-0 ${isInsufficient ? 'bg-red-50 -mx-4 px-4' : ''}">
                 <div class="flex-1">
                     <p class="font-medium text-slate-800">${item.nama}</p>
-                    <p class="text-sm text-slate-500">Jumlah: ${item.jumlah} ${item.satuan}</p>
+                    <p class="text-sm text-slate-500">
+                        Diminta: <span class="font-semibold">${item.jumlah} ${item.satuan}</span>
+                    </p>
+                    <p class="text-xs ${isInsufficient ? 'text-red-600 font-semibold' : 'text-green-600'}">
+                        ${isInsufficient ? '⚠️' : '✓'} Stok tersedia: ${item.stok} ${item.satuan}
+                    </p>
                 </div>
-                <input type="hidden" name="items[${item.id}][pengajuanDetailID]" value="${item.id}">
-                <input type="checkbox" name="items[${item.id}][approve]" value="1" checked class="w-5 h-5 rounded text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer">
+                <div class="flex flex-col items-center gap-1">
+                    <label class="text-xs text-slate-500 font-medium">Setujui</label>
+                    <input type="number" 
+                           name="items[${item.id}][jumlah_disetujui]" 
+                           value="${maxApproval}" 
+                           min="0" 
+                           max="${item.jumlah}"
+                           class="w-20 text-center border ${isInsufficient ? 'border-red-300 bg-red-50' : 'border-slate-200'} rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500" 
+                           ${item.stok <= 0 ? 'disabled' : ''} />
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <label class="text-xs text-slate-500 font-medium">Pilih</label>
+                    <input type="hidden" name="items[${item.id}][pengajuanDetailID]" value="${item.id}">
+                    <input type="checkbox" 
+                           name="items[${item.id}][approve]" 
+                           value="1" 
+                           ${item.stok > 0 ? 'checked' : ''} 
+                           ${item.stok <= 0 ? 'disabled' : ''}
+                           class="w-5 h-5 rounded text-green-600 focus:ring-2 focus:ring-green-500 cursor-pointer">
+                </div>
             </div>
         `;
     });
+    
+    // Tambah warning jika ada stok tidak cukup
+    if (hasInsufficientStock) {
+        itemsHTML = `
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3 text-sm text-yellow-800">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <strong>Perhatian:</strong> Beberapa item memiliki stok tidak mencukupi. Jumlah yang disetujui otomatis disesuaikan.
+            </div>
+        ` + itemsHTML;
+    }
     
     document.getElementById('itemsContainer').innerHTML = itemsHTML;
     document.getElementById('formSetujui').action = `/admin/permintaan/setujui/${pengajuanID}`;

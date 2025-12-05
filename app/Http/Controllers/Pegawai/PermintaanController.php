@@ -127,9 +127,11 @@ class PermintaanController extends Controller
 
         DB::beginTransaction();
         try {
-            // Create pengajuan header
+            // Create pengajuan header dengan snapshot nama pegawai
             $pengajuan = Pengajuan::create([
                 'pegawaiID' => $pegawai->pegawaiID,
+                'nama_pegawai_snapshot' => $pegawai->nama_lengkap,  // Simpan snapshot nama
+                'nip_snapshot' => $pegawai->nip,                    // Simpan snapshot NIP
                 'requested_at' => now(),
                 'description' => $request->description,
                 'status' => 'menunggu',

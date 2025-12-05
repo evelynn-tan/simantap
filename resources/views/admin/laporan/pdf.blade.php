@@ -182,8 +182,8 @@
                 <td>{{ $pengajuan->approved_at ? $pengajuan->approved_at->format('d/m/Y') : '-' }}</td>
                 @if($jenisLaporan !== 'pegawai')
                 <td>
-                    {{ $pengajuan->pegawai->nama_lengkap ?? '-' }}<br>
-                    <small style="color: #666;">{{ $pengajuan->pegawai->nip ?? '' }}</small>
+                    {{ $pengajuan->nama_pegawai }}<br>
+                    <small style="color: #666;">{{ $pengajuan->nip }}</small>
                 </td>
                 @endif
                 <td>

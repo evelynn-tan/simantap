@@ -156,8 +156,8 @@
                             {{ $pengajuan->approved_at ? $pengajuan->approved_at->timezone('Asia/Jakarta')->format('d M Y') : '-' }}
                         </td>
                         <td class="px-6 py-4">
-                            <div class="font-medium text-slate-800">{{ $pengajuan->pegawai->nama_lengkap ?? '-' }}</div>
-                            <div class="text-xs text-slate-500">{{ $pengajuan->pegawai->nip ?? '' }}</div>
+                            <div class="font-medium text-slate-800">{{ $pengajuan->nama_pegawai }}</div>
+                            <div class="text-xs text-slate-500">{{ $pengajuan->nip }}</div>
                         </td>
                         <td class="px-6 py-4 text-slate-700">
                             <ul class="space-y-1">

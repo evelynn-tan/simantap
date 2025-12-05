@@ -146,7 +146,7 @@ class DataBarangController extends Controller
 
         if ($pengajuanDetailsCount > 0 || $detailRanggingCount > 0 || $stockOpnameDetailsCount > 0) {
             return redirect()->route('admin.barang.index')
-                ->with('error', "Barang '{$nama}' ({$kode}) tidak dapat dihapus karena sudah digunakan dalam permintaan, transaksi, atau stock opname. Hubungi admin untuk menghapus data terkait terlebih dahulu.");
+                ->with('error', "Barang '{$nama}' ({$kode}) tidak dapat dihapus karena sudah digunakan dalam permintaan, transaksi, atau stock opname.");
         }
 
         $barang->delete();

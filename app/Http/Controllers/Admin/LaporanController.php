@@ -14,6 +14,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class LaporanController extends Controller
 {
@@ -84,49 +89,125 @@ class LaporanController extends Controller
     }
 
     /**
-     * Export to Excel (CSV format)
+     * Export to Excel (XLSX format dengan PhpSpreadsheet)
+     * - NIP diformat sebagai text untuk mencegah scientific notation
+     * - Styling profesional dengan header berwarna
+     * - Auto-width kolom
      */
     public function exportExcel(Request $request)
     {
         $jenisLaporan = $request->get('jenis_laporan', 'umum');
         $data = $this->getReportData($request, $jenisLaporan);
         
-        $filename = 'laporan_' . $jenisLaporan . '_' . date('Y-m-d_His') . '.csv';
-        
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Laporan Permintaan');
+
+        // ============ HEADER STYLING ============
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+                'size' => 11,
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '1E40AF'], // Blue-800
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
         ];
 
-        $callback = function() use ($data, $jenisLaporan) {
-            $file = fopen('php://output', 'w');
-            // Add BOM for Excel UTF-8
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
-            // Header row
-            fputcsv($file, ['No', 'Tanggal', 'Pegawai', 'NIP', 'Barang', 'Jumlah', 'Satuan', 'Keperluan', 'Status']);
-            
-            $no = 1;
-            foreach ($data as $item) {
-                foreach ($item->pengajuanDetails as $detail) {
-                    fputcsv($file, [
-                        $no++,
-                        $item->approved_at ? $item->approved_at->format('d/m/Y') : '-',
-                        $item->pegawai->nama_lengkap ?? '-',
-                        $item->pegawai->nip ?? '-',
-                        $detail->barang->namaBarang ?? '-',
-                        $detail->jumlah ?? 0,
-                        $detail->barang->satuan ?? '-',
-                        $item->description ?? '-',
-                        ucfirst($item->status),
-                    ]);
-                }
-            }
-            
-            fclose($file);
-        };
+        // Data cell styling
+        $dataStyle = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => 'CCCCCC'],
+                ],
+            ],
+            'alignment' => [
+                'vertical' => Alignment::VERTICAL_CENTER,
+            ],
+        ];
 
-        return Response::stream($callback, 200, $headers);
+        // ============ HEADER ROW ============
+        $headers = ['No', 'Tanggal', 'Pegawai', 'NIP', 'Barang', 'Jumlah Diminta', 'Jumlah Disetujui', 'Satuan', 'Keperluan', 'Status'];
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $col++;
+        }
+        $sheet->getStyle('A1:J1')->applyFromArray($headerStyle);
+        $sheet->getRowDimension(1)->setRowHeight(25);
+
+        // ============ DATA ROWS ============
+        $row = 2;
+        $no = 1;
+        foreach ($data as $item) {
+            foreach ($item->pengajuanDetails as $detail) {
+                // NIP sebagai TEXT (untuk mencegah scientific notation)
+                $nip = (string)($item->nip ?? '-');
+                
+                $sheet->setCellValue('A' . $row, $no);
+                $sheet->setCellValue('B' . $row, $item->approved_at ? $item->approved_at->format('d/m/Y') : '-');
+                $sheet->setCellValue('C' . $row, $item->nama_pegawai ?? '-');
+                
+                // Set NIP as explicit text value
+                $sheet->setCellValueExplicit('D' . $row, $nip, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                
+                $sheet->setCellValue('E' . $row, $detail->barang->namaBarang ?? '-');
+                $sheet->setCellValue('F' . $row, $detail->jumlah ?? 0);
+                $sheet->setCellValue('G' . $row, $detail->jumlah_disetujui ?? $detail->jumlah ?? 0);
+                $sheet->setCellValue('H' . $row, $detail->barang->satuan ?? '-');
+                $sheet->setCellValue('I' . $row, $item->description ?? '-');
+                $sheet->setCellValue('J' . $row, ucfirst($item->status));
+
+                // Alternate row coloring
+                if ($row % 2 == 0) {
+                    $sheet->getStyle('A' . $row . ':J' . $row)->getFill()
+                        ->setFillType(Fill::FILL_SOLID)
+                        ->getStartColor()->setRGB('F3F4F6');
+                }
+
+                $no++;
+                $row++;
+            }
+        }
+
+        // Apply data styling
+        $lastRow = $row - 1;
+        if ($lastRow >= 2) {
+            $sheet->getStyle('A2:J' . $lastRow)->applyFromArray($dataStyle);
+        }
+
+        // ============ AUTO-SIZE COLUMNS ============
+        foreach (range('A', 'J') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Center align number columns
+        $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F2:G' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // ============ OUTPUT FILE ============
+        $filename = 'laporan_' . $jenisLaporan . '_' . date('Y-m-d_His') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 
     /**
@@ -212,7 +293,7 @@ class LaporanController extends Controller
             $totalItems = $items->count();
             $isi = $items->map(fn($p) => [
                 'pengajuanID' => $p->pengajuanID,
-                'pegawai' => $p->pegawai->nama_lengkap ?? '-',
+                'pegawai' => $p->nama_pegawai,  // Gunakan accessor snapshot
                 'tanggal' => $p->requested_at->format('Y-m-d'),
                 'items_count' => $p->pengajuanDetails->count(),
                 'total_jumlah' => $p->pengajuanDetails->sum('jumlah'),
