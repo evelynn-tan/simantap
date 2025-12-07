@@ -7,13 +7,13 @@
 <div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
 
     <!-- KPI Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
         <!-- Total Pengguna -->
-        <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-6 text-white shadow-lg border border-blue-400">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-4 sm:p-5 lg:p-6 text-white shadow-lg border border-blue-400">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="text-blue-100 text-sm font-semibold uppercase mb-2">Total Pengguna</p>
-                    <h3 class="text-4xl font-bold">{{ $totalPengguna }}</h3>
+                    <p class="text-blue-100 text-[10px] sm:text-xs lg:text-sm font-semibold uppercase mb-1 sm:mb-2">Total Pengguna</p>
+                    <h3 class="text-2xl sm:text-3xl lg:text-4xl font-bold">{{ $totalPengguna }}</h3>
                 </div>
                 <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                     <i class="fas fa-users text-2xl text-white"></i>
@@ -49,22 +49,22 @@
     </div>
 
     <!-- Search & Add Button -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex items-center gap-4">
-        <div class="flex-1 flex items-center gap-2 bg-slate-50 rounded-lg px-4 py-2.5 border border-slate-200">
-            <i class="fas fa-search text-slate-400"></i>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+        <div class="flex-1 flex items-center gap-2 bg-slate-50 rounded-lg px-3 sm:px-4 py-2 sm:py-2.5 border border-slate-200">
+            <i class="fas fa-search text-slate-400 text-sm"></i>
             <input 
                 type="text" 
                 id="searchInput" 
                 placeholder="Cari nama atau email..." 
-                class="bg-transparent flex-1 text-sm text-slate-700 outline-none"
+                class="bg-transparent flex-1 text-xs sm:text-sm text-slate-700 outline-none w-full"
                 style="font-family: 'Poppins', sans-serif;"
             >
         </div>
         <button 
             type="button"
             onclick="openTambahPenggunaModal()"
-            class="inline-flex items-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition duration-200">
-            <i class="fas fa-plus mr-2"></i> Tambah Pengguna
+            class="inline-flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-xs sm:text-sm transition duration-200 whitespace-nowrap">
+            <i class="fas fa-plus mr-1.5 sm:mr-2"></i> <span class="hidden xs:inline">Tambah</span> Pengguna
         </button>
     </div>
 
@@ -74,31 +74,32 @@
             <table class="w-full text-sm" id="penggunaTable">
                 <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Nama</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Email</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Role</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Jabatan</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">NIP</th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
+                        <th class="px-3 sm:px-4 lg:px-6 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Nama</th>
+                        <th class="hidden sm:table-cell px-3 sm:px-4 lg:px-6 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Email</th>
+                        <th class="px-3 sm:px-4 lg:px-6 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Role</th>
+                        <th class="hidden md:table-cell px-3 sm:px-4 lg:px-6 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Jabatan</th>
+                        <th class="hidden lg:table-cell px-3 sm:px-4 lg:px-6 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-600 uppercase">NIP</th>
+                        <th class="px-3 sm:px-4 lg:px-6 py-3 text-center text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                     @forelse ($users as $user)
                     <tr class="hover:bg-slate-50 transition pengguna-row" data-name="{{ strtolower($user->pegawai->nama_lengkap ?? $user->operator->nama_lengkap ?? '') }}" data-email="{{ strtolower($user->email) }}">
-                        <td class="px-6 py-4 font-semibold text-slate-800">
-                            {{ $user->pegawai->nama_lengkap ?? $user->operator->nama_lengkap ?? 'N/A' }}
+                        <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+                            <div class="font-semibold text-slate-800 text-xs sm:text-sm">{{ $user->pegawai->nama_lengkap ?? $user->operator->nama_lengkap ?? 'N/A' }}</div>
+                            <div class="text-[10px] sm:hidden text-slate-500 truncate">{{ $user->email }}</div>
                         </td>
-                        <td class="px-6 py-4 text-slate-700">{{ $user->email }}</td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+                        <td class="hidden sm:table-cell px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-slate-700 text-xs sm:text-sm">{{ $user->email }}</td>
+                        <td class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+                            <span class="inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold
                                 @if($user->role_display === 'Admin') bg-red-100 text-red-800
                                 @elseif($user->role_display === 'Pegawai BPS') bg-green-100 text-green-800
                                 @else bg-blue-100 text-blue-800 @endif">
                                 {{ $user->role_display }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-slate-700">{{ $user->pegawai->jabatan ?? $user->operator->jabatan ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 text-slate-700 font-mono">{{ $user->pegawai->nip ?? $user->operator->nip ?? 'N/A' }}</td>
+                        <td class="hidden md:table-cell px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-slate-700 text-xs sm:text-sm">{{ $user->pegawai->jabatan ?? $user->operator->jabatan ?? 'N/A' }}</td>
+                        <td class="hidden lg:table-cell px-3 sm:px-4 lg:px-6 py-3 sm:py-4 text-slate-700 font-mono text-xs">{{ $user->pegawai->nip ?? $user->operator->nip ?? 'N/A' }}</td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex gap-2 justify-center">
                                 <button 

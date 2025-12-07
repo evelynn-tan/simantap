@@ -15,27 +15,27 @@
             <p class="text-blue-100 text-sm mt-1">Pilih jenis laporan dan filter yang diinginkan</p>
         </div>
         
-        <div class="p-6">
+        <div class="p-4 sm:p-5 lg:p-6">
             <!-- Tabs -->
-            <div class="flex gap-1 mb-6 bg-slate-100 p-1 rounded-lg w-fit">
+            <div class="flex gap-1 mb-4 sm:mb-6 bg-slate-100 p-1 rounded-lg w-full sm:w-fit overflow-x-auto">
                 <button 
                     onclick="switchTab('umum')"
                     id="tab-umum"
-                    class="px-5 py-2.5 font-semibold text-sm transition rounded-md bg-white text-blue-600 shadow-sm">
-                    <i class="fas fa-chart-bar mr-2"></i> Laporan Umum
+                    class="flex-1 sm:flex-none px-3 sm:px-5 py-2 sm:py-2.5 font-semibold text-xs sm:text-sm transition rounded-md bg-white text-blue-600 shadow-sm whitespace-nowrap">
+                    <i class="fas fa-chart-bar mr-1 sm:mr-2"></i> <span class="hidden xs:inline">Laporan</span> Umum
                 </button>
                 <button 
                     onclick="switchTab('pegawai')"
                     id="tab-pegawai"
-                    class="px-5 py-2.5 font-semibold text-sm transition rounded-md text-slate-600 hover:bg-white/50">
-                    <i class="fas fa-user mr-2"></i> Per Pegawai
+                    class="flex-1 sm:flex-none px-3 sm:px-5 py-2 sm:py-2.5 font-semibold text-xs sm:text-sm transition rounded-md text-slate-600 hover:bg-white/50 whitespace-nowrap">
+                    <i class="fas fa-user mr-1 sm:mr-2"></i> Per Pegawai
                 </button>
             </div>
 
             <!-- Form Laporan Umum -->
             <form id="form-umum" action="{{ route('admin.laporan.index') }}" method="GET" class="block">
                 <input type="hidden" name="jenis_laporan" value="umum">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-end">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">
                             <i class="fas fa-calendar text-blue-500 mr-1"></i> Tanggal Mulai
@@ -72,7 +72,7 @@
             <!-- Form Laporan Per Pegawai -->
             <form id="form-pegawai" action="{{ route('admin.laporan.index') }}" method="GET" class="hidden">
                 <input type="hidden" name="jenis_laporan" value="pegawai">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-end">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">
                             <i class="fas fa-user text-blue-500 mr-1"></i> Pegawai <span class="text-red-500">*</span>

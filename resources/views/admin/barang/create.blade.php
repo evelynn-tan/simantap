@@ -38,7 +38,7 @@
                     </div>
 
                     <!-- Kategori & Satuan -->
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label for="kategori_id" class="block text-sm font-semibold text-slate-700 mb-2">Kategori *</label>
                             <select 

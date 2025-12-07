@@ -40,6 +40,7 @@ class BarangSeeder extends Seeder
             
             // 7. Perlengkapan Stempel
             ['nama' => 'TINTA STEMPEL HORSE', 'kategori' => 'Perlengkapan Stempel', 'satuan' => 'buah', 'stok' => 25, 'deskripsi' => 'Tinta stempel merk Horse'],
+            ['nama' => 'LABEL STIKER', 'kategori' => 'Perlengkapan Stempel', 'satuan' => 'buah', 'stok' => 50, 'deskripsi' => 'Label stiker untuk surat'],
             
             // 8. Penjepit Kertas
             ['nama' => 'BINDER CLIPS NO.200', 'kategori' => 'Penjepit Kertas', 'satuan' => 'box', 'stok' => 30, 'deskripsi' => 'Binder clip ukuran besar'],
@@ -73,6 +74,9 @@ class BarangSeeder extends Seeder
             
             // 22. Kertas Cetak
             ['nama' => 'KERTAS A4 70 gr', 'kategori' => 'Kertas Cetak', 'satuan' => 'rim', 'stok' => 100, 'deskripsi' => 'Kertas HVS A4 70 gram'],
+            ['nama' => 'KERTAS HVS A4 80 gr', 'kategori' => 'Kertas Cetak', 'satuan' => 'rim', 'stok' => 200, 'deskripsi' => 'Kertas HVS A4 80 gram'],
+            ['nama' => 'KERTAS FOLIO', 'kategori' => 'Kertas Cetak', 'satuan' => 'rim', 'stok' => 200, 'deskripsi' => 'Kertas folio'],
+
             
             // 23. Kertas Khusus
             ['nama' => 'KERTAS FOTO (GLOSSY)', 'kategori' => 'Kertas Khusus', 'satuan' => 'lembar', 'stok' => 200, 'deskripsi' => 'Kertas foto glossy untuk cetak foto'],
@@ -82,6 +86,10 @@ class BarangSeeder extends Seeder
             
             // 25. Tinta Printer
             ['nama' => 'TINTA EPSON 664 BLACK', 'kategori' => 'Tinta Printer', 'satuan' => 'buah', 'stok' => 30, 'deskripsi' => 'Tinta printer Epson 664 hitam'],
+            ['nama' => 'TINTA EPSON 664 COLOR', 'kategori' => 'Tinta Printer', 'satuan' => 'buah', 'stok' => 30, 'deskripsi' => 'Tinta printer Epson 664 biru'],
+            ['nama' => 'TINTA EPSON 664 COLOR', 'kategori' => 'Tinta Printer', 'satuan' => 'buah', 'stok' => 30, 'deskripsi' => 'Tinta printer Epson 664 merah'],
+            ['nama' => 'TINTA EPSON 664 COLOR', 'kategori' => 'Tinta Printer', 'satuan' => 'buah', 'stok' => 30, 'deskripsi' => 'Tinta printer Epson 664 kuning'],
+            
             
             // 26. Toner Printer
             ['nama' => 'TONER HP 49A', 'kategori' => 'Toner Printer', 'satuan' => 'buah', 'stok' => 5, 'deskripsi' => 'Toner printer HP LaserJet 49A'],
@@ -115,14 +123,20 @@ class BarangSeeder extends Seeder
             // 41-42. Perkakas/Pertukangan
             ['nama' => 'CANGKUL', 'kategori' => 'Perkakas/Pertukangan', 'satuan' => 'buah', 'stok' => 5, 'deskripsi' => 'Cangkul untuk berkebun'],
             ['nama' => 'OBENG', 'kategori' => 'Perkakas/Pertukangan', 'satuan' => 'buah', 'stok' => 10, 'deskripsi' => 'Obeng plus dan minus'],
+            ['nama' => 'TESPEN LISTRIK', 'kategori' => 'Perkakas/Pertukangan', 'satuan' => 'buah', 'stok' => 30, 'deskripsi' => 'Tespens listrik'],
             
             // 43, 45-46. Perlengkapan Listrik
             ['nama' => 'KABEL GULUNG', 'kategori' => 'Perlengkapan Listrik', 'satuan' => 'buah', 'stok' => 5, 'deskripsi' => 'Kabel roll/gulung'],
             ['nama' => 'STOP KONTAK', 'kategori' => 'Perlengkapan Listrik', 'satuan' => 'buah', 'stok' => 20, 'deskripsi' => 'Stop kontak listrik'],
             ['nama' => 'BATERAI AAA', 'kategori' => 'Perlengkapan Listrik', 'satuan' => 'buah', 'stok' => 50, 'deskripsi' => 'Baterai AAA untuk remote'],
+            ['nama' => 'BATERAI AA', 'kategori' => 'Perlengkapan Listrik', 'satuan' => 'buah', 'stok' => 50, 'deskripsi' => 'Baterai AA untuk JAM DLL'],
+            ['nama' => 'KABEL LAN Cat5E', 'kategori' => 'Perlengkapan Listrik', 'satuan' => 'buah', 'stok' => 50, 'deskripsi' => 'Kabel LAN Cat5E untuk jaringan'],
+            ['nama' => 'KABEL HDMI', 'kategori' => 'Perlengkapan Listrik', 'satuan' => 'buah', 'stok' => 50, 'deskripsi' => 'Kabel HDMI untuk TV DLL'],
             
             // 44. Lampu
             ['nama' => 'PHILIPS 5 WATT', 'kategori' => 'Lampu', 'satuan' => 'buah', 'stok' => 30, 'deskripsi' => 'Lampu LED Philips 5 Watt'],
+            ['nama' => 'ZENIC 35 WATT', 'kategori' => 'Lampu', 'satuan' => 'buah', 'stok' => 90, 'deskripsi' => 'Lampu LED Zenic 35 Watt'],
+
             
             // 47. Perlengkapan Sensus/Survei
             ['nama' => 'ROMPI PETUGAS DAN KORTIM ST2013', 'kategori' => 'Perlengkapan Sensus/Survei', 'satuan' => 'pcs', 'stok' => 50, 'deskripsi' => 'Rompi petugas sensus ST2013'],
@@ -140,7 +154,9 @@ class BarangSeeder extends Seeder
             ['nama' => 'Statistik Kesejahteraan Rakyat Kota Tanjungpinang 2023', 'kategori' => 'Publikasi BPS', 'satuan' => 'buah', 'stok' => 30, 'deskripsi' => 'Publikasi Statistik Kesejahteraan Rakyat 2023'],
             
             // 52. Publikasi/Souvenir
-            ['nama' => 'Kalender Dinding 2023', 'kategori' => 'Publikasi/Souvenir', 'satuan' => 'buah', 'stok' => 100, 'deskripsi' => 'Kalender dinding BPS tahun 2023'],
+            ['nama' => 'Kalender Dinding 2024', 'kategori' => 'Publikasi/Souvenir', 'satuan' => 'buah', 'stok' => 100, 'deskripsi' => 'Kalender dinding BPS tahun 2024'],
+            ['nama' => 'Kalender Dinding 2025', 'kategori' => 'Publikasi/Souvenir', 'satuan' => 'buah', 'stok' => 100, 'deskripsi' => 'Kalender dinding BPS tahun 2025'],
+            ['nama' => 'Kalender Dinding 2026', 'kategori' => 'Publikasi/Souvenir', 'satuan' => 'buah', 'stok' => 100, 'deskripsi' => 'Kalender dinding BPS tahun 2026'],
             
             // 54. Perlengkapan Survei
             ['nama' => 'Sepatu Boot', 'kategori' => 'Perlengkapan Survei', 'satuan' => 'buah', 'stok' => 20, 'deskripsi' => 'Sepatu boot untuk survei lapangan'],

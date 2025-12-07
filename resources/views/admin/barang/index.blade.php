@@ -110,49 +110,49 @@
             <table class="w-full text-sm" id="barangTable">
                 <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
+                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
                             onclick="sortTable(0, 'string')" data-sort-dir="none">
                             <div class="flex items-center gap-2">
                                 Kode
                                 <span class="sort-icon text-slate-400"><i class="fas fa-sort"></i></span>
                             </div>
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
+                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
                             onclick="sortTable(1, 'string')" data-sort-dir="none">
                             <div class="flex items-center gap-2">
                                 Nama Barang
                                 <span class="sort-icon text-slate-400"><i class="fas fa-sort"></i></span>
                             </div>
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
+                        <th class="hidden sm:table-cell px-4 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
                             onclick="sortTable(2, 'string')" data-sort-dir="none">
                             <div class="flex items-center gap-2">
                                 Kategori
                                 <span class="sort-icon text-slate-400"><i class="fas fa-sort"></i></span>
                             </div>
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
+                        <th class="hidden md:table-cell px-4 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
                             onclick="sortTable(3, 'string')" data-sort-dir="none">
                             <div class="flex items-center gap-2">
                                 Satuan
                                 <span class="sort-icon text-slate-400"><i class="fas fa-sort"></i></span>
                             </div>
                         </th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
+                        <th class="px-4 sm:px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
                             onclick="sortTable(4, 'number')" data-sort-dir="none">
                             <div class="flex items-center justify-center gap-2">
                                 Stok
                                 <span class="sort-icon text-slate-400"><i class="fas fa-sort"></i></span>
                             </div>
                         </th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
+                        <th class="px-4 sm:px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase cursor-pointer hover:bg-slate-100 transition select-none" 
                             onclick="sortTable(5, 'status')" data-sort-dir="none">
                             <div class="flex items-center justify-center gap-2">
                                 Status
                                 <span class="sort-icon text-slate-400"><i class="fas fa-sort"></i></span>
                             </div>
                         </th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
+                        <th class="px-4 sm:px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="barangTableBody" class="divide-y divide-slate-200">
@@ -163,12 +163,12 @@
                         data-kategori="{{ $barang->categoryID }}"
                         data-status="{{ $barang->status }}"
                     >
-                        <td class="px-6 py-4 font-mono font-bold text-slate-800">{{ $barang->kode_barang }}</td>
-                        <td class="px-6 py-4 font-medium text-slate-800">{{ $barang->namaBarang }}</td>
-                        <td class="px-6 py-4 text-slate-700">{{ $barang->kategori->nama_kategori ?? '-' }}</td>
-                        <td class="px-6 py-4 text-slate-700">{{ ucfirst($barang->satuan) }}</td>
-                        <td class="px-6 py-4 text-center font-bold text-slate-800" data-value="{{ $barang->stok ?? 0 }}">{{ $barang->stok ?? 0 }}</td>
-                        <td class="px-6 py-4 text-center" data-value="{{ $barang->status }}">
+                        <td class="px-4 sm:px-6 py-4 font-mono font-bold text-slate-800 text-sm">{{ $barang->kode_barang }}</td>
+                        <td class="px-4 sm:px-6 py-4 font-medium text-slate-800">{{ $barang->namaBarang }}</td>
+                        <td class="hidden sm:table-cell px-4 sm:px-6 py-4 text-slate-700">{{ $barang->kategori->nama_kategori ?? '-' }}</td>
+                        <td class="hidden md:table-cell px-4 sm:px-6 py-4 text-slate-700">{{ ucfirst($barang->satuan) }}</td>
+                        <td class="px-4 sm:px-6 py-4 text-center font-bold text-slate-800" data-value="{{ $barang->stok ?? 0 }}">{{ $barang->stok ?? 0 }}</td>
+                        <td class="px-4 sm:px-6 py-4 text-center" data-value="{{ $barang->status }}">
                             @if ($barang->status === 'habis')
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">
                                     <i class="fas fa-times-circle mr-1"></i> Habis

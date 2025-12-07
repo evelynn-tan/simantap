@@ -69,24 +69,25 @@
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Tanggal</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Pegawai</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Barang Diminta</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Keperluan</th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Status</th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Tanggal</th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Pegawai</th>
+                        <th class="hidden md:table-cell px-3 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Barang Diminta</th>
+                        <th class="hidden lg:table-cell px-3 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Keperluan</th>
+                        <th class="px-3 sm:px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Status</th>
+                        <th class="px-3 sm:px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                     @forelse ($pengajuans as $permintaan)
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="px-6 py-4 text-sm text-slate-700 font-medium whitespace-nowrap">
-                            {{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('d M Y H:i') }}
+                        <td class="px-3 sm:px-6 py-4 text-sm text-slate-700 font-medium whitespace-nowrap">
+                            {{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('d M Y') }}
+                            <span class="hidden sm:inline">{{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('H:i') }}</span>
                         </td>
-                        <td class="px-6 py-4 text-sm text-slate-700 font-semibold">
+                        <td class="px-3 sm:px-6 py-4 text-sm text-slate-700 font-semibold">
                             {{ $permintaan->pegawai->nama_lengkap ?? '-' }}
                         </td>
-                        <td class="px-6 py-4 text-sm">
+                        <td class="hidden md:table-cell px-3 sm:px-6 py-4 text-sm">
                             <div class="space-y-1">
                                 @foreach($permintaan->pengajuanDetails as $detail)
                                     <div class="text-slate-700">
@@ -96,10 +97,10 @@
                                 @endforeach
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-sm text-slate-600 max-w-xs">
+                        <td class="hidden lg:table-cell px-3 sm:px-6 py-4 text-sm text-slate-600 max-w-xs">
                             <span class="line-clamp-1">{{ Str::limit($permintaan->description, 50) }}</span>
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-3 sm:px-6 py-4 text-center">
                             @if ($permintaan->status == 'menunggu')
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
                                     <i class="fas fa-hourglass mr-1"></i> Menunggu

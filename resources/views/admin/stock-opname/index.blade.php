@@ -8,8 +8,8 @@
 <div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
 
     <!-- Info Card - New Session -->
-    <div class="bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-lg p-6 text-white">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl shadow-lg p-4 sm:p-5 lg:p-6 text-white">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <div class="flex items-start gap-4">
                 <div class="h-14 w-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                     <i class="fas fa-clipboard-check text-3xl"></i>
@@ -84,12 +84,12 @@
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">ID Opname</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Tanggal</th>
-                        <th class="px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Operator</th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Total Item</th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Item Selisih</th>
-                        <th class="px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
+                        <th class="px-3 sm:px-4 lg:px-6 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-600 uppercase">ID Opname</th>
+                        <th class="px-3 sm:px-4 lg:px-6 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Tanggal</th>
+                        <th class="hidden md:table-cell px-3 sm:px-4 lg:px-6 py-3 text-left text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Operator</th>
+                        <th class="hidden sm:table-cell px-3 sm:px-4 lg:px-6 py-3 text-center text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Total Item</th>
+                        <th class="px-3 sm:px-4 lg:px-6 py-3 text-center text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Selisih</th>
+                        <th class="px-3 sm:px-4 lg:px-6 py-3 text-center text-[10px] sm:text-xs font-bold text-slate-600 uppercase">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">

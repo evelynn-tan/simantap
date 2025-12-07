@@ -96,7 +96,7 @@
                 <thead class="bg-slate-50 text-slate-500 border-b border-slate-100">
                     <tr>
                         {{-- KODE --}}
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
+                        <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
                             @click="sortBy('kode_barang')">
                             <span class="flex items-center gap-2">
                                 <span>Kode</span>
@@ -108,7 +108,7 @@
                         </th>
 
                         {{-- NAMA BARANG --}}
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
+                        <th class="px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
                             @click="sortBy('namaBarang')">
                             <span class="flex items-center gap-2">
                                 <span>Nama Barang</span>
@@ -119,8 +119,8 @@
                             </span>
                         </th>
 
-                        {{-- KATEGORI --}}
-                        <th class="px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
+                        {{-- KATEGORI (hidden on mobile) --}}
+                        <th class="hidden sm:table-cell px-3 sm:px-6 py-4 text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors"
                             @click="sortBy('categoryID')">
                             <span class="flex items-center gap-2">
                                 <span>Kategori</span>
@@ -151,22 +151,22 @@
                 <tbody class="bg-white divide-y divide-slate-50">
                     @forelse($barangs as $barang)
                     <tr class="hover:bg-emerald-50/50 transition duration-200 group">
-                        <td class="px-6 py-4 text-sm font-medium text-slate-700">
+                        <td class="px-3 sm:px-6 py-4 text-sm font-medium text-slate-700">
                             <span class="font-mono bg-slate-100 px-2 py-1 rounded text-xs">{{ $barang->kode_barang }}</span>
                         </td>
 
-                        <td class="px-6 py-4 text-sm text-slate-700">
+                        <td class="px-3 sm:px-6 py-4 text-sm text-slate-700">
                             <div class="font-semibold group-hover:text-emerald-700 transition">{{ $barang->namaBarang }}</div>
                         </td>
 
-                        <td class="px-6 py-4 text-sm text-gray-500">
+                        <td class="hidden sm:table-cell px-3 sm:px-6 py-4 text-sm text-gray-500">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs bg-slate-100 text-slate-700">
                                 <i class="fas fa-folder text-slate-400 mr-1.5"></i>
                                 {{ $barang->kategori->nama_kategori }}
                             </span>
                         </td>
 
-                        <td class="px-6 py-4 text-sm">
+                        <td class="px-3 sm:px-6 py-4 text-sm">
                             <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold 
                                 {{ $barang->stok < 5 ? 'bg-red-50 text-red-600 border border-red-200' : ($barang->stok < 10 ? 'bg-yellow-50 text-yellow-600 border border-yellow-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200') }}">
                                 <i class="fas fa-cubes mr-1.5"></i>
