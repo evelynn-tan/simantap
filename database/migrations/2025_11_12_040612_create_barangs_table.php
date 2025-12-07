@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('kode_barang');  // Auto-generated: BRG-001, BRG-002, dll
             $table->string('namaBarang');
             $table->foreignId('categoryID')->constrained('kategoris', 'categoryID')->onDelete('restrict');
-            $table->enum('satuan', ['rim', 'pcs', 'buah', 'box', 'pack', 'set', 'lembar', 'meter', 'kg', 'liter'])->default('pcs');
+            $table->string('satuan', 50)->default('buah');  // Satuan fleksibel: rim, pcs, buah, box, pack, set, lembar, meter, kg, liter, dll
             $table->integer('stok')->default(0);  // SIMPLIFIED: hanya satu kolom stok
             $table->text('deskripsi')->nullable();
             // DIHAPUS: stok_awal, stok_sekarang, status (diganti dengan accessor logic)

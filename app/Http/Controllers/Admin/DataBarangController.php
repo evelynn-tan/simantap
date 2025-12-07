@@ -55,7 +55,7 @@ class DataBarangController extends Controller
         $request->validate([
             'namaBarang' => 'required|string|max:255',
             'kategori_id' => 'required|exists:kategoris,categoryID',
-            'satuan' => 'required|in:rim,pcs,buah,box,pack,set,lembar,meter,kg,liter',
+            'satuan' => 'required|string|max:50',
             'stok' => 'required|integer|min:0',
         ]);
 
@@ -114,7 +114,7 @@ class DataBarangController extends Controller
         $request->validate([
             'namaBarang' => 'required|string|max:255',
             'kategori_id' => 'required|exists:kategoris,categoryID',
-            'satuan' => 'required|in:rim,pcs,buah,box,pack,set,lembar,meter,kg,liter',
+            'satuan' => 'required|string|max:50',
             'stok' => 'required|integer|min:0',
         ]);
 

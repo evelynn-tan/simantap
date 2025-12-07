@@ -40,20 +40,20 @@ class User extends Authenticatable
      */
     public function getNameAttribute()
     {
-        // Jika peran adalah operator, ambil dari tabel operators
-        if ($this->role === 'operator' && $this->operator) {
-            // Mengambil dari kolom 'nama_lengkap' di tabel operators
-            return $this->operator->nama_lengkap; 
-        }
-
         // Jika peran adalah pegawai, ambil dari tabel pegawais
         if ($this->role === 'pegawai' && $this->pegawai) {
-            // Asumsi: Kolom nama di tabel pegawais juga 'nama_lengkap' atau 'nama'
-            // Menggunakan nama_lengkap sebagai asumsi konsisten
             return $this->pegawai->nama_lengkap ?? $this->email; 
         }
 
-        // Fallback ke email jika nama tidak ditemukan atau role tidak dikenal
+        // Jika peran adalah operator, gunakan email sebagai identifier
+        // (tabel operators tidak punya kolom nama_lengkap)
+        if ($this->role === 'operator') {
+            // Format email menjadi lebih readable: operator1@bps.go.id -> Operator 1
+            $emailPrefix = explode('@', $this->email)[0];
+            return ucwords(str_replace(['_', '.'], ' ', $emailPrefix));
+        }
+
+        // Fallback ke email jika role tidak dikenal
         return $this->email;
     }
 
