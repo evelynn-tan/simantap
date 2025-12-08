@@ -21,7 +21,7 @@ class DataBarangController extends Controller
 
         // KPI Metrics
         $barangHabis = $barangs->where('stok', 0)->count();
-        $stokRendah = $barangs->where('stok', '>', 0)->where('stok', '<', 10)->count();
+        $stokRendah = $barangs->where('stok', '>', 0)->where('stok', '<', 5)->count();
 
         return view('admin.barang.index', compact(
             'barangs',
