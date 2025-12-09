@@ -646,15 +646,6 @@
 
                     {{-- Footer note --}}
                     <div class="text-center mt-8 pt-6 border-t border-gray-100">
-                        <div class="flex items-center justify-center gap-4 mb-3">
-                            <a href="#" class="footer-link flex items-center gap-1">
-                                <i class="fas fa-question-circle"></i> Bantuan
-                            </a>
-                            <span class="text-gray-300">|</span>
-                            <a href="#" class="footer-link flex items-center gap-1">
-                                <i class="fas fa-shield-alt"></i> Kebijakan
-                            </a>
-                        </div>
                         <p class="text-gray-400 text-xs">
                             © {{ now()->year }} BPS Kota Tanjungpinang. All rights reserved.
                         </p>
