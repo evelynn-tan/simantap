@@ -487,21 +487,28 @@
                         </div>
                     </div>
 
-                    <!-- Stats -->
-                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 mb-8">
-                        <div class="grid grid-cols-3 divide-x divide-white/20">
-                            <div class="stat-item">
-                                <span class="stat-number">100+</span>
-                                <span class="stat-label">Jenis Aset</span>
+                    <!-- Stats - Premium Design -->
+                    <div class="grid grid-cols-3 gap-3 mb-8">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-default group">
+                            <div class="h-12 w-12 mx-auto mb-2 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-yellow-400/30 transition-shadow">
+                                <i class="fas fa-bolt text-white text-xl"></i>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-number">50+</span>
-                                <span class="stat-label">Pegawai</span>
+                            <span class="text-white font-bold text-sm block">Proses Cepat</span>
+                            <span class="text-white/60 text-xs">Real-time</span>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-default group">
+                            <div class="h-12 w-12 mx-auto mb-2 bg-gradient-to-br from-emerald-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-emerald-400/30 transition-shadow">
+                                <i class="fas fa-shield-alt text-white text-xl"></i>
                             </div>
-                            <div class="stat-item">
-                                <span class="stat-number">24/7</span>
-                                <span class="stat-label">Akses</span>
+                            <span class="text-white font-bold text-sm block">Data Aman</span>
+                            <span class="text-white/60 text-xs">Terenkripsi</span>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 text-center hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-default group">
+                            <div class="h-12 w-12 mx-auto mb-2 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-blue-400/30 transition-shadow">
+                                <i class="fas fa-cloud text-white text-xl"></i>
                             </div>
+                            <span class="text-white font-bold text-sm block">Cloud Based</span>
+                            <span class="text-white/60 text-xs">Akses Dimana Saja</span>
                         </div>
                     </div>
 

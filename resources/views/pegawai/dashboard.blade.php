@@ -37,7 +37,7 @@
         <div class="absolute bottom-0 left-1/4 -mb-10 w-60 h-60 bg-yellow-400 opacity-10 rounded-full blur-3xl animate-float"></div>
         <div class="absolute top-1/2 right-1/3 w-20 h-20 bg-cyan-300 opacity-20 rounded-full blur-2xl"></div>
         
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="relative flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="flex-1">
                 <div class="flex items-center gap-4 mb-4">
                     <div class="h-16 w-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/20">
