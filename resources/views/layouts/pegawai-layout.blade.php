@@ -30,6 +30,17 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         [x-cloak] { display: none !important; }
+        
+        /* Auto-dismiss alerts */
+        .alert-auto-hide {
+            animation: fadeInOut 6s ease-in-out forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+        }
     </style>
     @stack('styles')
 </head>

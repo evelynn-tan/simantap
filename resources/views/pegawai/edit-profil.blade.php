@@ -9,7 +9,7 @@
     
     {{-- Success/Error Notification (Inline, bukan alert JS) --}}
     @if(session('success'))
-    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3 animate-fade-in">
+    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-4 flex items-center gap-3 alert-auto-hide">
         <div class="h-10 w-10 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
             <i class="fas fa-check text-white"></i>
         </div>
@@ -24,7 +24,7 @@
     @endif
 
     @if(session('error'))
-    <div class="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 animate-fade-in">
+    <div class="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-xl p-4 flex items-center gap-3 alert-auto-hide">
         <div class="h-10 w-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
             <i class="fas fa-exclamation text-white"></i>
         </div>
@@ -39,7 +39,7 @@
     @endif
 
     @if($errors->any())
-    <div class="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-xl p-4 animate-fade-in">
+    <div class="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-xl p-4 alert-auto-hide">
         <div class="flex items-center gap-3 mb-2">
             <div class="h-10 w-10 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0">
                 <i class="fas fa-exclamation-triangle text-white"></i>

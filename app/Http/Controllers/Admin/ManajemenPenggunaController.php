@@ -205,7 +205,7 @@ class ManajemenPenggunaController extends Controller
     public function destroy(User $pengguna)
     {
         // Tambahkan logika agar tidak bisa hapus diri sendiri
-        if (auth()->id() == $pengguna->id) {
+        if (auth()->id() == $pengguna->userID) {
             return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 

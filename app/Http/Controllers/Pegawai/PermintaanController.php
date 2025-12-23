@@ -39,36 +39,22 @@ class PermintaanController extends Controller
             $query->where('categoryID', $request->kategori);
         }
 
-        // Status filter (stok > 0 by default, unless habis selected)
-        if ($request->filled('status')) {
-            $status = $request->status;
-            if ($status === 'tersedia') {
-                $query->where('stok', '>=', 10);
-            } elseif ($status === 'rendah') {
-                $query->whereBetween('stok', [1, 9]);
-            } elseif ($status === 'habis') {
-                $query->where('stok', 0);
-            }
-        } else {
-            // Default: only show items with stock > 0
-            $query->where('stok', '>', 0);
-        }
+        // Default: only show items with stock > 0
+        $query->where('stok', '>', 0);
 
-        // Sorting
+        // Dynamic Sorting
         $sortColumn = $request->get('sort', 'namaBarang');
         $sortDirection = $request->get('direction', 'asc');
         
-        // Validate sort column
-        $allowedSorts = ['kode_barang', 'namaBarang', 'stok', 'categoryID'];
+        // Validate sort column to prevent SQL injection
+        $allowedSorts = ['kode_barang', 'namaBarang', 'categoryID', 'stok'];
         if (!in_array($sortColumn, $allowedSorts)) {
             $sortColumn = 'namaBarang';
         }
-        
-        // Validate direction
         if (!in_array($sortDirection, ['asc', 'desc'])) {
             $sortDirection = 'asc';
         }
-
+        
         $query->orderBy($sortColumn, $sortDirection);
 
         $barangs = $query->paginate(10);
@@ -92,7 +78,7 @@ class PermintaanController extends Controller
     }
 
     /**
-     * Save new request
+     * Save new request (single item only - simple)
      */
     public function ajukan(Request $request)
     {
@@ -103,7 +89,7 @@ class PermintaanController extends Controller
             return redirect()->back()->with('error', 'Data pegawai tidak ditemukan.');
         }
 
-        // Validation
+        // Validation - simple single item
         $request->validate([
             'description' => 'required|string|max:500',
             'items' => 'required|array|min:1',
@@ -115,7 +101,7 @@ class PermintaanController extends Controller
             'items.*.jumlah.min' => 'Jumlah barang tidak boleh 0.',
         ]);
 
-        // Check stock availability for all items
+        // Check stock availability
         foreach ($request->items as $item) {
             $barang = Barang::findOrFail($item['barangID']);
             if ($barang->stok < $item['jumlah']) {
@@ -130,14 +116,14 @@ class PermintaanController extends Controller
             // Create pengajuan header dengan snapshot nama pegawai
             $pengajuan = Pengajuan::create([
                 'pegawaiID' => $pegawai->pegawaiID,
-                'nama_pegawai_snapshot' => $pegawai->nama_lengkap,  // Simpan snapshot nama
-                'nip_snapshot' => $pegawai->nip,                    // Simpan snapshot NIP
+                'nama_pegawai_snapshot' => $pegawai->nama_lengkap,
+                'nip_snapshot' => $pegawai->nip,
                 'requested_at' => now(),
                 'description' => $request->description,
                 'status' => 'menunggu',
             ]);
 
-            // Create detail items (status defaults to 'menunggu')
+            // Create detail items
             foreach ($request->items as $item) {
                 PengajuanDetail::create([
                     'pengajuanID' => $pengajuan->pengajuanID,
@@ -197,9 +183,18 @@ class PermintaanController extends Controller
      */
     public function batal(Pengajuan $pengajuan)
     {
+        $userId = Auth::id();
+        $pegawai = Pegawai::where('userID', $userId)->first();
+
+        // Verify ownership
+        if ($pengajuan->pegawaiID !== $pegawai->pegawaiID) {
+            return redirect()->back()
+                ->with('error', 'Anda tidak memiliki akses untuk membatalkan pengajuan ini.');
+        }
+
         if ($pengajuan->status !== 'menunggu') {
             return redirect()->back()
-                ->with('error', 'Hanya permintaan yang menunggu yang dapat dibatalkan.');
+                ->with('error', 'Hanya permintaan dengan status "menunggu" yang dapat dibatalkan.');
         }
 
         $pengajuan->update(['status' => 'dibatalkan']);

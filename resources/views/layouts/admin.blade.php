@@ -18,6 +18,17 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         [x-cloak] { display: none !important; }
+        
+        /* Auto-dismiss alerts */
+        .alert-auto-hide {
+            animation: fadeInOut 6s ease-in-out forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+        }
     </style>
 </head>
 <body class="bg-slate-50" style="font-family: 'Poppins', sans-serif;">
@@ -184,7 +195,7 @@
             <!-- ISI KONTEN DINAMIS -->
             <main class="w-full flex-grow p-3 sm:p-4 lg:p-6">
                 @if ($errors->any())
-                    <div class="mb-3 sm:mb-4 lg:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-xl text-red-800">
+                    <div class="mb-3 sm:mb-4 lg:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 alert-auto-hide">
                         <p class="font-semibold mb-2 text-xs sm:text-sm lg:text-base">❌ Terjadi Kesalahan:</p>
                         <ul class="list-disc list-inside text-[10px] sm:text-xs lg:text-sm">
                             @foreach ($errors->all() as $error)
@@ -195,19 +206,19 @@
                 @endif
 
                 @if (session('success'))
-                    <div class="mb-3 sm:mb-4 lg:mb-6 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-xl text-green-800">
+                    <div class="mb-3 sm:mb-4 lg:mb-6 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-xl text-green-800 alert-auto-hide">
                         <p class="font-semibold text-xs sm:text-sm lg:text-base">✅ {{ session('success') }}</p>
                     </div>
                 @endif
 
                 @if (session('error'))
-                    <div class="mb-3 sm:mb-4 lg:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-xl text-red-800">
+                    <div class="mb-3 sm:mb-4 lg:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-xl text-red-800 alert-auto-hide">
                         <p class="font-semibold text-xs sm:text-sm lg:text-base">❌ {{ session('error') }}</p>
                     </div>
                 @endif
 
                 @if (session('warning'))
-                    <div class="mb-3 sm:mb-4 lg:mb-6 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800">
+                    <div class="mb-3 sm:mb-4 lg:mb-6 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 alert-auto-hide">
                         <p class="font-semibold text-xs sm:text-sm lg:text-base">⚠️ {{ session('warning') }}</p>
                     </div>
                 @endif

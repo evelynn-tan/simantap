@@ -1,0 +1,346 @@
+
+
+<?php $__env->startSection('title', 'Manajemen Permintaan - SIMANTAP'); ?>
+<?php $__env->startSection('header', 'Manajemen Permintaan'); ?>
+<?php $__env->startSection('subtitle', 'Kelola dan proses permintaan barang dari pegawai'); ?>
+
+<?php $__env->startSection('content'); ?>
+<div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-6 text-white shadow-lg border border-blue-400">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-semibold uppercase mb-2">Total Permintaan</p>
+                    <h3 class="text-4xl font-bold"><?php echo e(count($pengajuans)); ?></h3>
+                </div>
+                <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-file-alt text-2xl text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-xl p-6 text-white shadow-lg border border-yellow-400">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-yellow-100 text-sm font-semibold uppercase mb-2">Menunggu</p>
+                    <h3 class="text-4xl font-bold"><?php echo e(count($pengajuans->where('status', 'menunggu'))); ?></h3>
+                </div>
+                <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-hourglass text-2xl text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-6 text-white shadow-lg border border-green-400">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-green-100 text-sm font-semibold uppercase mb-2">Disetujui</p>
+                    <h3 class="text-4xl font-bold"><?php echo e(count($pengajuans->where('status', 'disetujui'))); ?></h3>
+                </div>
+                <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-2xl text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-red-500 to-red-700 rounded-xl p-6 text-white shadow-lg border border-red-400">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-red-100 text-sm font-semibold uppercase mb-2">Ditolak</p>
+                    <h3 class="text-4xl font-bold"><?php echo e(count($pengajuans->where('status', 'ditolak'))); ?></h3>
+                </div>
+                <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-times-circle text-2xl text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daftar Permintaan -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200">
+            <h3 class="text-lg font-bold text-slate-800">📋 Daftar Permintaan Barang</h3>
+            <p class="text-sm text-slate-500 mt-1">Kelola status permintaan yang masuk dari pegawai</p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Tanggal</th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Pegawai</th>
+                        <th class="hidden md:table-cell px-3 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Barang Diminta</th>
+                        <th class="hidden lg:table-cell px-3 sm:px-6 py-3 text-left text-xs font-bold text-slate-600 uppercase">Keperluan</th>
+                        <th class="px-3 sm:px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Status</th>
+                        <th class="px-3 sm:px-6 py-3 text-center text-xs font-bold text-slate-600 uppercase">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    <?php $__empty_1 = true; $__currentLoopData = $pengajuans; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permintaan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-3 sm:px-6 py-4 text-sm text-slate-700 font-medium whitespace-nowrap">
+                            <?php echo e($permintaan->requested_at->timezone('Asia/Jakarta')->format('d M Y')); ?>
+
+                            <span class="hidden sm:inline"><?php echo e($permintaan->requested_at->timezone('Asia/Jakarta')->format('H:i')); ?></span>
+                        </td>
+                        <td class="px-3 sm:px-6 py-4 text-sm text-slate-700 font-semibold">
+                            <?php echo e($permintaan->pegawai->nama_lengkap ?? '-'); ?>
+
+                        </td>
+                        <td class="hidden md:table-cell px-3 sm:px-6 py-4 text-sm">
+                            <div class="space-y-1">
+                                <?php $__currentLoopData = $permintaan->pengajuanDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <div class="text-slate-700">
+                                        <?php if($detail->nama_barang_custom): ?>
+                                            <span class="font-medium text-purple-600"><?php echo e($detail->nama_barang_custom); ?></span>
+                                            <span class="text-xs bg-purple-100 text-purple-700 px-1 rounded ml-1">Custom</span>
+                                            <span class="text-slate-500 text-xs">(<?php echo e($detail->jumlah); ?> <?php echo e($detail->satuan_custom ?? 'unit'); ?>)</span>
+                                        <?php else: ?>
+                                            <span class="font-medium"><?php echo e($detail->barang->namaBarang ?? 'N/A'); ?></span>
+                                            <span class="text-slate-500 text-xs">(<?php echo e($detail->jumlah); ?> <?php echo e($detail->barang->satuan ?? 'unit'); ?>)</span>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        </td>
+                        <td class="hidden lg:table-cell px-3 sm:px-6 py-4 text-sm text-slate-600 max-w-xs">
+                            <span class="line-clamp-1"><?php echo e(Str::limit($permintaan->description, 50)); ?></span>
+                        </td>
+                        <td class="px-3 sm:px-6 py-4 text-center">
+                            <?php if($permintaan->status == 'menunggu'): ?>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                    <i class="fas fa-hourglass mr-1"></i> Menunggu
+                                </span>
+                            <?php elseif($permintaan->status == 'disetujui'): ?>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                                    <i class="fas fa-check mr-1"></i> Disetujui
+                                </span>
+                            <?php elseif($permintaan->status == 'dibatalkan'): ?>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                                    <i class="fas fa-ban mr-1"></i> Dibatalkan
+                                </span>
+                            <?php else: ?>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
+                                    <i class="fas fa-times mr-1"></i> Ditolak
+                                </span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <?php if($permintaan->status == 'menunggu'): ?>
+                                <div class="flex gap-2 justify-center">
+                                    <button 
+                                        onclick="openSetujuiModal(<?php echo e($permintaan->pengajuanID); ?>)"
+                                        class="inline-flex items-center px-3 py-2 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg text-sm font-semibold transition duration-200"
+                                        title="Setujui">
+                                        <i class="fas fa-check mr-1"></i> Setujui
+                                    </button>
+                                    <button 
+                                        onclick="openTolakModal(<?php echo e($permintaan->pengajuanID); ?>)"
+                                        class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-sm font-semibold transition duration-200"
+                                        title="Tolak">
+                                        <i class="fas fa-times mr-1"></i> Tolak
+                                    </button>
+                                </div>
+                            <?php else: ?>
+                                <span class="text-slate-400 text-sm">-</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="text-slate-400">
+                                <i class="fas fa-inbox text-4xl mb-3 opacity-50"></i>
+                                <p class="font-medium">Belum ada permintaan barang</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ============ MODAL SETUJUI ============ -->
+<div id="setujuiModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center px-6 py-5 border-b border-slate-200 sticky top-0 bg-white">
+            <h3 class="text-lg font-bold text-slate-800">✅ Setujui Permintaan</h3>
+            <button onclick="closeSetujuiModal()" class="text-slate-400 hover:text-slate-600 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="formSetujui" method="POST" class="p-6 space-y-4">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" id="pengajuanIDSetujui" name="pengajuan_id">
+            
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Detail Barang</label>
+                <div id="itemsContainer" class="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3 max-h-64 overflow-y-auto">
+                    <!-- Items akan di-populate oleh JavaScript -->
+                </div>
+            </div>
+
+            <div class="flex gap-3 justify-end border-t border-slate-200 pt-4">
+                <button type="button" onclick="closeSetujuiModal()" class="px-4 py-2 text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg font-semibold transition">
+                    Batal
+                </button>
+                <button type="submit" class="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition">
+                    Setujui Semua
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============ MODAL TOLAK ============ -->
+<div id="tolakModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-2xl border border-slate-200 w-full max-w-lg">
+        <div class="flex justify-between items-center px-6 py-5 border-b border-slate-200">
+            <h3 class="text-lg font-bold text-slate-800">❌ Tolak Permintaan</h3>
+            <button onclick="closeTolakModal()" class="text-slate-400 hover:text-slate-600 text-2xl">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <form id="formTolak" method="POST" class="p-6 space-y-4">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" id="pengajuanIDTolak" name="pengajuan_id">
+            
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Alasan Penolakan *</label>
+                <textarea name="alasan" id="alasanTolak" required placeholder="Jelaskan alasan penolakan..." rows="5" class="block w-full border border-slate-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none" style="font-family: 'Poppins', sans-serif;"></textarea>
+            </div>
+
+            <div class="flex gap-3 justify-end border-t border-slate-200 pt-4">
+                <button type="button" onclick="closeTolakModal()" class="px-4 py-2 text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg font-semibold transition">
+                    Batal
+                </button>
+                <button type="submit" class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition">
+                    Tolak Permintaan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const pengajuanData = {
+    <?php $__currentLoopData = $pengajuans; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <?php echo e($p->pengajuanID); ?>: {
+        id: <?php echo e($p->pengajuanID); ?>,
+        pegawai: '<?php echo e($p->pegawai->nama_lengkap ?? "Unknown"); ?>',
+        details: [
+            <?php $__currentLoopData = $p->pengajuanDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+            {
+                id: <?php echo e($detail->pengajuanDetailID); ?>,
+                nama: '<?php echo e($detail->nama_barang_custom ?? ($detail->barang->namaBarang ?? "N/A")); ?>',
+                jumlah: <?php echo e($detail->jumlah); ?>,
+                satuan: '<?php echo e($detail->satuan_custom ?? ($detail->barang->satuan ?? "unit")); ?>',
+                stok: <?php echo e($detail->barangID ? ($detail->barang->stok ?? 0) : 999); ?>,
+                isCustom: <?php echo e($detail->nama_barang_custom ? 'true' : 'false'); ?>
+
+            },
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+        ]
+    },
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+};
+
+function openSetujuiModal(pengajuanID) {
+    const data = pengajuanData[pengajuanID];
+    if (!data) return;
+
+    document.getElementById('pengajuanIDSetujui').value = pengajuanID;
+    
+    // Build items HTML dengan input jumlah dan info stok
+    let itemsHTML = '';
+    let hasInsufficientStock = false;
+    
+    data.details.forEach(item => {
+        const maxApproval = Math.min(item.jumlah, item.stok);
+        const isInsufficient = item.stok < item.jumlah;
+        if (isInsufficient) hasInsufficientStock = true;
+        
+        itemsHTML += `
+            <div class="flex items-center gap-4 py-3 border-b border-slate-200 last:border-0 ${isInsufficient ? 'bg-red-50 -mx-4 px-4' : ''}">
+                <div class="flex-1">
+                    <p class="font-medium text-slate-800">${item.nama}</p>
+                    <p class="text-sm text-slate-500">
+                        Diminta: <span class="font-semibold">${item.jumlah} ${item.satuan}</span>
+                    </p>
+                    <p class="text-xs ${isInsufficient ? 'text-red-600 font-semibold' : 'text-green-600'}">
+                        ${isInsufficient ? '⚠️' : '✓'} Stok tersedia: ${item.stok} ${item.satuan}
+                    </p>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <label class="text-xs text-slate-500 font-medium">Setujui</label>
+                    <input type="number" 
+                           name="items[${item.id}][jumlah_disetujui]" 
+                           value="${maxApproval}" 
+                           min="0" 
+                           max="${item.jumlah}"
+                           class="w-20 text-center border ${isInsufficient ? 'border-red-300 bg-red-50' : 'border-slate-200'} rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500" 
+                           ${item.stok <= 0 ? 'disabled' : ''} />
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <label class="text-xs text-slate-500 font-medium">Pilih</label>
+                    <input type="hidden" name="items[${item.id}][pengajuanDetailID]" value="${item.id}">
+                    <input type="checkbox" 
+                           name="items[${item.id}][approve]" 
+                           value="1" 
+                           ${item.stok > 0 ? 'checked' : ''} 
+                           ${item.stok <= 0 ? 'disabled' : ''}
+                           class="w-5 h-5 rounded text-green-600 focus:ring-2 focus:ring-green-500 cursor-pointer">
+                </div>
+            </div>
+        `;
+    });
+    
+    // Tambah warning jika ada stok tidak cukup
+    if (hasInsufficientStock) {
+        itemsHTML = `
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3 text-sm text-yellow-800">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <strong>Perhatian:</strong> Beberapa item memiliki stok tidak mencukupi. Jumlah yang disetujui otomatis disesuaikan.
+            </div>
+        ` + itemsHTML;
+    }
+    
+    document.getElementById('itemsContainer').innerHTML = itemsHTML;
+    document.getElementById('formSetujui').action = `/admin/permintaan/setujui/${pengajuanID}`;
+    document.getElementById('setujuiModal').style.display = 'flex';
+}
+
+function closeSetujuiModal() {
+    document.getElementById('setujuiModal').style.display = 'none';
+}
+
+function openTolakModal(pengajuanID) {
+    document.getElementById('pengajuanIDTolak').value = pengajuanID;
+    document.getElementById('alasanTolak').value = '';
+    document.getElementById('formTolak').action = `/admin/permintaan/tolak/${pengajuanID}`;
+    document.getElementById('tolakModal').style.display = 'flex';
+}
+
+function closeTolakModal() {
+    document.getElementById('tolakModal').style.display = 'none';
+}
+
+// Close modals on outside click
+document.addEventListener('click', function(e) {
+    const setujuiModal = document.getElementById('setujuiModal');
+    const tolakModal = document.getElementById('tolakModal');
+    
+    if (e.target === setujuiModal) closeSetujuiModal();
+    if (e.target === tolakModal) closeTolakModal();
+});
+</script>
+
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\FILE TINGKAT 3\SEMESTER 5\REKAYASA PERANGKAT LUNAK (RPL)\simantap\resources\views\admin\permintaan\index.blade.php ENDPATH**/ ?>

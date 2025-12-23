@@ -91,8 +91,14 @@
                             <div class="space-y-1">
                                 @foreach($permintaan->pengajuanDetails as $detail)
                                     <div class="text-slate-700">
-                                        <span class="font-medium">{{ $detail->barang->namaBarang ?? 'N/A' }}</span>
-                                        <span class="text-slate-500 text-xs">({{ $detail->jumlah }} {{ $detail->barang->satuan ?? 'unit' }})</span>
+                                        @if($detail->nama_barang_custom)
+                                            <span class="font-medium text-purple-600">{{ $detail->nama_barang_custom }}</span>
+                                            <span class="text-xs bg-purple-100 text-purple-700 px-1 rounded ml-1">Custom</span>
+                                            <span class="text-slate-500 text-xs">({{ $detail->jumlah }} {{ $detail->satuan_custom ?? 'unit' }})</span>
+                                        @else
+                                            <span class="font-medium">{{ $detail->barang->namaBarang ?? 'N/A' }}</span>
+                                            <span class="text-slate-500 text-xs">({{ $detail->jumlah }} {{ $detail->barang->satuan ?? 'unit' }})</span>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
@@ -108,6 +114,10 @@
                             @elseif ($permintaan->status == 'disetujui')
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
                                     <i class="fas fa-check mr-1"></i> Disetujui
+                                </span>
+                            @elseif ($permintaan->status == 'dibatalkan')
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
+                                    <i class="fas fa-ban mr-1"></i> Dibatalkan
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
@@ -227,10 +237,11 @@ const pengajuanData = {
             @foreach($p->pengajuanDetails as $detail)
             {
                 id: {{ $detail->pengajuanDetailID }},
-                nama: '{{ $detail->barang->namaBarang ?? "N/A" }}',
+                nama: '{{ $detail->nama_barang_custom ?? ($detail->barang->namaBarang ?? "N/A") }}',
                 jumlah: {{ $detail->jumlah }},
-                satuan: '{{ $detail->barang->satuan ?? "unit" }}',
-                stok: {{ $detail->barang->stok ?? 0 }}
+                satuan: '{{ $detail->satuan_custom ?? ($detail->barang->satuan ?? "unit") }}',
+                stok: {{ $detail->barangID ? ($detail->barang->stok ?? 0) : 999 }},
+                isCustom: {{ $detail->nama_barang_custom ? 'true' : 'false' }}
             },
             @endforeach
         ]

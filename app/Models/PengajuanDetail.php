@@ -15,9 +15,11 @@ class PengajuanDetail extends Model
     protected $fillable = [
         'pengajuanID',
         'barangID',
+        'nama_barang_custom',  // Untuk barang yang tidak ada di list
+        'satuan_custom',       // Satuan untuk barang custom
         'jumlah',
-        'jumlah_disetujui',  // Jumlah yang disetujui (bisa lebih kecil dari jumlah diminta)
-        'status',  // NEW: menunggu, disetujui, ditolak
+        'jumlah_disetujui',    // Jumlah yang disetujui (bisa lebih kecil dari jumlah diminta)
+        'status',              // menunggu, disetujui, ditolak
     ];
 
     protected $casts = [

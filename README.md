@@ -1,7 +1,7 @@
 # SIMANTAP - Sistem Manajemen Inventaris Terpadu BMN
 
-[![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.1+-blue.svg)](https://php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-9.x-red.svg)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.0+-blue.svg)](https://php.net)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **SIMANTAP** adalah aplikasi web untuk manajemen inventaris **Barang Milik Negara (BMN)** yang dibangun menggunakan Laravel. Aplikasi ini dirancang khusus untuk membantu pengelolaan aset dan inventaris di instansi pemerintah seperti **BPS (Badan Pusat Statistik)**.
@@ -53,14 +53,16 @@
 
 | Teknologi | Versi | Keterangan |
 |-----------|-------|------------|
-| **Laravel** | 10.x | PHP Framework |
-| **PHP** | 8.1+ | Backend Language |
+| **Laravel** | 9.x | PHP Framework |
+| **PHP** | 8.0+ | Backend Language |
 | **MySQL** | 8.0+ | Database |
 | **Tailwind CSS** | 3.x | CSS Framework |
-| **Jetstream** | 4.x | Authentication |
-| **Livewire** | 3.x | Dynamic Components |
-| **PhpSpreadsheet** | 1.x | Export Excel |
-| **Vite** | 5.x | Asset Bundler |
+| **Jetstream** | 2.x | Authentication (Laravel Fortify) |
+| **Livewire** | 2.x | Dynamic Components |
+| **Flowbite** | 2.x | UI Component Library |
+| **Alpine.js** | 3.x | Lightweight JS Framework |
+| **PhpSpreadsheet** | 5.x | Export Excel |
+| **Vite** | 4.x | Asset Bundler |
 
 ---
 
@@ -68,7 +70,7 @@
 
 Pastikan sistem Anda memenuhi persyaratan berikut:
 
-- **PHP** >= 8.1 dengan ekstensi:
+- **PHP** >= 8.0 dengan ekstensi:
   - BCMath, Ctype, Fileinfo, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML, Zip
 - **Composer** >= 2.0
 - **Node.js** >= 18.x dan **NPM** >= 9.x

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Pengajuan;
 use App\Models\PengajuanDetail;
 use App\Models\Barang;
+use App\Models\Transaksi;
+use App\Models\DetailRangging;
 
 class ManajemenPermintaanController extends Controller
 {
@@ -38,11 +40,7 @@ class ManajemenPermintaanController extends Controller
      * - Set status pengajuan = 'disetujui'
      * - Set per-item status = 'disetujui'
      * - Kurangi stok barang (dengan validasi dan partial approval)
-     * 
-     * PERBAIKAN:
-     * - Database transaction dengan row locking untuk mencegah race condition
-     * - Validasi stok sebelum decrement
-     * - Support partial approval (jumlah_disetujui <= jumlah)
+     * - BARU: Catat histori transaksi barang keluar
      */
     public function setujui(Request $request, Pengajuan $pengajuan)
     {
@@ -57,15 +55,25 @@ class ManajemenPermintaanController extends Controller
         $now = now();
 
         try {
-            // Gunakan database transaction dengan row locking
             DB::transaction(function () use ($request, $pengajuan, $userID, $now) {
                 $errors = [];
                 $hasApprovedItems = false;
+                $approvedDetails = [];
 
                 foreach ($request->items as $item) {
                     $detail = PengajuanDetail::findOrFail($item['pengajuanDetailID']);
 
                     if ($item['approve'] ?? false) {
+                        // Skip custom items from stock deduction (they don't exist in inventory)
+                        if (!empty($detail->nama_barang_custom)) {
+                            $detail->update([
+                                'status' => 'disetujui',
+                                'jumlah_disetujui' => $detail->jumlah
+                            ]);
+                            $hasApprovedItems = true;
+                            continue;
+                        }
+
                         // Lock row untuk mencegah race condition
                         $barang = Barang::lockForUpdate()->find($detail->barangID);
 
@@ -81,10 +89,12 @@ class ManajemenPermintaanController extends Controller
                         // Validasi ketersediaan stok
                         if ($barang->stok < $jumlahDisetujui) {
                             $errors[] = "Stok '{$barang->namaBarang}' tidak cukup (diminta: {$jumlahDisetujui}, tersedia: {$barang->stok})";
-                            // Tolak item ini karena stok tidak cukup
                             $detail->update(['status' => 'ditolak']);
                             continue;
                         }
+
+                        // Simpan stok sebelumnya untuk histori
+                        $stokSebelum = $barang->stok;
 
                         // Setujui item dengan jumlah yang disetujui
                         $detail->update([
@@ -94,6 +104,16 @@ class ManajemenPermintaanController extends Controller
 
                         // Kurangi stok barang
                         $barang->decrement('stok', $jumlahDisetujui);
+                        
+                        // Simpan untuk histori transaksi
+                        $approvedDetails[] = [
+                            'barangID' => $barang->barangID,
+                            'jumlah' => $jumlahDisetujui,
+                            'stok_sebelum' => $stokSebelum,
+                            'stok_sesudah' => $barang->stok,
+                            'namaBarang' => $barang->namaBarang,
+                        ];
+                        
                         $hasApprovedItems = true;
                     } else {
                         // Item tidak dicentang = ditolak
@@ -108,14 +128,37 @@ class ManajemenPermintaanController extends Controller
                     'approved_at' => $now,
                 ]);
 
-                // Jika ada error stok, lempar exception untuk rollback
+                // BARU: Catat histori transaksi barang keluar
+                if (!empty($approvedDetails)) {
+                    // Buat transaksi untuk barang keluar
+                    $transaksi = Transaksi::create([
+                        'userID' => $userID,
+                        'tanggal' => $now->toDateString(),
+                        'jenis' => 'keluar',
+                        'sumber' => 'Pengajuan #' . $pengajuan->pengajuanID,
+                        'keterangan' => 'Permintaan dari ' . ($pengajuan->nama_pegawai_snapshot ?? 'Pegawai'),
+                    ]);
+
+                    // Catat detail item yang keluar
+                    foreach ($approvedDetails as $detailData) {
+                        DetailRangging::create([
+                            'transaksiID' => $transaksi->transaksiID,
+                            'barangID' => $detailData['barangID'],
+                            'jumlah' => $detailData['jumlah'],
+                            'stok_sebelum' => $detailData['stok_sebelum'],
+                            'stok_sesudah' => $detailData['stok_sesudah'],
+                        ]);
+                    }
+                }
+
+                // Jika ada error stok, lempar exception untuk info
                 if (!empty($errors)) {
                     throw new \Exception(implode('; ', $errors));
                 }
             });
 
             return redirect()->route('admin.permintaan.index')
-                ->with('success', 'Pengajuan telah diproses.');
+                ->with('success', 'Pengajuan telah diproses dan histori transaksi tercatat.');
 
         } catch (\Exception $e) {
             return redirect()->route('admin.permintaan.index')

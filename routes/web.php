@@ -49,7 +49,7 @@ Route::middleware(['auth:sanctum', 'verified', 'role:operator'])->prefix('admin'
     Route::post('/permintaan/setujui/{pengajuan}', [ManajemenPermintaanController::class, 'setujui'])->name('permintaan.setujui')->where('pengajuan', '[0-9]+');
     Route::post('/permintaan/tolak/{pengajuan}', [ManajemenPermintaanController::class, 'tolak'])->name('permintaan.tolak')->where('pengajuan', '[0-9]+');
     
-    // Perbaikan kecil: resource jangan pakai path 'views/admin/...', cukup nama URL saja
+    // Stock Opname
     Route::resource('stock-opname', StockOpnameController::class)->parameters([
         'stock-opname' => 'opname'
     ]);
@@ -80,5 +80,8 @@ Route::middleware(['auth:sanctum', 'verified', 'role:pegawai'])->prefix('pegawai
     // Rute tambahan untuk fitur permintaan
     Route::get('/ajukan-permintaan', [PegawaiPermintaanController::class, 'create'])->name('permintaan.create');
     Route::post('/ajukan-permintaan', [PegawaiPermintaanController::class, 'ajukan'])->name('permintaan.ajukan');
+    
+    // Rute untuk membatalkan pengajuan (hanya status 'menunggu')
+    Route::delete('/permintaan/{pengajuan}/batal', [PegawaiPermintaanController::class, 'batal'])->name('permintaan.batal');
 
 });

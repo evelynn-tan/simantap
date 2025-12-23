@@ -5,7 +5,7 @@
 @section('subtitle', 'Tambahkan barang baru ke dalam sistem inventori')
 
 @section('content')
-<div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
+<div class="space-y-6" style="font-family: 'Poppins', sans-serif;" x-data="createBarangForm()">
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
@@ -20,13 +20,15 @@
                 <form action="{{ route('admin.barang.store') }}" method="POST" class="p-6 space-y-5">
                     @csrf
                     
-                    <!-- Nama Barang -->
+                    <!-- Nama Barang with Duplicate Check -->
                     <div>
                         <label for="namaBarang" class="block text-sm font-semibold text-slate-700 mb-2">Nama Barang *</label>
                         <input 
                             type="text" 
                             name="namaBarang" 
                             id="namaBarang" 
+                            x-model="namaBarang"
+                            @input.debounce.500ms="checkDuplicate"
                             class="block w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" 
                             placeholder="Contoh: Kertas HVS A4 80 gram" 
                             value="{{ old('namaBarang') }}" 
@@ -35,6 +37,41 @@
                         @error('namaBarang')
                             <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                         @enderror
+
+                        <!-- Duplicate Warning -->
+                        <div x-show="duplicates.length > 0" x-transition class="mt-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-amber-800 mb-2">⚠️ Barang dengan nama serupa sudah ada!</p>
+                                    <p class="text-xs text-amber-700 mb-3">Apakah Anda ingin menambah stok ke barang yang sudah ada? Atau lanjutkan buat barang baru?</p>
+                                    
+                                    <div class="space-y-2">
+                                        <template x-for="item in duplicates" :key="item.barangID">
+                                            <div class="flex items-center justify-between bg-white p-3 rounded-lg border border-amber-200">
+                                                <div>
+                                                    <p class="font-semibold text-slate-800" x-text="item.namaBarang"></p>
+                                                    <p class="text-xs text-slate-500">
+                                                        <span class="font-mono bg-slate-100 px-1 rounded" x-text="item.kode_barang"></span> • 
+                                                        <span x-text="item.kategori?.nama_kategori || '-'"></span> • 
+                                                        Stok: <span x-text="item.stok"></span> <span x-text="item.satuan"></span>
+                                                    </p>
+                                                </div>
+                                                <a :href="'/admin/barang/' + item.barangID + '/edit'" 
+                                                   class="px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-lg text-xs font-semibold transition">
+                                                    <i class="fas fa-edit mr-1"></i> Edit/Tambah Stok
+                                                </a>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    
+                                    <button type="button" @click="ignoreDuplicate = true; duplicates = []" 
+                                            class="mt-3 text-xs text-amber-600 hover:text-amber-800 font-medium">
+                                        <i class="fas fa-arrow-right mr-1"></i> Lanjutkan buat barang baru
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Kategori & Satuan -->
@@ -44,6 +81,7 @@
                             <select 
                                 id="kategori_id" 
                                 name="kategori_id" 
+                                x-model="kategoriId"
                                 class="block w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" 
                                 required
                             >
@@ -54,6 +92,10 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <!-- Suggestion from duplicate -->
+                            <p x-show="suggestedKategori" class="text-xs text-blue-600 mt-1">
+                                💡 Saran: <span x-text="suggestedKategori"></span>
+                            </p>
                             @error('kategori_id')
                                 <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                             @enderror
@@ -64,6 +106,7 @@
                             <select 
                                 id="satuan" 
                                 name="satuan" 
+                                x-model="satuan"
                                 class="block w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" 
                                 required
                             >
@@ -79,6 +122,10 @@
                                 <option value="kg" {{ old('satuan') == 'kg' ? 'selected' : '' }}>Kg</option>
                                 <option value="liter" {{ old('satuan') == 'liter' ? 'selected' : '' }}>Liter</option>
                             </select>
+                            <!-- Suggestion from duplicate -->
+                            <p x-show="suggestedSatuan" class="text-xs text-blue-600 mt-1">
+                                💡 Saran: <span x-text="suggestedSatuan"></span>
+                            </p>
                             @error('satuan')
                                 <p class="text-red-500 text-xs mt-1.5">{{ $message }}</p>
                             @enderror
@@ -128,6 +175,7 @@
                         </button>
                         <button 
                             type="reset" 
+                            @click="resetForm"
                             class="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold rounded-lg transition duration-200"
                         >
                             Reset
@@ -176,10 +224,70 @@
                     <p class="text-xs text-slate-600 mb-2">📌 <strong>Catatan:</strong></p>
                     <p class="text-xs text-slate-600">Kode barang akan otomatis di-generate oleh sistem</p>
                 </div>
+
+                <div class="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                    <p class="text-xs text-amber-800">
+                        <i class="fas fa-lightbulb mr-1"></i>
+                        <strong>Tip:</strong> Jika barang dengan nama yang sama sudah ada, sistem akan memberi peringatan agar tidak terjadi duplikasi data.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 
 </div>
+
+<script>
+function createBarangForm() {
+    return {
+        namaBarang: '',
+        kategoriId: '',
+        satuan: '',
+        duplicates: [],
+        ignoreDuplicate: false,
+        suggestedKategori: '',
+        suggestedSatuan: '',
+        
+        async checkDuplicate() {
+            if (this.namaBarang.length < 3 || this.ignoreDuplicate) {
+                this.duplicates = [];
+                return;
+            }
+            
+            try {
+                const response = await fetch(`{{ route('admin.barang.search') }}?q=${encodeURIComponent(this.namaBarang)}&limit=5`);
+                const data = await response.json();
+                
+                if (data.length > 0) {
+                    this.duplicates = data;
+                    // Set suggestions from first match
+                    if (data[0].kategori) {
+                        this.suggestedKategori = data[0].kategori.nama_kategori;
+                    }
+                    if (data[0].satuan) {
+                        this.suggestedSatuan = data[0].satuan;
+                    }
+                } else {
+                    this.duplicates = [];
+                    this.suggestedKategori = '';
+                    this.suggestedSatuan = '';
+                }
+            } catch (error) {
+                console.error('Error checking duplicate:', error);
+            }
+        },
+        
+        resetForm() {
+            this.namaBarang = '';
+            this.kategoriId = '';
+            this.satuan = '';
+            this.duplicates = [];
+            this.ignoreDuplicate = false;
+            this.suggestedKategori = '';
+            this.suggestedSatuan = '';
+        }
+    }
+}
+</script>
 
 @endsection

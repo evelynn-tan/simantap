@@ -161,22 +161,26 @@ class DataBarangController extends Controller
     public function search(Request $request)
     {
         $search = $request->get('q', '');
+        $limit = $request->get('limit', 10);
 
         $barangs = Barang::where('namaBarang', 'like', "%{$search}%")
             ->orWhere('kode_barang', 'like', "%{$search}%")
             ->with('kategori')
-            ->limit(10)
+            ->limit($limit)
             ->get();
 
-        return response()->json([
-            'data' => $barangs->map(fn($b) => [
-                'barangID' => $b->barangID,
-                'kode_barang' => $b->kode_barang,
-                'namaBarang' => $b->namaBarang,
-                'stok' => $b->stok,
-                'status' => $b->status,
-                'satuan' => $b->satuan,
-            ])
-        ]);
+        // Return simple array for frontend duplicate detection
+        return response()->json($barangs->map(fn($b) => [
+            'barangID' => $b->barangID,
+            'kode_barang' => $b->kode_barang,
+            'namaBarang' => $b->namaBarang,
+            'stok' => $b->stok,
+            'status' => $b->status,
+            'satuan' => $b->satuan,
+            'kategori' => $b->kategori ? [
+                'categoryID' => $b->kategori->categoryID,
+                'nama_kategori' => $b->kategori->nama_kategori,
+            ] : null,
+        ]));
     }
 }
