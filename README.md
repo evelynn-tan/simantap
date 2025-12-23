@@ -22,7 +22,6 @@
 - [Struktur Folder](#-struktur-folder)
 - [Panduan Penggunaan](#-panduan-penggunaan)
 - [Kontributor](#-kontributor)
-- [Lisensi](#-lisensi)
 
 ---
 
@@ -388,20 +387,15 @@ chmod -R 775 storage bootstrap/cache
 
 | Nama | Role | NIM |
 |------|------|-----|
-| Nabhan Athallah | Developer | - |
-| M. Faruq Hafidzullah | Developer | - |
-| Danang Ivan Pangestu | Developer | - |
-| Difya Ayu Meisya | Developer | - |
-| Aulia Ul Hasanah | Developer | - |
-| Evelyn Tan Eldisha | Developer | - |
+| Nabhan Athallah | Developer | 222313272 |
+| M. Faruq Hafidzullah | Developer | 222313186 |
+| Danang Ivan Pangestu | Developer | 222313036 |
+| Evelyn Tan Eldisha N. | Developer | 222313067 |
+| Difya Ayu Meisya N. | Developer | 222313049 |
+| Aulia Ul Hasanah | Developer | 222313000 |
 
 ---
 
-## 📄 Lisensi
-
-Project ini dilisensikan di bawah [MIT License](LICENSE).
-
----
 
 ## 🙏 Acknowledgements
 
