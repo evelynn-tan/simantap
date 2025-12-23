@@ -30,15 +30,16 @@
 
 ### 👨‍💼 Untuk Operator BMN (Admin)
 - **Dashboard Analytics** - Statistik lengkap dengan grafik interaktif
-- **Manajemen Barang** - CRUD barang dengan auto-generate kode
+- **Manajemen Barang** - CRUD barang dengan auto-generate kode & deteksi duplikat
 - **Persetujuan Permintaan** - Approve/reject dengan partial approval
 - **Stock Opname** - Pencatatan stok fisik dengan auto penyesuaian
 - **Laporan** - Export ke Excel dan PDF dengan styling profesional
 - **Manajemen Pengguna** - Kelola akun operator dan pegawai
 
 ### 👤 Untuk Pegawai
-- **Daftar Barang** - Lihat katalog barang tersedia
-- **Ajukan Permintaan** - Request barang dengan multiple items
+- **Daftar Barang** - Lihat katalog barang tersedia dengan sorting & filter
+- **Ajukan Permintaan** - Request barang dengan validasi stok real-time
+- **Batalkan Permintaan** - Batalkan pengajuan yang masih menunggu
 - **Monitor Status** - Tracking status permintaan real-time
 - **Edit Profil** - Update data diri dan foto profil
 
@@ -46,6 +47,11 @@
 - **Role-based Access Control** - Operator vs Pegawai
 - **Database Transaction** - Row locking untuk mencegah race condition
 - **Snapshot Data** - Histori data pegawai saat pengajuan
+
+### 🎨 UI/UX
+- **Auto-dismiss Alerts** - Notifikasi otomatis hilang setelah beberapa detik
+- **Responsive Design** - Tampilan optimal di desktop dan mobile
+- **Modern Interface** - Gradient, badges, dan animasi smooth
 
 ---
 
@@ -85,7 +91,7 @@ Pastikan sistem Anda memenuhi persyaratan berikut:
 
 ```bash
 # Clone repository dari GitHub
-git clone https://github.com/username/simantap.git
+git clone https://github.com/evelynn-tan/simantap.git
 
 # Masuk ke direktori project
 cd simantap
@@ -171,6 +177,9 @@ Atau jalankan migrasi dan seeder sekaligus:
 ```bash
 # Fresh migrate + seed (HATI-HATI: menghapus semua data!)
 php artisan migrate:fresh --seed
+
+# Buat symbolic link untuk storage (untuk upload foto)
+php artisan storage:link
 ```
 
 Output yang diharapkan:
@@ -340,9 +349,10 @@ simantap/
 
 ### Sebagai Pegawai
 1. **Dashboard** - Lihat barang yang sedang digunakan
-2. **Daftar Barang** - Browse katalog barang
-3. **Ajukan Permintaan** - Request barang yang dibutuhkan
-4. **Monitor Permintaan** - Cek status permintaan
+2. **Daftar Barang** - Browse katalog dengan sorting (klik header kolom)
+3. **Ajukan Permintaan** - Request barang, sistem cek stok tersedia
+4. **Monitor Permintaan** - Cek status & batalkan jika masih menunggu
+5. **Edit Profil** - Update data diri dan foto
 
 ---
 
