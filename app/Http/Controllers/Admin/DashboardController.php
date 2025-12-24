@@ -110,6 +110,9 @@ class DashboardController extends Controller
             ->orderByDesc('tanggal_opname')
             ->take(3)
             ->get();
+        
+        // Total Opname (untuk KPI card)
+        $totalOpname = StockOpname::count();
 
         return view('admin.dashboard', compact(
             'jumlahJenisAset',
@@ -133,7 +136,8 @@ class DashboardController extends Controller
             'trendLabels',
             'trendHarian',
             'statusStok',
-            'recentOpname'
+            'recentOpname',
+            'totalOpname'
         ));
     }
 }

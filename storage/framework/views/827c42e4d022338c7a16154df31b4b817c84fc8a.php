@@ -1,10 +1,10 @@
-@extends('layouts.admin')
 
-@section('title', 'Manajemen Permintaan - SIMANTAP')
-@section('header', 'Manajemen Permintaan')
-@section('subtitle', 'Kelola dan proses permintaan barang dari pegawai')
 
-@section('content')
+<?php $__env->startSection('title', 'Manajemen Permintaan - SIMANTAP'); ?>
+<?php $__env->startSection('header', 'Manajemen Permintaan'); ?>
+<?php $__env->startSection('subtitle', 'Kelola dan proses permintaan barang dari pegawai'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
 
     <!-- KPI Cards -->
@@ -13,7 +13,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-blue-100 text-sm font-semibold uppercase mb-2">Total Permintaan</p>
-                    <h3 class="text-4xl font-bold">{{ count($pengajuans) }}</h3>
+                    <h3 class="text-4xl font-bold"><?php echo e(count($pengajuans)); ?></h3>
                 </div>
                 <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                     <i class="fas fa-file-alt text-2xl text-white"></i>
@@ -25,7 +25,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-yellow-100 text-sm font-semibold uppercase mb-2">Menunggu</p>
-                    <h3 class="text-4xl font-bold">{{ count($pengajuans->where('status', 'menunggu')) }}</h3>
+                    <h3 class="text-4xl font-bold"><?php echo e(count($pengajuans->where('status', 'menunggu'))); ?></h3>
                 </div>
                 <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                     <i class="fas fa-hourglass text-2xl text-white"></i>
@@ -37,7 +37,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-green-100 text-sm font-semibold uppercase mb-2">Disetujui</p>
-                    <h3 class="text-4xl font-bold">{{ count($pengajuans->where('status', 'disetujui')) }}</h3>
+                    <h3 class="text-4xl font-bold"><?php echo e(count($pengajuans->where('status', 'disetujui'))); ?></h3>
                 </div>
                 <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                     <i class="fas fa-check-circle text-2xl text-white"></i>
@@ -49,7 +49,7 @@
             <div class="flex items-start justify-between">
                 <div>
                     <p class="text-red-100 text-sm font-semibold uppercase mb-2">Ditolak</p>
-                    <h3 class="text-4xl font-bold">{{ count($pengajuans->where('status', 'ditolak')) }}</h3>
+                    <h3 class="text-4xl font-bold"><?php echo e(count($pengajuans->where('status', 'ditolak'))); ?></h3>
                 </div>
                 <div class="h-12 w-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
                     <i class="fas fa-times-circle text-2xl text-white"></i>
@@ -78,80 +78,81 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
-                    @forelse ($pengajuans as $permintaan)
+                    <?php $__empty_1 = true; $__currentLoopData = $pengajuans; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permintaan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <tr class="hover:bg-slate-50 transition">
                         <td class="px-3 sm:px-6 py-4 text-sm text-slate-700 font-medium whitespace-nowrap">
-                            {{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('d M Y') }}
-                            <span class="hidden sm:inline">{{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('H:i') }}</span>
+                            <?php echo e($permintaan->requested_at->timezone('Asia/Jakarta')->format('d M Y')); ?>
+
+                            <span class="hidden sm:inline"><?php echo e($permintaan->requested_at->timezone('Asia/Jakarta')->format('H:i')); ?></span>
                         </td>
                         <td class="px-3 sm:px-6 py-4 text-sm text-slate-700 font-semibold">
-                            <div>{{ $permintaan->pegawai->nama_lengkap ?? '-' }}</div>
-                            {{-- Mobile: Show items count below name --}}
+                            <div><?php echo e($permintaan->pegawai->nama_lengkap ?? '-'); ?></div>
+                            
                             <div class="md:hidden text-xs text-slate-500 mt-1">
-                                {{ $permintaan->pengajuanDetails->count() }} item · 
-                                {{ $permintaan->pengajuanDetails->sum('jumlah') }} unit
+                                <?php echo e($permintaan->pengajuanDetails->count()); ?> item · 
+                                <?php echo e($permintaan->pengajuanDetails->sum('jumlah')); ?> unit
                             </div>
                         </td>
                         <td class="hidden sm:table-cell px-3 sm:px-6 py-4 text-sm">
                             <div class="space-y-1">
-                                @foreach($permintaan->pengajuanDetails as $detail)
+                                <?php $__currentLoopData = $permintaan->pengajuanDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                     <div class="text-slate-700">
-                                        @if($detail->nama_barang_custom)
-                                            <span class="font-medium text-purple-600">{{ $detail->nama_barang_custom }}</span>
+                                        <?php if($detail->nama_barang_custom): ?>
+                                            <span class="font-medium text-purple-600"><?php echo e($detail->nama_barang_custom); ?></span>
                                             <span class="text-xs bg-purple-100 text-purple-700 px-1 rounded ml-1">Custom</span>
-                                            <span class="text-slate-500 text-xs">({{ $detail->jumlah }} {{ $detail->satuan_custom ?? 'unit' }})</span>
-                                        @else
-                                            <span class="font-medium">{{ $detail->barang->namaBarang ?? 'N/A' }}</span>
-                                            <span class="text-slate-500 text-xs">({{ $detail->jumlah }} {{ $detail->barang->satuan ?? 'unit' }})</span>
-                                        @endif
+                                            <span class="text-slate-500 text-xs">(<?php echo e($detail->jumlah); ?> <?php echo e($detail->satuan_custom ?? 'unit'); ?>)</span>
+                                        <?php else: ?>
+                                            <span class="font-medium"><?php echo e($detail->barang->namaBarang ?? 'N/A'); ?></span>
+                                            <span class="text-slate-500 text-xs">(<?php echo e($detail->jumlah); ?> <?php echo e($detail->barang->satuan ?? 'unit'); ?>)</span>
+                                        <?php endif; ?>
                                     </div>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
                         </td>
                         <td class="hidden lg:table-cell px-3 sm:px-6 py-4 text-sm text-slate-600 max-w-xs">
-                            <span class="line-clamp-1">{{ Str::limit($permintaan->description, 50) }}</span>
+                            <span class="line-clamp-1"><?php echo e(Str::limit($permintaan->description, 50)); ?></span>
                         </td>
                         <td class="px-3 sm:px-6 py-4 text-center">
-                            @if ($permintaan->status == 'menunggu')
+                            <?php if($permintaan->status == 'menunggu'): ?>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">
                                     <i class="fas fa-hourglass mr-1"></i> Menunggu
                                 </span>
-                            @elseif ($permintaan->status == 'disetujui')
+                            <?php elseif($permintaan->status == 'disetujui'): ?>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
                                     <i class="fas fa-check mr-1"></i> Disetujui
                                 </span>
-                            @elseif ($permintaan->status == 'dibatalkan')
+                            <?php elseif($permintaan->status == 'dibatalkan'): ?>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
                                     <i class="fas fa-ban mr-1"></i> Dibatalkan
                                 </span>
-                            @else
+                            <?php else: ?>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">
                                     <i class="fas fa-times mr-1"></i> Ditolak
                                 </span>
-                            @endif
+                            <?php endif; ?>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            @if ($permintaan->status == 'menunggu')
+                            <?php if($permintaan->status == 'menunggu'): ?>
                                 <div class="flex gap-2 justify-center">
                                     <button 
-                                        onclick="openSetujuiModal({{ $permintaan->pengajuanID }})"
+                                        onclick="openSetujuiModal(<?php echo e($permintaan->pengajuanID); ?>)"
                                         class="inline-flex items-center px-3 py-2 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg text-sm font-semibold transition duration-200"
                                         title="Setujui">
                                         <i class="fas fa-check mr-1"></i> Setujui
                                     </button>
                                     <button 
-                                        onclick="openTolakModal({{ $permintaan->pengajuanID }})"
+                                        onclick="openTolakModal(<?php echo e($permintaan->pengajuanID); ?>)"
                                         class="inline-flex items-center px-3 py-2 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg text-sm font-semibold transition duration-200"
                                         title="Tolak">
                                         <i class="fas fa-times mr-1"></i> Tolak
                                     </button>
                                 </div>
-                            @else
+                            <?php else: ?>
                                 <span class="text-slate-400 text-sm">-</span>
-                            @endif
+                            <?php endif; ?>
                         </td>
                     </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr>
                         <td colspan="6" class="px-6 py-12 text-center">
                             <div class="text-slate-400">
@@ -160,7 +161,7 @@
                             </div>
                         </td>
                     </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -179,7 +180,7 @@
         </div>
 
         <form id="formSetujui" method="POST" class="p-6 space-y-4">
-            @csrf
+            <?php echo csrf_field(); ?>
             <input type="hidden" id="pengajuanIDSetujui" name="pengajuan_id">
             
             <div>
@@ -212,7 +213,7 @@
         </div>
 
         <form id="formTolak" method="POST" class="p-6 space-y-4">
-            @csrf
+            <?php echo csrf_field(); ?>
             <input type="hidden" id="pengajuanIDTolak" name="pengajuan_id">
             
             <div>
@@ -234,24 +235,25 @@
 
 <script>
 const pengajuanData = {
-    @foreach($pengajuans as $p)
-    {{ $p->pengajuanID }}: {
-        id: {{ $p->pengajuanID }},
-        pegawai: '{{ $p->pegawai->nama_lengkap ?? "Unknown" }}',
+    <?php $__currentLoopData = $pengajuans; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $p): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <?php echo e($p->pengajuanID); ?>: {
+        id: <?php echo e($p->pengajuanID); ?>,
+        pegawai: '<?php echo e($p->pegawai->nama_lengkap ?? "Unknown"); ?>',
         details: [
-            @foreach($p->pengajuanDetails as $detail)
+            <?php $__currentLoopData = $p->pengajuanDetails; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $detail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             {
-                id: {{ $detail->pengajuanDetailID }},
-                nama: '{{ $detail->nama_barang_custom ?? ($detail->barang->namaBarang ?? "N/A") }}',
-                jumlah: {{ $detail->jumlah }},
-                satuan: '{{ $detail->satuan_custom ?? ($detail->barang->satuan ?? "unit") }}',
-                stok: {{ $detail->barangID ? ($detail->barang->stok ?? 0) : 999 }},
-                isCustom: {{ $detail->nama_barang_custom ? 'true' : 'false' }}
+                id: <?php echo e($detail->pengajuanDetailID); ?>,
+                nama: '<?php echo e($detail->nama_barang_custom ?? ($detail->barang->namaBarang ?? "N/A")); ?>',
+                jumlah: <?php echo e($detail->jumlah); ?>,
+                satuan: '<?php echo e($detail->satuan_custom ?? ($detail->barang->satuan ?? "unit")); ?>',
+                stok: <?php echo e($detail->barangID ? ($detail->barang->stok ?? 0) : 999); ?>,
+                isCustom: <?php echo e($detail->nama_barang_custom ? 'true' : 'false'); ?>
+
             },
-            @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         ]
     },
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 };
 
 function openSetujuiModal(pengajuanID) {
@@ -344,4 +346,5 @@ document.addEventListener('click', function(e) {
 });
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\FILE TINGKAT 3\SEMESTER 5\REKAYASA PERANGKAT LUNAK (RPL)\simantap\resources\views/admin/permintaan/index.blade.php ENDPATH**/ ?>

@@ -1,10 +1,10 @@
-@extends('layouts.admin')
 
-@section('title', 'Dashboard Admin')
-@section('header', 'Dashboard Operator BMN')
-@section('subtitle', 'Ringkasan status aset dan permintaan barang')
 
-@section('content')
+<?php $__env->startSection('title', 'Dashboard Admin'); ?>
+<?php $__env->startSection('header', 'Dashboard Operator BMN'); ?>
+<?php $__env->startSection('subtitle', 'Ringkasan status aset dan permintaan barang'); ?>
+
+<?php $__env->startSection('content'); ?>
 <div class="space-y-6" style="font-family: 'Poppins', sans-serif;">
     
     <!-- Welcome Banner (Fixed: tidak overlap dengan header) -->
@@ -23,7 +23,7 @@
                 <h2 class="text-xl font-bold">Selamat Datang, Operator!</h2>
                 <p class="text-blue-200 text-xs mt-0.5">SIMANTAP - BPS Kota Tanjungpinang</p>
                 <p class="text-blue-100 text-xs mt-2 flex flex-wrap items-center gap-3">
-                    <span>📅 {{ \Carbon\Carbon::now()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('l, d F Y') }}</span>
+                    <span>📅 <?php echo e(\Carbon\Carbon::now()->timezone('Asia/Jakarta')->locale('id')->translatedFormat('l, d F Y')); ?></span>
                     <span>🕐 <span id="live-clock"></span> WIB</span>
                 </p>
             </div>
@@ -47,8 +47,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-blue-600 text-xs font-semibold uppercase tracking-wider">Jenis Barang</p>
-                    <p class="text-3xl font-bold text-blue-900 mt-1 group-hover:text-blue-700 transition">{{ $jumlahJenisAset ?? 0 }}</p>
-                    <p class="text-xs text-blue-700 mt-2">Total: <span class="font-bold">{{ number_format($totalStok ?? 0) }} unit</span></p>
+                    <p class="text-3xl font-bold text-blue-900 mt-1 group-hover:text-blue-700 transition"><?php echo e($jumlahJenisAset ?? 0); ?></p>
+                    <p class="text-xs text-blue-700 mt-2">Total: <span class="font-bold"><?php echo e(number_format($totalStok ?? 0)); ?> unit</span></p>
                 </div>
                 <div class="h-12 w-12 bg-blue-200 group-hover:bg-blue-300 rounded-xl flex items-center justify-center transition">
                     <i class="fas fa-boxes text-2xl text-blue-700"></i>
@@ -57,7 +57,7 @@
         </div>
 
         <!-- Menunggu Proses -->
-        <a href="{{ route('admin.permintaan.index') }}" class="bg-gradient-to-br from-yellow-50 to-amber-100 p-5 rounded-xl shadow-sm border border-yellow-200 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group relative {{ ($permintaanBaru ?? 0) > 0 ? 'animate-pulse' : '' }}">
+        <a href="<?php echo e(route('admin.permintaan.index')); ?>" class="bg-gradient-to-br from-yellow-50 to-amber-100 p-5 rounded-xl shadow-sm border border-yellow-200 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group relative <?php echo e(($permintaanBaru ?? 0) > 0 ? 'animate-pulse' : ''); ?>">
             <!-- Info Tooltip -->
             <div class="absolute top-3 right-3 group/tooltip" onclick="event.preventDefault(); event.stopPropagation();">
                 <span class="h-5 w-5 bg-yellow-200 hover:bg-yellow-300 rounded-full flex items-center justify-center cursor-help transition">
@@ -71,7 +71,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-yellow-700 text-xs font-semibold uppercase tracking-wider">Menunggu Proses</p>
-                    <p class="text-3xl font-bold text-yellow-900 mt-1">{{ $permintaanBaru ?? 0 }}</p>
+                    <p class="text-3xl font-bold text-yellow-900 mt-1"><?php echo e($permintaanBaru ?? 0); ?></p>
                     <p class="text-xs text-yellow-800 mt-2 font-semibold">⚠️ Perlu tindakan</p>
                 </div>
                 <div class="h-12 w-12 bg-yellow-200 group-hover:bg-yellow-300 rounded-xl flex items-center justify-center transition">
@@ -95,8 +95,8 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-red-700 text-xs font-semibold uppercase tracking-wider">Stok Kritis</p>
-                    <p class="text-3xl font-bold text-red-900 mt-1">{{ ($barangRendah ?? 0) + ($barangHabis ?? 0) }}</p>
-                    <p class="text-xs text-red-800 mt-2"><span class="font-bold">{{ $barangHabis ?? 0 }}</span> habis · <span class="font-bold">{{ $barangRendah ?? 0 }}</span> rendah</p>
+                    <p class="text-3xl font-bold text-red-900 mt-1"><?php echo e(($barangRendah ?? 0) + ($barangHabis ?? 0)); ?></p>
+                    <p class="text-xs text-red-800 mt-2"><span class="font-bold"><?php echo e($barangHabis ?? 0); ?></span> habis · <span class="font-bold"><?php echo e($barangRendah ?? 0); ?></span> rendah</p>
                 </div>
                 <div class="h-12 w-12 bg-red-200 group-hover:bg-red-300 rounded-xl flex items-center justify-center transition">
                     <i class="fas fa-exclamation-triangle text-2xl text-red-700"></i>
@@ -119,10 +119,10 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-green-700 text-xs font-semibold uppercase tracking-wider">Total Permintaan</p>
-                    <p class="text-3xl font-bold text-green-900 mt-1">{{ $totalPermintaan ?? 0 }}</p>
+                    <p class="text-3xl font-bold text-green-900 mt-1"><?php echo e($totalPermintaan ?? 0); ?></p>
                     <p class="text-xs text-green-800 mt-2">
-                        <span class="text-green-600 font-bold">✓{{ $permintaanDisetujui ?? 0 }}</span> · 
-                        <span class="text-red-600 font-bold">✗{{ $permintaanDitolak ?? 0 }}</span>
+                        <span class="text-green-600 font-bold">✓<?php echo e($permintaanDisetujui ?? 0); ?></span> · 
+                        <span class="text-red-600 font-bold">✗<?php echo e($permintaanDitolak ?? 0); ?></span>
                     </p>
                 </div>
                 <div class="h-12 w-12 bg-green-200 group-hover:bg-green-300 rounded-xl flex items-center justify-center transition">
@@ -148,7 +148,7 @@
                     <i class="fas fa-users text-purple-600"></i>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-slate-800">{{ $totalPegawai ?? 0 }}</p>
+                    <p class="text-2xl font-bold text-slate-800"><?php echo e($totalPegawai ?? 0); ?></p>
                     <p class="text-xs text-slate-500">Pegawai</p>
                 </div>
             </div>
@@ -167,7 +167,7 @@
                     <i class="fas fa-layer-group text-teal-600"></i>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-slate-800">{{ $totalKategori ?? 0 }}</p>
+                    <p class="text-2xl font-bold text-slate-800"><?php echo e($totalKategori ?? 0); ?></p>
                     <p class="text-xs text-slate-500">Kategori</p>
                 </div>
             </div>
@@ -186,7 +186,7 @@
                     <i class="fas fa-clipboard-check text-orange-600"></i>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-slate-800">{{ $totalOpname ?? 0 }}</p>
+                    <p class="text-2xl font-bold text-slate-800"><?php echo e($totalOpname ?? 0); ?></p>
                     <p class="text-xs text-slate-500">Opname</p>
                 </div>
             </div>
@@ -205,8 +205,8 @@
                     <i class="fas fa-percentage text-pink-600"></i>
                 </div>
                 <div>
-                    @php $approvalRate = $totalPermintaan > 0 ? round(($permintaanDisetujui / $totalPermintaan) * 100) : 0; @endphp
-                    <p class="text-2xl font-bold text-slate-800">{{ $approvalRate }}%</p>
+                    <?php $approvalRate = $totalPermintaan > 0 ? round(($permintaanDisetujui / $totalPermintaan) * 100) : 0; ?>
+                    <p class="text-2xl font-bold text-slate-800"><?php echo e($approvalRate); ?>%</p>
                     <p class="text-xs text-slate-500">Approval</p>
                 </div>
             </div>
@@ -251,7 +251,7 @@
         <!-- Statistik Bulanan -->
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-5 py-3 border-b border-slate-200">
-                <h3 class="text-sm font-bold text-slate-800">📅 Statistik Bulanan {{ date('Y') }}</h3>
+                <h3 class="text-sm font-bold text-slate-800">📅 Statistik Bulanan <?php echo e(date('Y')); ?></h3>
             </div>
             <div class="p-4">
                 <canvas id="monthlyChart" height="100"></canvas>
@@ -293,28 +293,29 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
-                        @forelse($permintaanTerbaru ?? [] as $permintaan)
+                        <?php $__empty_1 = true; $__currentLoopData = $permintaanTerbaru ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $permintaan): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-yellow-50 transition">
                             <td class="px-4 py-2.5 text-slate-700 font-medium whitespace-nowrap">
-                                <div>{{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('d M') }}</div>
-                                <div class="text-xs text-slate-400">{{ $permintaan->requested_at->timezone('Asia/Jakarta')->format('H:i') }}</div>
+                                <div><?php echo e($permintaan->requested_at->timezone('Asia/Jakarta')->format('d M')); ?></div>
+                                <div class="text-xs text-slate-400"><?php echo e($permintaan->requested_at->timezone('Asia/Jakarta')->format('H:i')); ?></div>
                             </td>
                             <td class="px-4 py-2.5 text-slate-700">
-                                <div class="font-medium text-sm">{{ $permintaan->pegawai->nama_lengkap ?? '-' }}</div>
-                                <div class="text-xs text-slate-400">{{ $permintaan->pegawai->divisi ?? '' }}</div>
+                                <div class="font-medium text-sm"><?php echo e($permintaan->pegawai->nama_lengkap ?? '-'); ?></div>
+                                <div class="text-xs text-slate-400"><?php echo e($permintaan->pegawai->divisi ?? ''); ?></div>
                             </td>
                             <td class="px-4 py-2.5 text-center">
                                 <span class="inline-flex items-center justify-center h-5 w-5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
-                                    {{ $permintaan->pengajuanDetails->count() }}
+                                    <?php echo e($permintaan->pengajuanDetails->count()); ?>
+
                                 </span>
                             </td>
                             <td class="px-4 py-2.5 text-center">
-                                <a href="{{ route('admin.permintaan.index') }}" class="text-blue-600 hover:text-blue-800 font-semibold text-xs">
+                                <a href="<?php echo e(route('admin.permintaan.index')); ?>" class="text-blue-600 hover:text-blue-800 font-semibold text-xs">
                                     Tinjau <i class="fas fa-arrow-right ml-1"></i>
                                 </a>
                             </td>
                         </tr>
-                        @empty
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
                             <td colspan="4" class="px-4 py-6 text-center text-slate-400">
                                 <div class="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -323,17 +324,17 @@
                                 <p class="font-medium text-green-600 text-sm">Semua sudah diproses!</p>
                             </td>
                         </tr>
-                        @endforelse
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
-            @if(($permintaanTerbaru ?? collect())->count() > 0)
+            <?php if(($permintaanTerbaru ?? collect())->count() > 0): ?>
             <div class="px-5 py-2.5 border-t border-slate-200 text-right bg-slate-50">
-                <a href="{{ route('admin.permintaan.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition">
-                    Lihat Semua ({{ $permintaanBaru }}) <i class="fas fa-arrow-right ml-1"></i>
+                <a href="<?php echo e(route('admin.permintaan.index')); ?>" class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition">
+                    Lihat Semua (<?php echo e($permintaanBaru); ?>) <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
-            @endif
+            <?php endif; ?>
         </div>
 
         <!-- Barang Paling Sering Diminta -->
@@ -347,49 +348,51 @@
                 </h3>
             </div>
             <div class="p-3 space-y-2">
-                @forelse($barangTeratas ?? [] as $index => $barang)
+                <?php $__empty_1 = true; $__currentLoopData = $barangTeratas ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $barang): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                 <div class="flex items-center gap-3 p-2.5 bg-gradient-to-r from-slate-50 to-white rounded-lg border border-slate-100 hover:border-orange-200 hover:shadow transition-all duration-200">
                     <div class="flex-shrink-0">
-                        @if($index == 0)
+                        <?php if($index == 0): ?>
                             <span class="inline-flex items-center justify-center h-8 w-8 bg-gradient-to-br from-yellow-400 to-orange-500 text-white text-xs font-bold rounded-full shadow">
                                 🥇
                             </span>
-                        @elseif($index == 1)
+                        <?php elseif($index == 1): ?>
                             <span class="inline-flex items-center justify-center h-8 w-8 bg-gradient-to-br from-slate-300 to-slate-400 text-white text-xs font-bold rounded-full">
                                 🥈
                             </span>
-                        @elseif($index == 2)
+                        <?php elseif($index == 2): ?>
                             <span class="inline-flex items-center justify-center h-8 w-8 bg-gradient-to-br from-amber-600 to-amber-700 text-white text-xs font-bold rounded-full">
                                 🥉
                             </span>
-                        @else
+                        <?php else: ?>
                             <span class="inline-flex items-center justify-center h-8 w-8 bg-blue-600 text-white text-xs font-bold rounded-full">
-                                {{ $index + 1 }}
+                                <?php echo e($index + 1); ?>
+
                             </span>
-                        @endif
+                        <?php endif; ?>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-slate-800 text-sm truncate">{{ $barang->namaBarang ?? 'N/A' }}</p>
+                        <p class="font-semibold text-slate-800 text-sm truncate"><?php echo e($barang->namaBarang ?? 'N/A'); ?></p>
                         <p class="text-xs text-slate-500">
-                            Stok: <span class="font-semibold {{ $barang->stok < 5 ? 'text-red-600' : 'text-green-600' }}">{{ $barang->stok ?? 0 }}</span> {{ $barang->satuan ?? 'unit' }}
+                            Stok: <span class="font-semibold <?php echo e($barang->stok < 5 ? 'text-red-600' : 'text-green-600'); ?>"><?php echo e($barang->stok ?? 0); ?></span> <?php echo e($barang->satuan ?? 'unit'); ?>
+
                         </p>
                     </div>
                     <div class="flex-shrink-0">
                         <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-orange-100 text-orange-800 rounded-lg text-xs font-bold">
                             <i class="fas fa-fire text-orange-500"></i>
-                            {{ $barang->total_permintaan ?? 0 }}x
+                            <?php echo e($barang->total_permintaan ?? 0); ?>x
                         </span>
                     </div>
                 </div>
-                @empty
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                 <div class="text-center py-6 text-slate-400">
                     <i class="fas fa-chart-bar text-2xl mb-2 opacity-50"></i>
                     <p class="text-sm">Belum ada data</p>
                 </div>
-                @endforelse
+                <?php endif; ?>
             </div>
             <div class="px-5 py-2.5 border-t border-slate-200 text-right bg-slate-50">
-                <a href="{{ route('admin.barang.index') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition">
+                <a href="<?php echo e(route('admin.barang.index')); ?>" class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition">
                     Kelola Barang <i class="fas fa-arrow-right ml-1"></i>
                 </a>
             </div>
@@ -401,7 +404,7 @@
     <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl shadow-lg p-5 text-white">
         <h3 class="text-sm font-bold mb-3">⚡ Aksi Cepat</h3>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <a href="{{ route('admin.barang.create') }}" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
+            <a href="<?php echo e(route('admin.barang.create')); ?>" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
                 <div class="h-9 w-9 bg-blue-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
                     <i class="fas fa-plus text-white text-sm"></i>
                 </div>
@@ -410,16 +413,16 @@
                     <p class="text-xs text-slate-400">Input barang baru</p>
                 </div>
             </a>
-            <a href="{{ route('admin.permintaan.index') }}" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
+            <a href="<?php echo e(route('admin.permintaan.index')); ?>" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
                 <div class="h-9 w-9 bg-yellow-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
                     <i class="fas fa-clipboard-list text-white text-sm"></i>
                 </div>
                 <div>
                     <p class="font-semibold text-sm">Proses Permintaan</p>
-                    <p class="text-xs text-slate-400">{{ $permintaanBaru }} menunggu</p>
+                    <p class="text-xs text-slate-400"><?php echo e($permintaanBaru); ?> menunggu</p>
                 </div>
             </a>
-            <a href="{{ route('admin.stock-opname.create') }}" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
+            <a href="<?php echo e(route('admin.stock-opname.create')); ?>" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
                 <div class="h-9 w-9 bg-teal-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
                     <i class="fas fa-clipboard-check text-white text-sm"></i>
                 </div>
@@ -428,7 +431,7 @@
                     <p class="text-xs text-slate-400">Cek stok fisik</p>
                 </div>
             </a>
-            <a href="{{ route('admin.laporan.index') }}" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
+            <a href="<?php echo e(route('admin.laporan.index')); ?>" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-lg transition group">
                 <div class="h-9 w-9 bg-purple-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition">
                     <i class="fas fa-file-alt text-white text-sm"></i>
                 </div>
@@ -473,10 +476,10 @@ const colors = {
 new Chart(document.getElementById('trendChart'), {
     type: 'line',
     data: {
-        labels: {!! json_encode($trendLabels) !!},
+        labels: <?php echo json_encode($trendLabels); ?>,
         datasets: [{
             label: 'Permintaan',
-            data: {!! json_encode($trendHarian) !!},
+            data: <?php echo json_encode($trendHarian); ?>,
             borderColor: colors.primary,
             backgroundColor: colors.primaryLight,
             borderWidth: 2,
@@ -504,7 +507,7 @@ new Chart(document.getElementById('statusChart'), {
     data: {
         labels: ['Menunggu', 'Disetujui', 'Ditolak'],
         datasets: [{
-            data: [{{ $statusDistribution['menunggu'] }}, {{ $statusDistribution['disetujui'] }}, {{ $statusDistribution['ditolak'] }}],
+            data: [<?php echo e($statusDistribution['menunggu']); ?>, <?php echo e($statusDistribution['disetujui']); ?>, <?php echo e($statusDistribution['ditolak']); ?>],
             backgroundColor: [colors.warning, colors.success, colors.danger],
             borderWidth: 0,
             hoverOffset: 8
@@ -522,10 +525,10 @@ new Chart(document.getElementById('statusChart'), {
 new Chart(document.getElementById('monthlyChart'), {
     type: 'bar',
     data: {
-        labels: {!! json_encode($bulanLabels) !!},
+        labels: <?php echo json_encode($bulanLabels); ?>,
         datasets: [{
             label: 'Permintaan',
-            data: {!! json_encode($bulanData) !!},
+            data: <?php echo json_encode($bulanData); ?>,
             backgroundColor: [
                 colors.primary, colors.teal, colors.success, colors.warning,
                 colors.orange, colors.pink, colors.purple, colors.danger,
@@ -550,10 +553,10 @@ new Chart(document.getElementById('monthlyChart'), {
 new Chart(document.getElementById('kategoriChart'), {
     type: 'bar',
     data: {
-        labels: {!! json_encode($stokPerKategori->pluck('nama')) !!},
+        labels: <?php echo json_encode($stokPerKategori->pluck('nama')); ?>,
         datasets: [{
             label: 'Total Stok',
-            data: {!! json_encode($stokPerKategori->pluck('stok')) !!},
+            data: <?php echo json_encode($stokPerKategori->pluck('stok')); ?>,
             backgroundColor: [colors.primary, colors.teal, colors.purple, colors.orange, colors.pink, colors.success],
             borderRadius: 4
         }]
@@ -571,4 +574,5 @@ new Chart(document.getElementById('kategoriChart'), {
 });
 </script>
 
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.admin', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\FILE TINGKAT 3\SEMESTER 5\REKAYASA PERANGKAT LUNAK (RPL)\simantap\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>

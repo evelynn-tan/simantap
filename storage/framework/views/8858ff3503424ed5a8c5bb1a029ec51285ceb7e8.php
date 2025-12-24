@@ -1,20 +1,20 @@
-@extends('layouts.pegawai-layout')
 
-@section('title', 'Daftar Barang Tersedia - SIMANTAP')
-@section('page-title', 'Daftar Barang Tersedia')
-@section('page-subtitle', 'Lihat dan ajukan permintaan untuk barang yang tersedia')
 
-@push('styles')
+<?php $__env->startSection('title', 'Daftar Barang Tersedia - SIMANTAP'); ?>
+<?php $__env->startSection('page-title', 'Daftar Barang Tersedia'); ?>
+<?php $__env->startSection('page-subtitle', 'Lihat dan ajukan permintaan untuk barang yang tersedia'); ?>
+
+<?php $__env->startPush('styles'); ?>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div x-data="barangPage()">
 
-    {{-- Header Banner with Search & Filter --}}
+    
     <div class="mb-6">
         <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
 
-                {{-- Search & Filter --}}
+                
                 <div class="flex flex-wrap items-center gap-2">
                     <div class="relative">
                         <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
@@ -46,9 +46,9 @@
                         class="px-4 py-2 border-0 rounded-lg text-sm text-slate-700"
                     >
                         <option value="">Semua Kategori</option>
-                        @foreach($kategoris ?? [] as $k)
-                            <option value="{{ $k->categoryID }}">{{ $k->nama_kategori }}</option>
-                        @endforeach
+                        <?php $__currentLoopData = $kategoris ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <option value="<?php echo e($k->categoryID); ?>"><?php echo e($k->nama_kategori); ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </select>
                     <button @click="resetFilters" class="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium transition flex items-center gap-2">
                         <i class="fas fa-undo"></i> Reset
@@ -56,7 +56,7 @@
                 </div>
             </div>
 
-            {{-- Active Filters Display --}}
+            
             <div x-show="currentSort || searchQuery || kategoriFilter" class="mt-4 flex flex-wrap items-center gap-2">
                 <span class="text-emerald-200 text-xs">Filter aktif:</span>
                 <template x-if="currentSort">
@@ -68,7 +68,7 @@
         </div>
     </div>
 
-    {{-- Table --}}
+    
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full">
@@ -102,58 +102,63 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    @forelse($barangs as $barang)
-                    @php
+                    <?php $__empty_1 = true; $__currentLoopData = $barangs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $barang): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <?php
                         // Calculate pending requests for this item by current user
                         $pendingQty = \App\Models\PengajuanDetail::whereHas('pengajuan', function($q) use ($pegawai) {
                             $q->where('pegawaiID', $pegawai->pegawaiID)->where('status', 'menunggu');
                         })->where('barangID', $barang->barangID)->sum('jumlah');
                         $availableStock = $barang->stok - $pendingQty;
                         if ($availableStock < 0) $availableStock = 0;
-                    @endphp
+                    ?>
                     <tr class="hover:bg-slate-50 transition">
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 font-mono">
-                                {{ $barang->kode_barang }}
+                                <?php echo e($barang->kode_barang); ?>
+
                             </span>
                         </td>
                         <td class="px-6 py-4 text-sm font-semibold text-slate-800">
-                            {{ $barang->namaBarang }}
+                            <?php echo e($barang->namaBarang); ?>
+
                         </td>
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-emerald-50 text-emerald-700">
-                                <i class="fas fa-folder mr-1.5"></i>{{ $barang->kategori->nama_kategori ?? '-' }}
+                                <i class="fas fa-folder mr-1.5"></i><?php echo e($barang->kategori->nama_kategori ?? '-'); ?>
+
                             </span>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            @if($barang->stok > 10)
+                            <?php if($barang->stok > 10): ?>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                                    <i class="fas fa-cubes mr-1.5"></i>{{ $barang->stok }} {{ $barang->satuan }}
+                                    <i class="fas fa-cubes mr-1.5"></i><?php echo e($barang->stok); ?> <?php echo e($barang->satuan); ?>
+
                                 </span>
-                            @elseif($barang->stok > 0)
+                            <?php elseif($barang->stok > 0): ?>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                                    <i class="fas fa-cubes mr-1.5"></i>{{ $barang->stok }} {{ $barang->satuan }}
+                                    <i class="fas fa-cubes mr-1.5"></i><?php echo e($barang->stok); ?> <?php echo e($barang->satuan); ?>
+
                                 </span>
-                            @else
+                            <?php else: ?>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
                                     <i class="fas fa-times-circle mr-1.5"></i>Habis
                                 </span>
-                            @endif
+                            <?php endif; ?>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            @if($barang->stok > 0)
+                            <?php if($barang->stok > 0): ?>
                             <button 
-                                @click='openModal(@json($barang), {{ $pendingQty }}, {{ $availableStock }})'
+                                @click='openModal(<?php echo json_encode($barang, 15, 512) ?>, <?php echo e($pendingQty); ?>, <?php echo e($availableStock); ?>)'
                                 class="inline-flex items-center px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-sm transition"
                             >
                                 <i class="fas fa-paper-plane mr-1.5"></i> Ajukan
                             </button>
-                            @else
+                            <?php else: ?>
                             <span class="text-slate-400 text-xs">Tidak tersedia</span>
-                            @endif
+                            <?php endif; ?>
                         </td>
                     </tr>
-                    @empty
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                     <tr>
                         <td colspan="5" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center">
@@ -162,21 +167,22 @@
                             </div>
                         </td>
                     </tr>
-                    @endforelse
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
 
-        {{-- Pagination --}}
-        @if(method_exists($barangs, 'links'))
+        
+        <?php if(method_exists($barangs, 'links')): ?>
         <div class="px-6 py-4 border-t bg-slate-50">
-            {{ $barangs->appends(request()->query())->links() }}
+            <?php echo e($barangs->appends(request()->query())->links()); ?>
+
         </div>
-        @endif
+        <?php endif; ?>
     </div>
 
 
-    {{-- ===================== MODAL AJUKAN BARANG ===================== --}}
+    
     <div 
         x-show="isModalOpen"
         class="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -217,12 +223,12 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('pegawai.permintaan.ajukan') }}">
-                @csrf
+            <form method="POST" action="<?php echo e(route('pegawai.permintaan.ajukan')); ?>">
+                <?php echo csrf_field(); ?>
                 <input type="hidden" name="items[0][barangID]" x-bind:value="selectedBarang.barangID">
                 
                 <div class="p-6">
-                    {{-- Info Barang --}}
+                    
                     <div class="mb-5 p-4 bg-emerald-50 rounded-xl border border-emerald-100">
                         <p class="text-xs font-bold text-emerald-600 uppercase mb-1">Barang Dipilih</p>
                         <h4 class="font-bold text-slate-800 text-lg" x-text="selectedBarang.namaBarang"></h4>
@@ -231,7 +237,7 @@
                         </p>
                     </div>
 
-                    {{-- Warning: Pending Requests --}}
+                    
                     <div x-show="pendingQty > 0" class="mb-5 p-4 bg-amber-50 rounded-xl border border-amber-200">
                         <div class="flex items-start gap-3">
                             <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
@@ -245,7 +251,7 @@
                         </div>
                     </div>
 
-                    {{-- Stok Info --}}
+                    
                     <div class="mb-5">
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Stok Tersedia</label>
                         <input type="text" 
@@ -255,7 +261,7 @@
                         >
                     </div>
 
-                    {{-- Jumlah dengan +/- buttons --}}
+                    
                     <div class="mb-5">
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Jumlah Diajukan</label>
                         <div class="flex items-center gap-2 sm:gap-3">
@@ -283,7 +289,7 @@
                         </p>
                     </div>
 
-                    {{-- Keperluan --}}
+                    
                     <div class="mb-5">
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Keperluan</label>
                         <textarea 
@@ -295,7 +301,7 @@
                         ></textarea>
                     </div>
 
-                    {{-- Buttons --}}
+                    
                     <div class="flex gap-3">
                         <button type="button" @click="closeModal" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-lg transition">
                             Batal
@@ -314,7 +320,7 @@
 
 </div>
 
-{{-- JavaScript --}}
+
 <script>
 function barangPage() {
     return {
@@ -325,10 +331,10 @@ function barangPage() {
         formData: {
             jumlah: 1,
         },
-        searchQuery: "{{ request('search', '') }}",
-        kategoriFilter: "{{ request('kategori', '') }}",
-        currentSort: "{{ request('sort', '') }}",
-        currentDirection: "{{ request('direction', 'asc') }}",
+        searchQuery: "<?php echo e(request('search', '')); ?>",
+        kategoriFilter: "<?php echo e(request('kategori', '')); ?>",
+        currentSort: "<?php echo e(request('sort', '')); ?>",
+        currentDirection: "<?php echo e(request('direction', 'asc')); ?>",
 
         get sortLabel() {
             const labels = {
@@ -412,7 +418,7 @@ function barangPage() {
             this.kategoriFilter = '';
             this.currentSort = '';
             this.currentDirection = 'asc';
-            window.location.href = "{{ route('pegawai.daftar-barang') }}";
+            window.location.href = "<?php echo e(route('pegawai.daftar-barang')); ?>";
         },
 
         applyFilters() {
@@ -423,9 +429,10 @@ function barangPage() {
                 params.set('sort', this.currentSort);
                 params.set('direction', this.currentDirection);
             }
-            window.location.href = "{{ route('pegawai.daftar-barang') }}?" + params.toString();
+            window.location.href = "<?php echo e(route('pegawai.daftar-barang')); ?>?" + params.toString();
         }
     }
 }
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.pegawai-layout', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH E:\FILE TINGKAT 3\SEMESTER 5\REKAYASA PERANGKAT LUNAK (RPL)\simantap\resources\views/pegawai/daftar-barang.blade.php ENDPATH**/ ?>

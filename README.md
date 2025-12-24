@@ -245,11 +245,16 @@ Buka browser dan akses: **http://localhost:8000**
 # Build assets untuk production
 npm run build
 
+# Jalankan migrasi (PENTING: setiap kali pull update!)
+php artisan migrate --force
+
 # Optimasi Laravel
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 ```
+
+> ⚠️ **PENTING**: Setelah setiap `git pull`, WAJIB jalankan `php artisan migrate --force` untuk update database schema!
 
 ---
 
