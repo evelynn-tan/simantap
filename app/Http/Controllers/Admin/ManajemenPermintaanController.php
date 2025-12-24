@@ -40,7 +40,6 @@ class ManajemenPermintaanController extends Controller
      * - Set status pengajuan = 'disetujui'
      * - Set per-item status = 'disetujui'
      * - Kurangi stok barang (dengan validasi dan partial approval)
-     * - BARU: Catat histori transaksi barang keluar
      */
     public function setujui(Request $request, Pengajuan $pengajuan)
     {
@@ -158,7 +157,7 @@ class ManajemenPermintaanController extends Controller
             });
 
             return redirect()->route('admin.permintaan.index')
-                ->with('success', 'Pengajuan telah diproses dan histori transaksi tercatat.');
+                ->with('success', 'Pengajuan telah diproses dan stok berhasil dikurangi.');
 
         } catch (\Exception $e) {
             return redirect()->route('admin.permintaan.index')
