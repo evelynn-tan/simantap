@@ -19,17 +19,28 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         [x-cloak] { display: none !important; }
         
-        /* Auto-dismiss alerts */
+        /* Auto-dismiss alerts with height collapse */
         .alert-auto-hide {
-            animation: fadeInOut 6s ease-in-out forwards;
+            animation: fadeInOut 5s ease-in-out forwards;
+            overflow: hidden;
         }
         @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(-20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            85% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); pointer-events: none; }
+            0% { opacity: 0; transform: translateY(-20px); max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; }
+            8% { opacity: 1; transform: translateY(0); max-height: 200px; margin-bottom: 1rem; padding-top: 0.75rem; padding-bottom: 0.75rem; }
+            85% { opacity: 1; transform: translateY(0); max-height: 200px; margin-bottom: 1rem; padding-top: 0.75rem; padding-bottom: 0.75rem; }
+            100% { opacity: 0; transform: translateY(-10px); max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; }
         }
     </style>
+    <script>
+        // Remove alert elements after animation completes
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.alert-auto-hide').forEach(function(el) {
+                el.addEventListener('animationend', function() {
+                    this.remove();
+                });
+            });
+        });
+    </script>
 </head>
 <body class="bg-slate-50" style="font-family: 'Poppins', sans-serif;">
 

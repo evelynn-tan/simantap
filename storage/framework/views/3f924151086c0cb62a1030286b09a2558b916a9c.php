@@ -9,15 +9,7 @@
 <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     
-    .alert-auto-hide {
-        animation: fadeInOut 5s ease-in-out forwards;
-    }
-    @keyframes fadeInOut {
-        0% { opacity: 0; transform: translateY(-20px); }
-        10% { opacity: 1; transform: translateY(0); }
-        90% { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(-20px); }
-    }
+    /* Override: auto-hide with height collapse is now in layout */
 </style>
 <?php $__env->stopPush(); ?>
 
